@@ -9,7 +9,7 @@ const {
   verifyPassword,
   hashToken,
 } = require("../services/authService");
-const { requireAuth } = require("../middleware/auth");
+const { AUTH_COOKIE_NAME, requireAuth } = require("../middleware/auth");
 const { removeAvatarByUrl, saveAvatarFromDataUrl } = require("../services/avatarService");
 const { calculateNavyBodyFat } = require("../services/bodyFatService");
 
@@ -37,6 +37,25 @@ async function createSession(userId, provider = "password", requestIp = null) {
     },
   });
   return sessionToken;
+}
+
+function getSessionCookieOptions() {
+  const isProduction = process.env.NODE_ENV === "production";
+  return {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    path: "/",
+    maxAge: 1000 * 60 * 60 * 24 * 30,
+  };
+}
+
+function setSessionCookie(res, rawToken) {
+  res.cookie(AUTH_COOKIE_NAME, rawToken, getSessionCookieOptions());
+}
+
+function clearSessionCookie(res) {
+  res.clearCookie(AUTH_COOKIE_NAME, getSessionCookieOptions());
 }
 
 async function syncUserBodyMetrics(userId) {
@@ -523,9 +542,9 @@ router.post("/register", async (req, res) => {
     });
 
     const session = await createSession(user.id, "password", getRequestIp(req));
+    setSessionCookie(res, session.rawToken);
 
     return res.status(201).json({
-      token: session.rawToken,
       user: sanitizeUser(user),
     });
   } catch (error) {
@@ -554,8 +573,8 @@ router.post("/login", async (req, res) => {
     });
 
     const session = await createSession(user.id, "password", requestIp);
+    setSessionCookie(res, session.rawToken);
     return res.json({
-      token: session.rawToken,
       user: sanitizeUser(user),
     });
   } catch (error) {
@@ -606,8 +625,8 @@ router.post("/google", async (req, res) => {
     }
 
     const session = await createSession(user.id, "google", getRequestIp(req));
+    setSessionCookie(res, session.rawToken);
     return res.json({
-      token: session.rawToken,
       user: sanitizeUser(user),
     });
   } catch (error) {
@@ -620,6 +639,7 @@ router.post("/logout", requireAuth, async (req, res) => {
     await prisma.authSession.deleteMany({
       where: { tokenHash: req.authSession.tokenHash },
     });
+    clearSessionCookie(res);
     return res.json({ ok: true });
   } catch (error) {
     return res.status(500).json({ error: error.message });

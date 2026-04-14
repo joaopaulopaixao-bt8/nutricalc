@@ -1,6 +1,7 @@
 const prisma = require("../lib/prisma");
 const { hashToken, sanitizeUser } = require("../services/authService");
 const ACCESS_AUDIT_WINDOW_MS = 1000 * 60 * 15;
+const AUTH_COOKIE_NAME = "nutricalc_session";
 
 function getRequestIp(req) {
   const forwarded = req.headers["x-forwarded-for"];
@@ -10,10 +11,26 @@ function getRequestIp(req) {
   return req.ip || req.socket?.remoteAddress || null;
 }
 
+function getCookieValue(req, name) {
+  const cookieHeader = req.headers.cookie || "";
+  if (!cookieHeader) return "";
+
+  const cookies = cookieHeader.split(";");
+  for (const rawCookie of cookies) {
+    const [rawName, ...rest] = rawCookie.split("=");
+    if (!rawName || rest.length === 0) continue;
+    if (rawName.trim() !== name) continue;
+    return decodeURIComponent(rest.join("=").trim());
+  }
+
+  return "";
+}
+
 async function attachAuthUser(req, res, next) {
   try {
     const authHeader = req.headers.authorization || "";
-    const [, rawToken] = authHeader.match(/^Bearer\s+(.+)$/i) || [];
+    const [, bearerToken] = authHeader.match(/^Bearer\s+(.+)$/i) || [];
+    const rawToken = bearerToken || getCookieValue(req, AUTH_COOKIE_NAME);
 
     if (!rawToken) {
       req.authUser = null;
@@ -72,6 +89,7 @@ function requireAuth(req, res, next) {
 }
 
 module.exports = {
+  AUTH_COOKIE_NAME,
   attachAuthUser,
   requireAuth,
 };

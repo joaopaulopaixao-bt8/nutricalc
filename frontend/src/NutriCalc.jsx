@@ -16,13 +16,11 @@ import {
   fetchCurrentUser,
   generateDiet as generateDietRequest,
   getDiet,
-  getStoredAuthToken,
   loginUser,
   loginWithGoogle,
   logoutUser,
   requestPasswordReset,
   registerUser,
-  setStoredAuthToken,
   updateBodyMetric,
   updateCurrentUser,
 } from "./api.js";
@@ -835,8 +833,7 @@ export default function NutriCalc() {
   const numericAge = Number(ud.age) || 0;
 
   const applyAuthPayload = useCallback((payload) => {
-    if (!payload?.token || !payload?.user) return;
-    setStoredAuthToken(payload.token);
+    if (!payload?.user) return;
     setAuthUser(payload.user);
     setUserName((current) => current || payload.user.name || "");
     setAuthError("");
@@ -928,13 +925,8 @@ export default function NutriCalc() {
 
   useEffect(() => {
     let cancelled = false;
-    const token = getStoredAuthToken();
 
     async function loadCurrentUser() {
-      if (!token) {
-        if (!cancelled) setAuthBootstrapLoading(false);
-        return;
-      }
       try {
         const payload = await fetchCurrentUser();
         if (!cancelled && payload?.user) {
@@ -966,7 +958,6 @@ export default function NutriCalc() {
           }));
         }
       } catch (error) {
-        setStoredAuthToken("");
         if (!cancelled) {
           setAuthUser(null);
         }
@@ -1422,9 +1413,8 @@ export default function NutriCalc() {
     try {
       await logoutUser();
     } catch (error) {
-      // We still clear the local token to avoid trapping the session in the UI.
+      // Even if logout fails, clear the in-memory session state to avoid trapping the UI.
     } finally {
-      setStoredAuthToken("");
       setAuthUser(null);
       setAuthMode("login");
       setAuthError("");
