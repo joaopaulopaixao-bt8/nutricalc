@@ -137,14 +137,14 @@ router.patch("/me", requireAuth, async (req, res) => {
     }
 
     if (removeAvatar) {
-      removeAvatarByUrl(currentUser.avatarUrl);
+      await removeAvatarByUrl(currentUser.avatarUrl);
       data.avatarUrl = null;
     }
 
     if (avatarDataUrl) {
-      const savedAvatarUrl = saveAvatarFromDataUrl(avatarDataUrl, req.authUser.id);
+      const savedAvatarUrl = await saveAvatarFromDataUrl(avatarDataUrl, req.authUser.id);
       if (currentUser.avatarUrl) {
-        removeAvatarByUrl(currentUser.avatarUrl);
+        await removeAvatarByUrl(currentUser.avatarUrl);
       }
       data.avatarUrl = savedAvatarUrl;
     }

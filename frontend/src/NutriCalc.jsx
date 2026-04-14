@@ -1411,7 +1411,7 @@ export default function NutriCalc() {
       setAuthNotice(
         payload?.devResetToken
           ? `Token de teste gerado: ${payload.devResetToken}`
-          : "Pedido de recuperacao registrado. Quando o envio por email for ativado, o link saira por la.",
+          : "Enviamos um email de recuperacao para o endereco cadastrado.",
       );
     } catch (error) {
       setAuthError(error.message);
@@ -2622,8 +2622,12 @@ function AuthModal({
         </div>
 
         <div style={{display:"flex",gap:8,marginBottom:18}}>
-          <button onClick={() => onChangeMode("login")} style={{...pB,flex:1,background:authMode==="login"?"rgba(132,204,22,0.15)":"rgba(255,255,255,0.03)",borderColor:authMode==="login"?"#84cc16":"rgba(255,255,255,0.08)",color:authMode==="login"?"#a3e635":"#cbd5e1"}}>Entrar</button>
-          <button onClick={() => onChangeMode("register")} style={{...pB,flex:1,background:authMode==="register"?"rgba(132,204,22,0.15)":"rgba(255,255,255,0.03)",borderColor:authMode==="register"?"#84cc16":"rgba(255,255,255,0.08)",color:authMode==="register"?"#a3e635":"#cbd5e1"}}>Criar conta</button>
+          {authMode !== "reset" && (
+            <>
+              <button onClick={() => onChangeMode("login")} style={{...pB,flex:1,background:authMode==="login"?"rgba(132,204,22,0.15)":"rgba(255,255,255,0.03)",borderColor:authMode==="login"?"#84cc16":"rgba(255,255,255,0.08)",color:authMode==="login"?"#a3e635":"#cbd5e1"}}>Entrar</button>
+              <button onClick={() => onChangeMode("register")} style={{...pB,flex:1,background:authMode==="register"?"rgba(132,204,22,0.15)":"rgba(255,255,255,0.03)",borderColor:authMode==="register"?"#84cc16":"rgba(255,255,255,0.08)",color:authMode==="register"?"#a3e635":"#cbd5e1"}}>Criar conta</button>
+            </>
+          )}
         </div>
 
         {authMode === "reset" && (

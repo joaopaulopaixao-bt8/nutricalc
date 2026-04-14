@@ -18,6 +18,9 @@ Defina estas variáveis:
 - `RESET_PASSWORD_URL`
 - `RESEND_API_KEY`
 - `RESEND_FROM_EMAIL`
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_AVATAR_BUCKET`
 - `NODE_ENV=production`
 
 Notas:
@@ -27,6 +30,8 @@ Notas:
 - `GOOGLE_CLIENT_ID` pode ficar vazio no primeiro deploy se vocês ainda não forem ativar o login Google.
 - `RESET_PASSWORD_URL` pode ser a mesma URL pública do frontend.
 - `RESEND_FROM_EMAIL` precisa ser um remetente válido configurado no Resend.
+- `SUPABASE_SERVICE_ROLE_KEY` deve ficar somente no backend/Render.
+- `SUPABASE_AVATAR_BUCKET` pode ser `avatars`.
 
 Build command sugerido:
 
