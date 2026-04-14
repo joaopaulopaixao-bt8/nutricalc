@@ -21,6 +21,7 @@ import {
   logoutUser,
   requestPasswordReset,
   registerUser,
+  resetPassword,
   updateBodyMetric,
   updateCurrentUser,
 } from "./api.js";
@@ -732,6 +733,9 @@ export default function NutriCalc() {
     email: "",
     password: "",
     resetEmail: "",
+    resetToken: "",
+    newPassword: "",
+    confirmPassword: "",
   });
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
@@ -815,6 +819,10 @@ export default function NutriCalc() {
   const [generateError, setGenerateError] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || import.meta.env.GOOGLE_CLIENT_ID || "";
+  const resetTokenFromUrl = useMemo(() => {
+    if (typeof window === "undefined") return "";
+    return new URLSearchParams(window.location.search).get("resetToken") || "";
+  }, []);
   const themeVars = getThemeVars();
   const derivedProfileAge = getAgeFromBirthDate(profileForm.birthDate || authUser?.birthDate || "");
   const isProfileSetupRequired = Boolean(authUser) && (
@@ -843,6 +851,9 @@ export default function NutriCalc() {
       email: payload.user.email || "",
       password: "",
       resetEmail: payload.user.email || "",
+      resetToken: "",
+      newPassword: "",
+      confirmPassword: "",
     });
     setProfileForm({
       name: payload.user.name || "",
@@ -973,6 +984,20 @@ export default function NutriCalc() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!resetTokenFromUrl) return;
+    setAuthMode("reset");
+    setAuthForm((prev) => ({
+      ...prev,
+      resetToken: resetTokenFromUrl,
+      password: "",
+      newPassword: "",
+      confirmPassword: "",
+    }));
+    setAuthError("");
+    setAuthNotice("");
+  }, [resetTokenFromUrl]);
 
   useEffect(() => {
     document.title = authUser ? "NutriCalc" : "NutriCalc | Acesso";
@@ -1394,6 +1419,48 @@ export default function NutriCalc() {
       setAuthLoading(false);
     }
   }, [authForm.email, authForm.resetEmail]);
+
+  const handleResetPasswordSubmit = useCallback(async () => {
+    setAuthLoading(true);
+    setAuthError("");
+    setAuthNotice("");
+    try {
+      if (!authForm.resetToken) {
+        throw new Error("Token de redefinicao ausente.");
+      }
+      if (!authForm.newPassword || authForm.newPassword.length < 6) {
+        throw new Error("A nova senha precisa ter pelo menos 6 caracteres.");
+      }
+      if (authForm.newPassword !== authForm.confirmPassword) {
+        throw new Error("As senhas nao conferem.");
+      }
+
+      await resetPassword({
+        token: authForm.resetToken,
+        password: authForm.newPassword,
+      });
+
+      if (typeof window !== "undefined") {
+        const cleanUrl = new URL(window.location.href);
+        cleanUrl.searchParams.delete("resetToken");
+        window.history.replaceState({}, "", cleanUrl.toString());
+      }
+
+      setAuthMode("login");
+      setAuthForm((prev) => ({
+        ...prev,
+        password: "",
+        resetToken: "",
+        newPassword: "",
+        confirmPassword: "",
+      }));
+      setAuthNotice("Senha redefinida com sucesso. Agora voce ja pode entrar.");
+    } catch (error) {
+      setAuthError(error.message);
+    } finally {
+      setAuthLoading(false);
+    }
+  }, [authForm.confirmPassword, authForm.newPassword, authForm.resetToken]);
 
   const handleGoogleLogin = useCallback(async (credential) => {
     setAuthLoading(true);
@@ -1922,6 +1989,7 @@ export default function NutriCalc() {
         }}
         onGoogleCredential={handleGoogleLogin}
         onPasswordReset={handlePasswordReset}
+        onResetPasswordSubmit={handleResetPasswordSubmit}
         onSubmit={handleAuthSubmit}
         themeVars={themeVars}
         onUpdateField={updateAuthForm}
@@ -2482,6 +2550,7 @@ function AuthModal({
   onChangeMode,
   onGoogleCredential,
   onPasswordReset,
+  onResetPasswordSubmit,
   onSubmit,
   themeVars,
   onUpdateField,
@@ -2557,58 +2626,86 @@ function AuthModal({
           <button onClick={() => onChangeMode("register")} style={{...pB,flex:1,background:authMode==="register"?"rgba(132,204,22,0.15)":"rgba(255,255,255,0.03)",borderColor:authMode==="register"?"#84cc16":"rgba(255,255,255,0.08)",color:authMode==="register"?"#a3e635":"#cbd5e1"}}>Criar conta</button>
         </div>
 
-        {authMode === "register" && (
+        {authMode === "reset" && (
+          <>
+            <div style={{marginBottom:14}}>
+              <label style={lS}>Nova senha</label>
+              <input type="password" value={authForm.newPassword} onChange={(e) => onUpdateField("newPassword", e.target.value)} placeholder="Digite a nova senha" style={iS} />
+            </div>
+            <div style={{marginBottom:14}}>
+              <label style={lS}>Confirmar senha</label>
+              <input type="password" value={authForm.confirmPassword} onChange={(e) => onUpdateField("confirmPassword", e.target.value)} placeholder="Repita a nova senha" style={iS} />
+            </div>
+
+            {authError && <div style={{marginBottom:12,padding:"10px 12px",borderRadius:10,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",color:"#fca5a5",fontSize:13}}>{authError}</div>}
+            {authNotice && <div style={{marginBottom:12,padding:"10px 12px",borderRadius:10,background:"rgba(132,204,22,0.08)",border:"1px solid rgba(132,204,22,0.2)",color:"#d9f99d",fontSize:13}}>{authNotice}</div>}
+
+            <button onClick={onResetPasswordSubmit} disabled={authLoading} style={{...nBS,width:"100%",marginBottom:12,opacity:authLoading?0.65:1}}>
+              {authLoading ? "Processando..." : "Redefinir senha"}
+            </button>
+
+            <button onClick={() => onChangeMode("login")} style={{...pB,width:"100%",padding:"12px 16px",borderColor:"rgba(255,255,255,0.12)",color:"#cbd5e1"}}>
+              Voltar para login
+            </button>
+          </>
+        )}
+
+        {authMode !== "reset" && authMode === "register" && (
           <div style={{marginBottom:14}}>
             <label style={lS}>Nome</label>
             <input value={authForm.name} onChange={(e) => onUpdateField("name", e.target.value)} placeholder="Digite seu nome" style={iS} />
           </div>
         )}
-        <div style={{marginBottom:14}}>
-          <label style={lS}>Email</label>
-          <input value={authForm.email} onChange={(e) => onUpdateField("email", e.target.value)} placeholder="Digite seu email" style={iS} />
-        </div>
-        <div style={{marginBottom:14}}>
-          <label style={lS}>Senha</label>
-          <input type="password" value={authForm.password} onChange={(e) => onUpdateField("password", e.target.value)} placeholder="Digite sua senha" style={iS} />
-        </div>
-
-        {authError && <div style={{marginBottom:12,padding:"10px 12px",borderRadius:10,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",color:"#fca5a5",fontSize:13}}>{authError}</div>}
-        {authNotice && <div style={{marginBottom:12,padding:"10px 12px",borderRadius:10,background:"rgba(132,204,22,0.08)",border:"1px solid rgba(132,204,22,0.2)",color:"#d9f99d",fontSize:13}}>{authNotice}</div>}
-
-        <button onClick={onSubmit} disabled={authLoading} style={{...nBS,width:"100%",marginBottom:12,opacity:authLoading?0.65:1}}>
-          {authLoading ? "Processando..." : authMode === "register" ? "Criar conta" : "Entrar"}
-        </button>
-
-        <div style={{display:"flex",alignItems:"center",gap:12,margin:"16px 0",color:"#64748b",fontSize:11,textTransform:"uppercase",letterSpacing:"0.1em"}}>
-          <div style={{flex:1,height:1,background:"rgba(255,255,255,0.08)"}} />
-          ou
-          <div style={{flex:1,height:1,background:"rgba(255,255,255,0.08)"}} />
-        </div>
-
-        {googleClientId ? (
-          <div ref={googleButtonRef} style={{display:"flex",justifyContent:"center",minHeight:44,marginBottom:10}} />
-        ) : (
-          <div style={{marginBottom:10,padding:"10px 12px",borderRadius:10,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",color:"#94a3b8",fontSize:12}}>
-            Login com Google preparado. Basta definir <code>VITE_GOOGLE_CLIENT_ID</code> no frontend e <code>GOOGLE_CLIENT_ID</code> no backend.
-          </div>
-        )}
-
-        <div style={{marginTop:14,paddingTop:14,borderTop:"1px solid rgba(255,255,255,0.08)"}}>
-          <div style={{fontSize:12,fontWeight:700,color:"#cbd5e1",marginBottom:8}}>Recuperação de senha</div>
-          <div style={{display:"flex",gap:8,alignItems:"end",flexWrap:"wrap"}}>
-            <div style={{flex:1,minWidth:180}}>
-              <label style={lS}>Email para recuperação</label>
-              <input value={authForm.resetEmail} onChange={(e) => onUpdateField("resetEmail", e.target.value)} placeholder="Digite seu email" style={iS} />
+        {authMode !== "reset" && (
+          <>
+            <div style={{marginBottom:14}}>
+              <label style={lS}>Email</label>
+              <input value={authForm.email} onChange={(e) => onUpdateField("email", e.target.value)} placeholder="Digite seu email" style={iS} />
             </div>
-            <button onClick={onPasswordReset} disabled={authLoading} style={{...pB,padding:"12px 16px",borderColor:"rgba(132,204,22,0.2)",color:"#a3e635",background:"rgba(132,204,22,0.08)"}}>
-              Gerar link
-            </button>
-          </div>
-        </div>
+            <div style={{marginBottom:14}}>
+              <label style={lS}>Senha</label>
+              <input type="password" value={authForm.password} onChange={(e) => onUpdateField("password", e.target.value)} placeholder="Digite sua senha" style={iS} />
+            </div>
 
-        <div style={{marginTop:14,padding:"10px 12px",borderRadius:10,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",color:"#94a3b8",fontSize:12}}>
-          Seus dados de saúde e histórico ficam vinculados apenas à sua conta. Quando formos publicar externamente, o envio real de email, domínio público e políticas de privacidade entram no checklist de produção.
-        </div>
+            {authError && <div style={{marginBottom:12,padding:"10px 12px",borderRadius:10,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",color:"#fca5a5",fontSize:13}}>{authError}</div>}
+            {authNotice && <div style={{marginBottom:12,padding:"10px 12px",borderRadius:10,background:"rgba(132,204,22,0.08)",border:"1px solid rgba(132,204,22,0.2)",color:"#d9f99d",fontSize:13}}>{authNotice}</div>}
+
+            <button onClick={onSubmit} disabled={authLoading} style={{...nBS,width:"100%",marginBottom:12,opacity:authLoading?0.65:1}}>
+              {authLoading ? "Processando..." : authMode === "register" ? "Criar conta" : "Entrar"}
+            </button>
+
+            <div style={{display:"flex",alignItems:"center",gap:12,margin:"16px 0",color:"#64748b",fontSize:11,textTransform:"uppercase",letterSpacing:"0.1em"}}>
+              <div style={{flex:1,height:1,background:"rgba(255,255,255,0.08)"}} />
+              ou
+              <div style={{flex:1,height:1,background:"rgba(255,255,255,0.08)"}} />
+            </div>
+
+            {googleClientId ? (
+              <div ref={googleButtonRef} style={{display:"flex",justifyContent:"center",minHeight:44,marginBottom:10}} />
+            ) : (
+              <div style={{marginBottom:10,padding:"10px 12px",borderRadius:10,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",color:"#94a3b8",fontSize:12}}>
+                Login com Google preparado. Basta definir <code>VITE_GOOGLE_CLIENT_ID</code> no frontend e <code>GOOGLE_CLIENT_ID</code> no backend.
+              </div>
+            )}
+
+            <div style={{marginTop:14,paddingTop:14,borderTop:"1px solid rgba(255,255,255,0.08)"}}>
+              <div style={{fontSize:12,fontWeight:700,color:"#cbd5e1",marginBottom:8}}>Recuperação de senha</div>
+              <div style={{display:"flex",gap:8,alignItems:"end",flexWrap:"wrap"}}>
+                <div style={{flex:1,minWidth:180}}>
+                  <label style={lS}>Email para recuperação</label>
+                  <input value={authForm.resetEmail} onChange={(e) => onUpdateField("resetEmail", e.target.value)} placeholder="Digite seu email" style={iS} />
+                </div>
+                <button onClick={onPasswordReset} disabled={authLoading} style={{...pB,padding:"12px 16px",borderColor:"rgba(132,204,22,0.2)",color:"#a3e635",background:"rgba(132,204,22,0.08)"}}>
+                  Gerar link
+                </button>
+              </div>
+            </div>
+
+            <div style={{marginTop:14,padding:"10px 12px",borderRadius:10,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",color:"#94a3b8",fontSize:12}}>
+              Seus dados de saúde e histórico ficam vinculados apenas à sua conta. Quando formos publicar externamente, o envio real de email, domínio público e políticas de privacidade entram no checklist de produção.
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

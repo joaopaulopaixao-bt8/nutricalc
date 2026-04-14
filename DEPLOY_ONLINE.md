@@ -15,6 +15,9 @@ Defina estas variáveis:
 - `DATABASE_URL`
 - `FRONTEND_URL`
 - `GOOGLE_CLIENT_ID`
+- `RESET_PASSWORD_URL`
+- `RESEND_API_KEY`
+- `RESEND_FROM_EMAIL`
 - `NODE_ENV=production`
 
 Notas:
@@ -22,6 +25,8 @@ Notas:
 - `DATABASE_URL` deve ser a connection string do Supabase em modo pooled ou direct, conforme o ambiente de vocês.
 - `FRONTEND_URL` deve ser a URL final publicada na Vercel.
 - `GOOGLE_CLIENT_ID` pode ficar vazio no primeiro deploy se vocês ainda não forem ativar o login Google.
+- `RESET_PASSWORD_URL` pode ser a mesma URL pública do frontend.
+- `RESEND_FROM_EMAIL` precisa ser um remetente válido configurado no Resend.
 
 Build command sugerido:
 

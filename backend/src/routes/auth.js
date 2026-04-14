@@ -12,6 +12,7 @@ const {
 const { AUTH_COOKIE_NAME, requireAuth } = require("../middleware/auth");
 const { removeAvatarByUrl, saveAvatarFromDataUrl } = require("../services/avatarService");
 const { calculateNavyBodyFat } = require("../services/bodyFatService");
+const { sendPasswordResetEmail } = require("../services/mailService");
 
 const router = express.Router();
 
@@ -666,6 +667,14 @@ router.post("/request-password-reset", async (req, res) => {
         expiresAt: resetToken.expiresAt,
       },
     });
+
+    if (process.env.NODE_ENV === "production") {
+      await sendPasswordResetEmail({
+        email: user.email,
+        name: user.name,
+        token: resetToken.rawToken,
+      });
+    }
 
     return res.json({
       ok: true,
