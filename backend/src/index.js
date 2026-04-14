@@ -64,7 +64,7 @@ app.use(cors({
   methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
-app.use(express.json({ limit: "3mb" }));
+app.use(express.json({ limit: "8mb" }));
 app.use(attachAuthUser);
 ensureAvatarDirectory();
 app.use("/uploads/avatars", express.static(path.join(process.cwd(), "storage", "avatars")));

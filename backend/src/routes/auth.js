@@ -56,7 +56,10 @@ function setSessionCookie(res, rawToken) {
 }
 
 function clearSessionCookie(res) {
-  res.clearCookie(AUTH_COOKIE_NAME, getSessionCookieOptions());
+  const cookieOptions = getSessionCookieOptions();
+  const { maxAge, ...clearOptions } = cookieOptions;
+  void maxAge;
+  res.clearCookie(AUTH_COOKIE_NAME, clearOptions);
 }
 
 async function syncUserBodyMetrics(userId) {
