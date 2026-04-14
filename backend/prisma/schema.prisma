@@ -1,0 +1,139 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Food {
+  id        String   @id
+  name      String
+  category  String   // protein, carb, fat
+  kcal      Float
+  prot      Float
+  carb      Float
+  fat       Float
+  mealTypes String[] // cafe, lanche, principal, jantar_adj
+  subGroup  String   // for coherent substitutions
+  glycemicIndexLevel String?
+  planningRole String @default("core") // core, flex, accessory
+  createdAt DateTime @default(now())
+
+  @@index([category])
+  @@index([subGroup])
+  @@index([glycemicIndexLevel])
+  @@index([planningRole])
+}
+
+model User {
+  id                 String               @id @default(cuid())
+  name               String?
+  email              String?              @unique
+  passwordHash       String?
+  googleId           String?              @unique
+  avatarUrl          String?
+  birthDate          DateTime?
+  weight             Float?
+  height             Float?
+  age                Int?
+  bodyFatPercentage  Float?
+  sex                String?
+  activity           Int?
+  lastLoginAt        DateTime?
+  lastAccessAt       DateTime?
+  lastAccessIp       String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @default(now()) @updatedAt
+  diets              Diet[]
+  reports            Report[]
+  bodyMetrics        BodyMetricEntry[]
+  sessions           AuthSession[]
+  passwordResetTokens PasswordResetToken[]
+}
+
+model BodyMetricEntry {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weight            Float?
+  height            Float?
+  age               Int?
+  bodyFatPercentage Float?
+  source            String   @default("manual")
+  notes             String?
+  recordedAt        DateTime @default(now())
+  createdAt         DateTime @default(now())
+
+  @@index([userId, recordedAt])
+}
+
+model AuthSession {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash  String   @unique
+  provider   String
+  lastSeenAt DateTime?
+  lastSeenIp String?
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+  usedAt     DateTime?
+
+  @@index([userId])
+}
+
+model Diet {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  objective      String
+  objectivePct   Int
+  targetKcal     Int
+  protPerKg      Float
+  carbPerKg      Float
+  fatPerKg       Float
+  snapshotWeight Float?
+  snapshotHeight Float?
+  snapshotAge    Int?
+  snapshotBodyFatPercentage Float?
+  snapshotSex    String?
+  snapshotActivity Int?
+  numMeals       Int
+  mealDistribution Json
+  selectedFoodIds  String[]
+  favoriteIds      String[]
+  generatedPlan    Json?
+  reports          Report[]
+  createdAt      DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dietId      String?
+  diet        Diet?    @relation(fields: [dietId], references: [id], onDelete: SetNull)
+  title       String
+  reportType  String   @default("diet_pdf")
+  objective   String?
+  htmlContent String
+  createdAt   DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([dietId])
+}

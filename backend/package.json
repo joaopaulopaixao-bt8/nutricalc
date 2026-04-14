@@ -1,0 +1,25 @@
+{
+  "name": "nutricalc-backend",
+  "version": "1.0.0",
+  "description": "NutriCalc API - Cálculo nutricional baseado em evidências",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
+    "db:push": "npx prisma db push",
+    "db:seed": "node src/seed.js",
+    "db:generate": "npx prisma generate",
+    "setup": "npm install && npx prisma generate && npx prisma db push && node src/seed.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.0.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

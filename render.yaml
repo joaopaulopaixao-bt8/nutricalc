@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: nutricalc-backend
+    env: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install && npx prisma generate && npx prisma db push && node src/seed.js
+    startCommand: npm start
+    autoDeploy: true
