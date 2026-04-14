@@ -31,6 +31,18 @@ function getSupabaseClient() {
   return supabaseClient;
 }
 
+function getPublicBaseUrl() {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  if (!supabaseUrl) {
+    throw new Error("Configure SUPABASE_URL para montar a URL publica do avatar.");
+  }
+  return supabaseUrl.replace(/\/+$/, "");
+}
+
+function buildPublicAvatarUrl(storagePath) {
+  return `${getPublicBaseUrl()}/storage/v1/object/public/${DEFAULT_BUCKET}/${encodeURI(storagePath)}`;
+}
+
 function extractStoragePath(avatarUrl) {
   if (!avatarUrl || typeof avatarUrl !== "string") return "";
 
@@ -89,8 +101,7 @@ async function saveAvatarFromDataUrl(dataUrl, userId) {
     throw new Error(`Nao foi possivel salvar o avatar: ${error.message}`);
   }
 
-  const { data } = supabase.storage.from(DEFAULT_BUCKET).getPublicUrl(storagePath);
-  return data.publicUrl;
+  return buildPublicAvatarUrl(storagePath);
 }
 
 module.exports = {
