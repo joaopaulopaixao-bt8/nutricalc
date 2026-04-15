@@ -114,6 +114,32 @@ function buildPublicAvatarUrl(storagePath) {
   return `${getPublicBaseUrl()}/storage/v1/object/public/${DEFAULT_BUCKET}/${encodeURI(storagePath)}`;
 }
 
+async function checkAvatarStorageHealth() {
+  const result = {
+    bucket: DEFAULT_BUCKET,
+    supabaseUrlConfigured: Boolean(process.env.SUPABASE_URL),
+    serviceRoleConfigured: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
+    bucketAccessible: false,
+    publicUrlSample: "",
+  };
+
+  try {
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase.storage.getBucket(DEFAULT_BUCKET);
+    if (error) {
+      result.error = error.message;
+      return result;
+    }
+
+    result.bucketAccessible = Boolean(data);
+    result.publicUrlSample = buildPublicAvatarUrl("health-check.txt");
+    return result;
+  } catch (error) {
+    result.error = error.message;
+    return result;
+  }
+}
+
 function extractStoragePath(avatarUrl) {
   if (!avatarUrl || typeof avatarUrl !== "string") return "";
 
@@ -176,6 +202,7 @@ async function importAvatarFromRemoteUrl(remoteUrl, userId) {
 }
 
 module.exports = {
+  checkAvatarStorageHealth,
   ensureAvatarDirectory,
   importAvatarFromRemoteUrl,
   removeAvatarByUrl,

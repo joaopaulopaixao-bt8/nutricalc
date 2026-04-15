@@ -2,6 +2,7 @@ const express = require("express");
 const { generateDiet } = require("../services/dietEngine");
 const { DEFAULT_DIET_GENERATION_CONFIG } = require("../config/dietGenerationConfig");
 const prisma = require("../lib/prisma");
+const { checkAvatarStorageHealth } = require("../services/avatarService");
 
 const router = express.Router();
 
@@ -19,6 +20,15 @@ router.get("/foods", async (req, res) => {
 
 router.get("/config/diet-generation", (req, res) => {
   res.json(DEFAULT_DIET_GENERATION_CONFIG);
+});
+
+router.get("/health/avatar-storage", async (req, res) => {
+  try {
+    const health = await checkAvatarStorageHealth();
+    res.json(health);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // ---- TDEE CALCULATION ----
