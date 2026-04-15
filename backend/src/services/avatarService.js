@@ -10,6 +10,41 @@ const MIME_TO_EXTENSION = {
   "image/webp": "webp",
 };
 
+function normalizeMimeType(value) {
+  if (!value || typeof value !== "string") return "";
+  return value.split(";")[0].trim().toLowerCase();
+}
+
+async function uploadAvatarBuffer(buffer, mimeType, userId) {
+  const normalizedMimeType = normalizeMimeType(mimeType);
+  const extension = MIME_TO_EXTENSION[normalizedMimeType];
+  if (!extension) {
+    throw new Error("Tipo de avatar nao suportado. Use PNG, JPG ou WEBP.");
+  }
+
+  if (!Buffer.isBuffer(buffer) || buffer.length === 0) {
+    throw new Error("Conteudo de avatar invalido.");
+  }
+
+  if (buffer.length > 2 * 1024 * 1024) {
+    throw new Error("O avatar precisa ter no maximo 2 MB.");
+  }
+
+  const supabase = getSupabaseClient();
+  const fileName = `${userId}-${crypto.randomBytes(8).toString("hex")}.${extension}`;
+  const storagePath = `users/${userId}/${fileName}`;
+  const { error } = await supabase.storage.from(DEFAULT_BUCKET).upload(storagePath, buffer, {
+    contentType: normalizedMimeType,
+    upsert: false,
+  });
+
+  if (error) {
+    throw new Error(`Nao foi possivel salvar o avatar: ${error.message}`);
+  }
+
+  return buildPublicAvatarUrl(storagePath);
+}
+
 function ensureAvatarDirectory() {
   // Storage persistente agora fica no Supabase Storage.
 }
@@ -79,33 +114,34 @@ async function saveAvatarFromDataUrl(dataUrl, userId) {
   }
 
   const [, mimeType, base64Payload] = match;
-  const extension = MIME_TO_EXTENSION[mimeType];
-  if (!extension) {
-    throw new Error("Tipo de avatar nao suportado. Use PNG, JPG ou WEBP.");
-  }
-
   const buffer = Buffer.from(base64Payload, "base64");
-  if (buffer.length > 2 * 1024 * 1024) {
-    throw new Error("O avatar precisa ter no maximo 2 MB.");
+  return uploadAvatarBuffer(buffer, mimeType, userId);
+}
+
+async function importAvatarFromRemoteUrl(remoteUrl, userId) {
+  if (!remoteUrl || typeof remoteUrl !== "string") {
+    return null;
   }
 
-  const supabase = getSupabaseClient();
-  const fileName = `${userId}-${crypto.randomBytes(8).toString("hex")}.${extension}`;
-  const storagePath = `users/${userId}/${fileName}`;
-  const { error } = await supabase.storage.from(DEFAULT_BUCKET).upload(storagePath, buffer, {
-    contentType: mimeType,
-    upsert: false,
+  const response = await fetch(remoteUrl, {
+    headers: {
+      Accept: "image/webp,image/jpeg,image/png,image/*;q=0.8,*/*;q=0.5",
+    },
   });
 
-  if (error) {
-    throw new Error(`Nao foi possivel salvar o avatar: ${error.message}`);
+  if (!response.ok) {
+    throw new Error(`Nao foi possivel baixar o avatar remoto: ${response.status}`);
   }
 
-  return buildPublicAvatarUrl(storagePath);
+  const mimeType = normalizeMimeType(response.headers.get("content-type"));
+  const arrayBuffer = await response.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+  return uploadAvatarBuffer(buffer, mimeType, userId);
 }
 
 module.exports = {
   ensureAvatarDirectory,
+  importAvatarFromRemoteUrl,
   removeAvatarByUrl,
   saveAvatarFromDataUrl,
 };

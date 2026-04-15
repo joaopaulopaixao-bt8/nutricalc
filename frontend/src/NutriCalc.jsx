@@ -2916,16 +2916,16 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage }) {
         <div style={{...sectionWrap}}>
           <div style={{...cardStyle,padding:"28px 26px",display:"grid",gridTemplateColumns:"minmax(0,1fr) auto",gap:18,alignItems:"center"}}>
             <div>
-              <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#93c5fd"}}>Transparência do produto</div>
-              <div style={{fontSize:30,fontWeight:800,letterSpacing:"-0.04em",marginTop:10}}>Fase 1 pronta para receber páginas institucionais públicas.</div>
+              <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#93c5fd"}}>Antes de entrar</div>
+              <div style={{fontSize:30,fontWeight:800,letterSpacing:"-0.04em",marginTop:10}}>Entenda como o NutriCalc funciona e entre só quando fizer sentido para você.</div>
               <div style={{fontSize:15,lineHeight:1.7,color:"#94a3b8",marginTop:10,maxWidth:760}}>
-                Esta home já encaminha para as páginas de privacidade, termos e metodologia. Assim a pessoa entende o produto antes de criar conta e encontra contexto legal e técnico sem precisar entrar no sistema.
+                A área pública existe para apresentar o produto com clareza. Você pode revisar privacidade, termos e metodologia agora, ou seguir direto para entrar e começar seu acompanhamento.
               </div>
             </div>
             <div style={{display:"flex",gap:10,flexWrap:"wrap",justifyContent:"flex-end"}}>
-              <button onClick={() => onNavigatePage("privacy")} style={{border:"1px solid rgba(255,255,255,0.08)",borderRadius:999,padding:"14px 18px",cursor:"pointer",background:"rgba(255,255,255,0.03)",color:"#e2e8f0",fontWeight:700}}>Privacidade</button>
-              <button onClick={() => onNavigatePage("terms")} style={{border:"1px solid rgba(255,255,255,0.08)",borderRadius:999,padding:"14px 18px",cursor:"pointer",background:"rgba(255,255,255,0.03)",color:"#e2e8f0",fontWeight:700}}>Termos</button>
-              <button onClick={() => onNavigatePage("methodology")} style={{border:"1px solid rgba(59,130,246,0.18)",borderRadius:999,padding:"14px 18px",cursor:"pointer",background:"rgba(59,130,246,0.08)",color:"#bfdbfe",fontWeight:700}}>Metodologia</button>
+              <button onClick={onEnter} style={{border:"none",borderRadius:999,padding:"14px 18px",cursor:"pointer",background:"linear-gradient(135deg,#84cc16,#65a30d)",color:"#0f172a",fontWeight:800}}>Entrar</button>
+              <button onClick={onCreateAccount} style={{border:"1px solid rgba(255,255,255,0.08)",borderRadius:999,padding:"14px 18px",cursor:"pointer",background:"rgba(255,255,255,0.03)",color:"#e2e8f0",fontWeight:700}}>Criar conta</button>
+              <button onClick={() => onNavigatePage("methodology")} style={{border:"1px solid rgba(59,130,246,0.18)",borderRadius:999,padding:"14px 18px",cursor:"pointer",background:"rgba(59,130,246,0.08)",color:"#bfdbfe",fontWeight:700}}>Ver metodologia</button>
             </div>
           </div>
         </div>

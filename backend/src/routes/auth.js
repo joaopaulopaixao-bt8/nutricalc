@@ -10,7 +10,7 @@ const {
   hashToken,
 } = require("../services/authService");
 const { AUTH_COOKIE_NAME, requireAuth } = require("../middleware/auth");
-const { removeAvatarByUrl, saveAvatarFromDataUrl } = require("../services/avatarService");
+const { importAvatarFromRemoteUrl, removeAvatarByUrl, saveAvatarFromDataUrl } = require("../services/avatarService");
 const { calculateNavyBodyFat } = require("../services/bodyFatService");
 const { sendPasswordResetEmail } = require("../services/mailService");
 
@@ -22,6 +22,16 @@ function getRequestIp(req) {
     return forwarded.split(",")[0].trim();
   }
   return req.ip || req.socket?.remoteAddress || null;
+}
+
+function isGoogleHostedAvatarUrl(value) {
+  if (!value || typeof value !== "string") return false;
+  try {
+    const parsed = new URL(value);
+    return /(^|\.)googleusercontent\.com$/i.test(parsed.hostname);
+  } catch (error) {
+    return false;
+  }
 }
 
 async function createSession(userId, provider = "password", requestIp = null) {
@@ -590,6 +600,7 @@ router.post("/google", async (req, res) => {
   try {
     const { credential } = req.body;
     const googleProfile = await verifyGoogleIdToken(credential);
+    const requestIp = getRequestIp(req);
 
     let user = await prisma.user.findFirst({
       where: {
@@ -602,33 +613,53 @@ router.post("/google", async (req, res) => {
 
     if (!user) {
       const now = new Date();
+      let persistedGoogleAvatarUrl = googleProfile.avatarUrl;
+      if (googleProfile.avatarUrl) {
+        try {
+          persistedGoogleAvatarUrl = await importAvatarFromRemoteUrl(googleProfile.avatarUrl, `google-${googleProfile.googleId}`);
+        } catch (error) {
+          persistedGoogleAvatarUrl = googleProfile.avatarUrl;
+        }
+      }
+
       user = await prisma.user.create({
         data: {
           name: googleProfile.name,
           email: googleProfile.email,
           googleId: googleProfile.googleId,
-          avatarUrl: googleProfile.avatarUrl,
+          avatarUrl: persistedGoogleAvatarUrl,
           lastLoginAt: now,
           lastAccessAt: now,
-          lastAccessIp: getRequestIp(req),
+          lastAccessIp: requestIp,
         },
       });
     } else {
+      let avatarUrl = user.avatarUrl;
+      if (!avatarUrl || isGoogleHostedAvatarUrl(avatarUrl)) {
+        if (googleProfile.avatarUrl) {
+          try {
+            avatarUrl = await importAvatarFromRemoteUrl(googleProfile.avatarUrl, user.id);
+          } catch (error) {
+            avatarUrl = googleProfile.avatarUrl;
+          }
+        }
+      }
+
       user = await prisma.user.update({
         where: { id: user.id },
         data: {
           name: user.name || googleProfile.name,
           email: user.email || googleProfile.email,
           googleId: user.googleId || googleProfile.googleId,
-          avatarUrl: user.avatarUrl || googleProfile.avatarUrl,
+          avatarUrl,
           lastLoginAt: new Date(),
           lastAccessAt: new Date(),
-          lastAccessIp: getRequestIp(req),
+          lastAccessIp: requestIp,
         },
       });
     }
 
-    const session = await createSession(user.id, "google", getRequestIp(req));
+    const session = await createSession(user.id, "google", requestIp);
     setSessionCookie(res, session.rawToken);
     return res.json({
       user: sanitizeUser(user),
