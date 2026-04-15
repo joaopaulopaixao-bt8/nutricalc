@@ -848,12 +848,17 @@ export default function NutriCalc() {
   const [tdeeError, setTdeeError] = useState("");
   const [generateError, setGenerateError] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [appViewportWidth, setAppViewportWidth] = useState(() => (
+    typeof window === "undefined" ? 1280 : window.innerWidth
+  ));
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || import.meta.env.GOOGLE_CLIENT_ID || "";
   const resetTokenFromUrl = useMemo(() => {
     if (typeof window === "undefined") return "";
     return new URLSearchParams(window.location.search).get("resetToken") || "";
   }, []);
   const themeVars = getThemeVars();
+  const appIsMobile = appViewportWidth < 768;
+  const appIsTablet = appViewportWidth < 1024;
   const derivedProfileAge = getAgeFromBirthDate(profileForm.birthDate || authUser?.birthDate || "");
   const isProfileSetupRequired = Boolean(authUser) && (
     !authUser?.name ||
@@ -921,6 +926,13 @@ export default function NutriCalc() {
 
   const updateBodyFatCalcForm = useCallback((key, value) => {
     setBodyFatCalcForm((prev) => ({ ...prev, [key]: value }));
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const handleResize = () => setAppViewportWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const navigatePublicPage = useCallback((page) => {
@@ -2135,25 +2147,26 @@ export default function NutriCalc() {
       <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
       <div style={{position:"fixed",inset:0,zIndex:0,opacity:0.03,backgroundImage:`linear-gradient(rgba(132,204,22,0.3) 1px,transparent 1px),linear-gradient(90deg,rgba(132,204,22,0.3) 1px,transparent 1px)`,backgroundSize:"40px 40px"}}/>
 
-      <header style={{position:"relative",zIndex:10,padding:"20px 24px",borderBottom:"1px solid rgba(132,204,22,0.15)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-        <div style={{display:"flex",alignItems:"center",gap:12}}>
+      <header style={{position:"relative",zIndex:10,padding:appIsMobile?"14px 14px 12px":"20px 24px",borderBottom:"1px solid rgba(132,204,22,0.15)",display:"flex",alignItems:appIsMobile?"stretch":"center",justifyContent:"space-between",flexDirection:appIsMobile?"column":"row",gap:appIsMobile?12:16}}>
+        <div style={{display:"flex",alignItems:"center",gap:12,justifyContent:appIsMobile?"space-between":"flex-start",width:appIsMobile?"100%":"auto"}}>
           <div style={{width:36,height:36,borderRadius:8,background:"linear-gradient(135deg,#84cc16,#65a30d)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,fontWeight:900,color:"#0f172a"}}>N</div>
           <span style={{fontSize:20,fontWeight:700,letterSpacing:"-0.02em"}}>Nutri<span style={{color:"#84cc16"}}>Calc</span></span>
+          {appIsMobile && <div style={{marginLeft:"auto",fontSize:11,color:"#64748b"}}>Baseado em evidências</div>}
         </div>
-        <div style={{display:"flex",alignItems:"center",gap:10}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap",width:appIsMobile?"100%":"auto",justifyContent:appIsMobile?"flex-start":"flex-end"}}>
           {authUser ? (
             <>
-              <div style={{display:"flex",alignItems:"center",gap:10,padding:"8px 12px",borderRadius:14,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)"}}>
+              <div style={{display:"flex",alignItems:"center",gap:10,padding:"8px 12px",borderRadius:14,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",width:appIsMobile?"100%":"auto",minWidth:0}}>
                 <div style={{width:34,height:34,borderRadius:"50%",overflow:"hidden",background:"linear-gradient(135deg,#1e293b,#334155)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:800,color:"#a3e635"}}>
                   {authUser.avatarUrl ? <img src={resolveMediaUrl(authUser.avatarUrl)} alt={authUser.name || "Usuario"} style={{width:"100%",height:"100%",objectFit:"cover"}} /> : (authUser.name || "U").slice(0, 1).toUpperCase()}
                 </div>
-                <div>
-                  <div style={{fontSize:13,fontWeight:700,color:"#e2e8f0"}}>{authUser.name || "Usuário"}</div>
-                  <div style={{fontSize:11,color:"#94a3b8"}}>{authUser.email || "Conta ativa"}</div>
+                <div style={{minWidth:0}}>
+                  <div style={{fontSize:13,fontWeight:700,color:"#e2e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{authUser.name || "Usuário"}</div>
+                  <div style={{fontSize:11,color:"#94a3b8",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{authUser.email || "Conta ativa"}</div>
                 </div>
               </div>
-              <button onClick={() => { setProfileOpen(true); setProfileError(""); setProfileNotice(""); }} style={{...pB,padding:"10px 14px",borderColor:"rgba(132,204,22,0.2)",color:"#a3e635",background:"rgba(132,204,22,0.08)"}}>Perfil</button>
-              <button onClick={handleLogout} style={{...pB,padding:"10px 14px",borderColor:"rgba(255,255,255,0.12)",color:"#cbd5e1"}}>Sair</button>
+              <button onClick={() => { setProfileOpen(true); setProfileError(""); setProfileNotice(""); }} style={{...pB,padding:"10px 14px",borderColor:"rgba(132,204,22,0.2)",color:"#a3e635",background:"rgba(132,204,22,0.08)",flex:appIsMobile?"1 1 calc(50% - 5px)":"none",minWidth:appIsMobile?0:"auto"}}>Perfil</button>
+              <button onClick={handleLogout} style={{...pB,padding:"10px 14px",borderColor:"rgba(255,255,255,0.12)",color:"#cbd5e1",flex:appIsMobile?"1 1 calc(50% - 5px)":"none",minWidth:appIsMobile?0:"auto"}}>Sair</button>
             </>
           ) : (
             <div style={{fontSize:13,color:"#94a3b8"}}>Acesso protegido</div>
@@ -2163,33 +2176,33 @@ export default function NutriCalc() {
               setSettingsTab("prioridades");
               setSettingsOpen((prev) => !prev);
             }}
-            style={{width:42,height:42,borderRadius:12,border:"1px solid rgba(132,204,22,0.2)",background:settingsOpen?"rgba(132,204,22,0.14)":"rgba(255,255,255,0.04)",color:settingsOpen?"#a3e635":"#cbd5e1",cursor:"pointer",fontSize:18}}
+            style={{width:42,height:42,borderRadius:12,border:"1px solid rgba(132,204,22,0.2)",background:settingsOpen?"rgba(132,204,22,0.14)":"rgba(255,255,255,0.04)",color:settingsOpen?"#a3e635":"#cbd5e1",cursor:"pointer",fontSize:18,marginLeft:appIsMobile?0:"auto"}}
             title="Configurações da geração"
           >
             ⚙
           </button>
-          <div style={{fontSize:13,color:"#64748b"}}>Baseado em evidências</div>
+          {!appIsMobile && <div style={{fontSize:13,color:"#64748b"}}>Baseado em evidências</div>}
         </div>
       </header>
 
       {authUser && (
-        <div style={{position:"relative",zIndex:20,maxWidth:1080,margin:"16px auto 0",padding:"0 24px"}}>
-          <div style={{padding:"18px 20px",borderRadius:24,background:"linear-gradient(135deg,rgba(132,204,22,0.14),rgba(15,23,42,0.82))",border:"1px solid rgba(132,204,22,0.2)",boxShadow:"0 18px 50px rgba(0,0,0,0.18)"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"start",gap:18,flexWrap:"wrap"}}>
+        <div style={{position:"relative",zIndex:20,maxWidth:1080,margin:"16px auto 0",padding:appIsMobile?"0 14px":"0 24px"}}>
+          <div style={{padding:appIsMobile?"16px":"18px 20px",borderRadius:24,background:"linear-gradient(135deg,rgba(132,204,22,0.14),rgba(15,23,42,0.82))",border:"1px solid rgba(132,204,22,0.2)",boxShadow:"0 18px 50px rgba(0,0,0,0.18)"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"start",gap:18,flexWrap:"wrap",flexDirection:appIsMobile?"column":"row"}}>
               <div style={{flex:"1 1 320px"}}>
                 <div style={{fontSize:12,letterSpacing:"0.12em",textTransform:"uppercase",color:"#bef264",fontWeight:800}}>Painel</div>
-                <div style={{fontSize:30,fontWeight:800,letterSpacing:"-0.03em",marginTop:4}}>Sua área no NutriCalc</div>
+                <div style={{fontSize:appIsMobile?24:30,fontWeight:800,letterSpacing:"-0.03em",marginTop:4,lineHeight:1.05}}>Sua área no NutriCalc</div>
                 <div style={{fontSize:14,color:"#cbd5e1",marginTop:8,maxWidth:620}}>
                   {authUser.name ? `${authUser.name}, seu histórico está pronto para você retomar a rotina sem perder o contexto.` : "Seu histórico está pronto para você retomar a rotina sem perder o contexto."}
                 </div>
               </div>
-              <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+              <div style={{display:"flex",gap:10,flexWrap:"wrap",width:appIsMobile?"100%":"auto",flexDirection:appIsMobile?"column":"row"}}>
                 {latestDiet && (
-                  <button onClick={() => handleOpenSavedDiet(latestDiet.id)} style={{...nBS,flex:"none",padding:"12px 18px"}}>
+                  <button onClick={() => handleOpenSavedDiet(latestDiet.id)} style={{...nBS,flex:"none",padding:"12px 18px",width:appIsMobile?"100%":"auto"}}>
                     Continuar de onde parei
                   </button>
                 )}
-                <button onClick={() => { setProfileOpen(true); setProfileError(""); setProfileNotice(""); }} style={{...pB,padding:"12px 18px",borderColor:"rgba(255,255,255,0.12)",color:"#e2e8f0"}}>
+                <button onClick={() => { setProfileOpen(true); setProfileError(""); setProfileNotice(""); }} style={{...pB,padding:"12px 18px",borderColor:"rgba(255,255,255,0.12)",color:"#e2e8f0",width:appIsMobile?"100%":"auto"}}>
                   Abrir perfil completo
                 </button>
               </div>
@@ -2628,6 +2641,23 @@ function PublicExperience({
   publicPage,
   themeVars,
 }) {
+  const [viewportWidth, setViewportWidth] = useState(() => (
+    typeof window === "undefined" ? 1280 : window.innerWidth
+  ));
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const handleResize = () => setViewportWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const viewport = {
+    width: viewportWidth,
+    isMobile: viewportWidth < 768,
+    isTablet: viewportWidth < 1024,
+  };
+
   const publicShellStyle = {
     ...themeVars,
     minHeight: "100vh",
@@ -2647,6 +2677,7 @@ function PublicExperience({
     onEnter: () => handlePrimaryCta("login"),
     onCreateAccount: () => handlePrimaryCta("register"),
     onNavigatePage,
+    viewport,
   };
 
   if (publicPage === "auth") {
@@ -2686,14 +2717,14 @@ function PublicExperience({
     <div style={publicShellStyle}>
       <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
       <div style={{position:"fixed",inset:0,zIndex:0,opacity:0.05,backgroundImage:"linear-gradient(rgba(132,204,22,0.18) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,0.16) 1px,transparent 1px)",backgroundSize:"42px 42px",pointerEvents:"none"}} />
-      <PublicHeader {...sharedLayoutProps} currentPage={publicPage} />
+      <PublicHeader {...sharedLayoutProps} currentPage={publicPage} viewport={viewport} />
       <div style={{position:"relative",zIndex:1}}>{content}</div>
-      <PublicFooter {...sharedLayoutProps} />
+      <PublicFooter {...sharedLayoutProps} viewport={viewport} />
     </div>
   );
 }
 
-function PublicHeader({ currentPage, onCreateAccount, onEnter, onNavigatePage }) {
+function PublicHeader({ currentPage, onCreateAccount, onEnter, onNavigatePage, viewport }) {
   const navButtonStyle = {
     border: "1px solid rgba(255,255,255,0.09)",
     background: "rgba(255,255,255,0.03)",
@@ -2706,8 +2737,8 @@ function PublicHeader({ currentPage, onCreateAccount, onEnter, onNavigatePage })
   };
 
   return (
-    <header style={{position:"sticky",top:0,zIndex:5,padding:"18px 24px 8px",backdropFilter:"blur(18px)"}}>
-      <div style={{maxWidth:1180,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",gap:18,flexWrap:"wrap"}}>
+    <header style={{position:"sticky",top:0,zIndex:5,padding:viewport.isMobile?"10px 14px 6px":"18px 24px 8px",backdropFilter:viewport.isMobile?"blur(10px)":"blur(18px)",background:viewport.isMobile?"linear-gradient(180deg,rgba(8,17,31,0.92),rgba(8,17,31,0.72))":"transparent"}}>
+      <div style={{maxWidth:1180,margin:"0 auto",display:"flex",alignItems:viewport.isMobile?"stretch":"center",justifyContent:"space-between",gap:viewport.isMobile?14:18,flexWrap:"wrap",flexDirection:viewport.isMobile?"column":"row"}}>
         <button onClick={() => onNavigatePage("landing")} style={{display:"flex",alignItems:"center",gap:12,background:"transparent",border:"none",color:"#e2e8f0",cursor:"pointer",padding:0}}>
           <div style={{width:42,height:42,borderRadius:14,background:"linear-gradient(135deg,#84cc16,#65a30d)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,fontWeight:900,color:"#0f172a",boxShadow:"0 16px 32px rgba(101,163,13,0.24)"}}>N</div>
           <div style={{textAlign:"left"}}>
@@ -2716,7 +2747,7 @@ function PublicHeader({ currentPage, onCreateAccount, onEnter, onNavigatePage })
           </div>
         </button>
 
-        <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap",justifyContent:viewport.isMobile?"flex-start":"flex-end"}}>
           {[
             { key: "methodology", label: "Metodologia" },
             { key: "privacy", label: "Privacidade" },
@@ -2743,7 +2774,7 @@ function PublicHeader({ currentPage, onCreateAccount, onEnter, onNavigatePage })
   );
 }
 
-function MarketingHome({ onCreateAccount, onEnter, onNavigatePage }) {
+function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
   const sectionWrap = { maxWidth: 1180, margin: "0 auto", padding: "0 24px" };
   const cardStyle = {
     borderRadius: 24,
@@ -2759,26 +2790,26 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage }) {
 
   return (
     <>
-      <section style={{padding:"34px 0 26px"}}>
-        <div style={{...sectionWrap,display:"grid",gridTemplateColumns:"minmax(0,1.15fr) minmax(320px,0.85fr)",gap:28,alignItems:"stretch"}}>
-          <div style={{...cardStyle,padding:"32px 30px"}}>
+      <section style={{padding:viewport.isMobile?"22px 0 18px":"34px 0 26px"}}>
+        <div style={{...sectionWrap,padding:viewport.isMobile?"0 14px":"0 24px",display:"grid",gridTemplateColumns:viewport.isTablet?"1fr":"minmax(0,1.15fr) minmax(320px,0.85fr)",gap:viewport.isMobile?16:28,alignItems:"stretch"}}>
+          <div style={{...cardStyle,padding:viewport.isMobile?"22px 18px":"32px 30px"}}>
             <div style={{display:"inline-flex",alignItems:"center",gap:10,padding:"9px 14px",borderRadius:999,background:"rgba(132,204,22,0.1)",border:"1px solid rgba(132,204,22,0.16)",fontSize:12,fontWeight:800,letterSpacing:"0.08em",textTransform:"uppercase",color:"#d9f99d"}}>
               Nutrição com histórico e acompanhamento
             </div>
-            <h1 style={{fontSize:"clamp(40px,6vw,68px)",lineHeight:0.95,letterSpacing:"-0.06em",margin:"18px 0 16px",maxWidth:720}}>
+            <h1 style={{fontSize:viewport.isMobile?"clamp(32px,11vw,42px)":"clamp(40px,6vw,68px)",lineHeight:viewport.isMobile?1.02:0.95,letterSpacing:"-0.06em",margin:"18px 0 16px",maxWidth:720}}>
               Seu planejamento alimentar em um painel claro, privado e pronto para evoluir com você.
             </h1>
-            <p style={{fontSize:18,lineHeight:1.65,color:"#cbd5e1",maxWidth:700,margin:0}}>
+            <p style={{fontSize:viewport.isMobile?16:18,lineHeight:1.65,color:"#cbd5e1",maxWidth:700,margin:0}}>
               O NutriCalc reúne cálculo energético, geração de dieta, relatórios e histórico corporal em uma única conta. Você entra, organiza seu perfil e acompanha a evolução sem perder contexto entre uma sessão e outra.
             </p>
 
-            <div style={{display:"flex",gap:12,marginTop:26,flexWrap:"wrap"}}>
-              <button onClick={onEnter} style={{border:"none",borderRadius:999,padding:"15px 22px",cursor:"pointer",fontSize:15,fontWeight:800,background:"linear-gradient(135deg,#84cc16,#65a30d)",color:"#0f172a"}}>Entrar</button>
-              <button onClick={onCreateAccount} style={{border:"1px solid rgba(255,255,255,0.1)",borderRadius:999,padding:"15px 22px",cursor:"pointer",fontSize:15,fontWeight:700,background:"rgba(255,255,255,0.03)",color:"#e2e8f0"}}>Criar conta</button>
-              <button onClick={() => onNavigatePage("methodology")} style={{border:"1px solid rgba(59,130,246,0.22)",borderRadius:999,padding:"15px 22px",cursor:"pointer",fontSize:15,fontWeight:700,background:"rgba(59,130,246,0.08)",color:"#bfdbfe"}}>Ver metodologia</button>
+            <div style={{display:"flex",gap:12,marginTop:26,flexWrap:"wrap",flexDirection:viewport.isMobile?"column":"row"}}>
+              <button onClick={onEnter} style={{border:"none",borderRadius:999,padding:"15px 22px",cursor:"pointer",fontSize:15,fontWeight:800,background:"linear-gradient(135deg,#84cc16,#65a30d)",color:"#0f172a",width:viewport.isMobile?"100%":"auto"}}>Entrar</button>
+              <button onClick={onCreateAccount} style={{border:"1px solid rgba(255,255,255,0.1)",borderRadius:999,padding:"15px 22px",cursor:"pointer",fontSize:15,fontWeight:700,background:"rgba(255,255,255,0.03)",color:"#e2e8f0",width:viewport.isMobile?"100%":"auto"}}>Criar conta</button>
+              <button onClick={() => onNavigatePage("methodology")} style={{border:"1px solid rgba(59,130,246,0.22)",borderRadius:999,padding:"15px 22px",cursor:"pointer",fontSize:15,fontWeight:700,background:"rgba(59,130,246,0.08)",color:"#bfdbfe",width:viewport.isMobile?"100%":"auto"}}>Ver metodologia</button>
             </div>
 
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:12,marginTop:28}}>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:12,marginTop:viewport.isMobile?22:28}}>
               {[
                 { value: "Conta individual", label: "Acesso pessoal com histórico privado" },
                 { value: "Fluxo contínuo", label: "Dietas, relatórios e evolução no mesmo lugar" },
@@ -2792,7 +2823,7 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage }) {
             </div>
           </div>
 
-          <div style={{...cardStyle,padding:24,display:"flex",flexDirection:"column",justifyContent:"space-between",gap:18}}>
+          <div style={{...cardStyle,padding:viewport.isMobile?18:24,display:"flex",flexDirection:"column",justifyContent:"space-between",gap:18}}>
             <div style={{display:"grid",gap:14}}>
               <div style={{padding:"18px 18px 16px",borderRadius:22,background:"linear-gradient(135deg, rgba(132,204,22,0.12), rgba(59,130,246,0.08))",border:"1px solid rgba(132,204,22,0.18)"}}>
                 <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#d9f99d"}}>Dentro do sistema</div>
@@ -2819,20 +2850,20 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage }) {
         </div>
       </section>
 
-      <section style={{padding:"12px 0 10px"}}>
-        <div style={{...sectionWrap}}>
-          <div style={{...cardStyle,padding:"28px 26px"}}>
+      <section style={{padding:viewport.isMobile?"8px 0 8px":"12px 0 10px"}}>
+        <div style={{...sectionWrap,padding:viewport.isMobile?"0 14px":"0 24px"}}>
+          <div style={{...cardStyle,padding:viewport.isMobile?"22px 18px":"28px 26px"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"end",gap:20,flexWrap:"wrap"}}>
               <div>
                 <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#93c5fd"}}>O que a pessoa encontra aqui</div>
-                <div style={{fontSize:30,fontWeight:800,letterSpacing:"-0.04em",marginTop:10}}>Uma entrada pública que explica o sistema antes de pedir login.</div>
+                <div style={{fontSize:viewport.isMobile?24:30,fontWeight:800,letterSpacing:"-0.04em",marginTop:10,lineHeight:1.08}}>Uma entrada pública que explica o sistema antes de pedir login.</div>
               </div>
               <div style={{fontSize:14,lineHeight:1.7,color:"#94a3b8",maxWidth:420}}>
                 Em vez de jogar a pessoa direto na autenticação, a home passa propósito, benefícios, segurança e contexto metodológico antes da decisão de entrar.
               </div>
             </div>
 
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16,marginTop:22}}>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16,marginTop:viewport.isMobile?18:22}}>
               {[
                 { title: "Monte seu perfil", text: "Crie uma conta, complete os dados essenciais e deixe a base pronta para o sistema trabalhar com contexto." },
                 { title: "Gere e salve dietas", text: "Centralize planos, relatórios e revisões sem depender de planilhas ou anotações soltas." },
@@ -2849,11 +2880,11 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage }) {
         </div>
       </section>
 
-      <section style={{padding:"10px 0 10px"}}>
-        <div style={{...sectionWrap,display:"grid",gridTemplateColumns:"minmax(0,0.9fr) minmax(320px,1.1fr)",gap:18}}>
-          <div style={{...cardStyle,padding:"26px 24px"}}>
+      <section style={{padding:viewport.isMobile?"8px 0 8px":"10px 0 10px"}}>
+        <div style={{...sectionWrap,padding:viewport.isMobile?"0 14px":"0 24px",display:"grid",gridTemplateColumns:viewport.isTablet?"1fr":"minmax(0,0.9fr) minmax(320px,1.1fr)",gap:18}}>
+          <div style={{...cardStyle,padding:viewport.isMobile?"22px 18px":"26px 24px"}}>
             <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#d9f99d"}}>Para quem o NutriCalc faz sentido</div>
-            <div style={{fontSize:30,fontWeight:800,letterSpacing:"-0.04em",marginTop:10}}>Pessoas que querem organizar alimentação com continuidade e clareza.</div>
+            <div style={{fontSize:viewport.isMobile?24:30,fontWeight:800,letterSpacing:"-0.04em",marginTop:10,lineHeight:1.08}}>Pessoas que querem organizar alimentação com continuidade e clareza.</div>
             <div style={{fontSize:15,lineHeight:1.75,color:"#94a3b8",marginTop:14}}>
               A proposta conversa melhor com quem quer sair do improviso e centralizar histórico, relatórios e métricas em um painel só, sem perder o fio entre um acesso e outro.
             </div>
@@ -2874,8 +2905,8 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage }) {
         </div>
       </section>
 
-      <section style={{padding:"16px 0 12px"}}>
-        <div style={{...sectionWrap,display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16}}>
+      <section style={{padding:viewport.isMobile?"10px 0 8px":"16px 0 12px"}}>
+        <div style={{...sectionWrap,padding:viewport.isMobile?"0 14px":"0 24px",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16}}>
           {[
             { title: "Privacidade por conta", text: "A home já prepara a leitura do produto como espaço pessoal, com dados vinculados ao usuário autenticado." },
             { title: "Base técnica visível", text: "Metodologia e fontes ganham espaço próprio para reduzir sensação de caixa-preta." },
@@ -2912,20 +2943,20 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage }) {
         </div>
       </section>
 
-      <section style={{padding:"18px 0 52px"}}>
-        <div style={{...sectionWrap}}>
-          <div style={{...cardStyle,padding:"28px 26px",display:"grid",gridTemplateColumns:"minmax(0,1fr) auto",gap:18,alignItems:"center"}}>
+      <section style={{padding:viewport.isMobile?"12px 0 34px":"18px 0 52px"}}>
+        <div style={{...sectionWrap,padding:viewport.isMobile?"0 14px":"0 24px"}}>
+          <div style={{...cardStyle,padding:viewport.isMobile?"22px 18px":"28px 26px",display:"grid",gridTemplateColumns:viewport.isTablet?"1fr":"minmax(0,1fr) auto",gap:18,alignItems:"center"}}>
             <div>
               <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#93c5fd"}}>Antes de entrar</div>
-              <div style={{fontSize:30,fontWeight:800,letterSpacing:"-0.04em",marginTop:10}}>Entenda como o NutriCalc funciona e entre só quando fizer sentido para você.</div>
+              <div style={{fontSize:viewport.isMobile?24:30,fontWeight:800,letterSpacing:"-0.04em",marginTop:10,lineHeight:1.08}}>Entenda como o NutriCalc funciona e entre só quando fizer sentido para você.</div>
               <div style={{fontSize:15,lineHeight:1.7,color:"#94a3b8",marginTop:10,maxWidth:760}}>
                 A área pública existe para apresentar o produto com clareza. Você pode revisar privacidade, termos e metodologia agora, ou seguir direto para entrar e começar seu acompanhamento.
               </div>
             </div>
-            <div style={{display:"flex",gap:10,flexWrap:"wrap",justifyContent:"flex-end"}}>
-              <button onClick={onEnter} style={{border:"none",borderRadius:999,padding:"14px 18px",cursor:"pointer",background:"linear-gradient(135deg,#84cc16,#65a30d)",color:"#0f172a",fontWeight:800}}>Entrar</button>
-              <button onClick={onCreateAccount} style={{border:"1px solid rgba(255,255,255,0.08)",borderRadius:999,padding:"14px 18px",cursor:"pointer",background:"rgba(255,255,255,0.03)",color:"#e2e8f0",fontWeight:700}}>Criar conta</button>
-              <button onClick={() => onNavigatePage("methodology")} style={{border:"1px solid rgba(59,130,246,0.18)",borderRadius:999,padding:"14px 18px",cursor:"pointer",background:"rgba(59,130,246,0.08)",color:"#bfdbfe",fontWeight:700}}>Ver metodologia</button>
+            <div style={{display:"flex",gap:10,flexWrap:"wrap",justifyContent:viewport.isTablet?"stretch":"flex-end",flexDirection:viewport.isMobile?"column":"row"}}>
+              <button onClick={onEnter} style={{border:"none",borderRadius:999,padding:"14px 18px",cursor:"pointer",background:"linear-gradient(135deg,#84cc16,#65a30d)",color:"#0f172a",fontWeight:800,width:viewport.isMobile?"100%":"auto"}}>Entrar</button>
+              <button onClick={onCreateAccount} style={{border:"1px solid rgba(255,255,255,0.08)",borderRadius:999,padding:"14px 18px",cursor:"pointer",background:"rgba(255,255,255,0.03)",color:"#e2e8f0",fontWeight:700,width:viewport.isMobile?"100%":"auto"}}>Criar conta</button>
+              <button onClick={() => onNavigatePage("methodology")} style={{border:"1px solid rgba(59,130,246,0.18)",borderRadius:999,padding:"14px 18px",cursor:"pointer",background:"rgba(59,130,246,0.08)",color:"#bfdbfe",fontWeight:700,width:viewport.isMobile?"100%":"auto"}}>Ver metodologia</button>
             </div>
           </div>
         </div>
@@ -2934,11 +2965,11 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage }) {
   );
 }
 
-function PublicInfoPage({ eyebrow, title, intro, sections, onCreateAccount, onEnter }) {
+function PublicInfoPage({ eyebrow, title, intro, sections, onCreateAccount, onEnter, viewport }) {
   const summaryCards = sections.slice(0, 3).map((section) => section.title);
   return (
     <section style={{padding:"34px 0 56px"}}>
-      <div style={{maxWidth:980,margin:"0 auto",padding:"0 24px"}}>
+      <div style={{maxWidth:980,margin:"0 auto",padding:viewport.isMobile?"0 14px":"0 24px"}}>
         <div style={{borderRadius:28,padding:"30px 28px",border:"1px solid rgba(255,255,255,0.08)",background:"linear-gradient(180deg, rgba(15,23,42,0.92), rgba(8,14,24,0.86))",boxShadow:"0 30px 80px rgba(0,0,0,0.28)"}}>
           <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:800,color:"#d9f99d"}}>{eyebrow}</div>
           <h1 style={{fontSize:"clamp(34px,5vw,52px)",lineHeight:0.98,letterSpacing:"-0.05em",margin:"12px 0 14px"}}>{title}</h1>
@@ -2953,9 +2984,9 @@ function PublicInfoPage({ eyebrow, title, intro, sections, onCreateAccount, onEn
             ))}
           </div>
 
-          <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:26}}>
-            <button onClick={onEnter} style={{border:"none",borderRadius:999,padding:"14px 20px",cursor:"pointer",fontSize:14,fontWeight:800,background:"linear-gradient(135deg,#84cc16,#65a30d)",color:"#0f172a"}}>Entrar</button>
-            <button onClick={onCreateAccount} style={{border:"1px solid rgba(255,255,255,0.09)",borderRadius:999,padding:"14px 20px",cursor:"pointer",fontSize:14,fontWeight:700,background:"rgba(255,255,255,0.03)",color:"#e2e8f0"}}>Criar conta</button>
+          <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:26,flexDirection:viewport.isMobile?"column":"row"}}>
+            <button onClick={onEnter} style={{border:"none",borderRadius:999,padding:"14px 20px",cursor:"pointer",fontSize:14,fontWeight:800,background:"linear-gradient(135deg,#84cc16,#65a30d)",color:"#0f172a",width:viewport.isMobile?"100%":"auto"}}>Entrar</button>
+            <button onClick={onCreateAccount} style={{border:"1px solid rgba(255,255,255,0.09)",borderRadius:999,padding:"14px 20px",cursor:"pointer",fontSize:14,fontWeight:700,background:"rgba(255,255,255,0.03)",color:"#e2e8f0",width:viewport.isMobile?"100%":"auto"}}>Criar conta</button>
           </div>
 
           <div style={{display:"grid",gap:16}}>
@@ -3099,7 +3130,7 @@ function MethodologyPage(props) {
   );
 }
 
-function PublicFooter({ onCreateAccount, onEnter, onNavigatePage }) {
+function PublicFooter({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
   const linkStyle = {
     background: "transparent",
     border: "none",
@@ -3110,8 +3141,8 @@ function PublicFooter({ onCreateAccount, onEnter, onNavigatePage }) {
   };
 
   return (
-    <footer style={{position:"relative",zIndex:2,padding:"0 24px 26px"}}>
-      <div style={{maxWidth:1180,margin:"0 auto",paddingTop:20,borderTop:"1px solid rgba(255,255,255,0.08)",display:"flex",justifyContent:"space-between",alignItems:"center",gap:16,flexWrap:"wrap"}}>
+    <footer style={{position:"relative",zIndex:2,padding:viewport.isMobile?"0 14px 22px":"0 24px 26px"}}>
+      <div style={{maxWidth:1180,margin:"0 auto",paddingTop:20,borderTop:"1px solid rgba(255,255,255,0.08)",display:"flex",justifyContent:"space-between",alignItems:viewport.isMobile?"flex-start":"center",gap:16,flexWrap:"wrap",flexDirection:viewport.isMobile?"column":"row"}}>
         <div>
           <div style={{fontSize:14,fontWeight:800}}>NutriCalc</div>
           <div style={{fontSize:13,color:"#94a3b8",marginTop:6}}>Planejamento alimentar, relatórios e histórico pessoal em uma única conta.</div>
@@ -3147,6 +3178,10 @@ function AuthModal({
 }) {
   const googleButtonRef = useRef(null);
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
+  const [authViewportWidth, setAuthViewportWidth] = useState(() => (
+    typeof window === "undefined" ? 1280 : window.innerWidth
+  ));
+  const authIsMobile = authViewportWidth < 768;
 
   useEffect(() => {
     if (!googleClientId || !googleButtonRef.current) return;
@@ -3205,23 +3240,30 @@ function AuthModal({
     }
   }, [authMode]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const handleResize = () => setAuthViewportWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
-    <div style={{...themeVars,minHeight:"100vh",background:"var(--app-bg)",color:"var(--app-text)",fontFamily:"'Outfit','Segoe UI',sans-serif",padding:"32px 20px",display:"flex",alignItems:"center",justifyContent:"center"}}>
-      <div style={{width:"100%",maxWidth:460,borderRadius:24,background:"linear-gradient(180deg,rgba(15,23,42,0.98),rgba(10,14,26,0.98))",border:"1px solid rgba(132,204,22,0.18)",boxShadow:"0 32px 100px rgba(0,0,0,0.45)",padding:24}}>
+    <div style={{...themeVars,minHeight:"100vh",background:"var(--app-bg)",color:"var(--app-text)",fontFamily:"'Outfit','Segoe UI',sans-serif",padding:authIsMobile?"18px 14px":"32px 20px",display:"flex",alignItems:"center",justifyContent:"center"}}>
+      <div style={{width:"100%",maxWidth:460,borderRadius:24,background:"linear-gradient(180deg,rgba(15,23,42,0.98),rgba(10,14,26,0.98))",border:"1px solid rgba(132,204,22,0.18)",boxShadow:"0 32px 100px rgba(0,0,0,0.45)",padding:authIsMobile?18:24}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"start",gap:12,marginBottom:18}}>
           <div>
             <button onClick={onBackToLanding} style={{display:"inline-flex",alignItems:"center",gap:8,background:"transparent",border:"none",padding:0,cursor:"pointer",color:"#93c5fd",fontSize:12,fontWeight:700,marginBottom:12}}>
               ← Voltar para a apresentação
             </button>
             <div style={{fontSize:30,fontWeight:900,letterSpacing:"-0.04em"}}>Nutri<span style={{color:"#84cc16"}}>Calc</span></div>
-            <div style={{fontSize:20,fontWeight:700,letterSpacing:"-0.02em",marginTop:8}}>{authMode === "register" ? "Criar sua conta" : "Acesse sua conta"}</div>
+            <div style={{fontSize:authIsMobile?18:20,fontWeight:700,letterSpacing:"-0.02em",marginTop:8,lineHeight:1.2}}>{authMode === "register" ? "Criar sua conta" : "Acesse sua conta"}</div>
             <div style={{fontSize:13,color:"#94a3b8",marginTop:6}}>
               {authMode === "register" ? "Entre no sistema para salvar dietas, relatórios e evolução corporal." : "Faça login para continuar de onde parou e centralizar seu histórico."}
             </div>
           </div>
         </div>
 
-        <div style={{display:"flex",gap:8,marginBottom:18}}>
+        <div style={{display:"flex",gap:8,marginBottom:18,flexDirection:authIsMobile?"column":"row"}}>
           {authMode !== "reset" && (
             <>
               <button onClick={() => onChangeMode("login")} style={{...pB,flex:1,background:authMode==="login"?"rgba(132,204,22,0.15)":"rgba(255,255,255,0.03)",borderColor:authMode==="login"?"#84cc16":"rgba(255,255,255,0.08)",color:authMode==="login"?"#a3e635":"#cbd5e1"}}>Entrar</button>
@@ -3285,7 +3327,7 @@ function AuthModal({
             </div>
 
             {googleClientId ? (
-              <div ref={googleButtonRef} style={{display:"flex",justifyContent:"center",minHeight:44,marginBottom:10}} />
+              <div ref={googleButtonRef} style={{display:"flex",justifyContent:"center",minHeight:44,marginBottom:10,overflow:"hidden"}} />
             ) : (
               <div style={{marginBottom:10,padding:"10px 12px",borderRadius:10,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",color:"#94a3b8",fontSize:12}}>
                 Login com Google preparado. Basta definir <code>VITE_GOOGLE_CLIENT_ID</code> no frontend e <code>GOOGLE_CLIENT_ID</code> no backend.
@@ -3320,8 +3362,8 @@ function AuthModal({
       </div>
 
       {forgotPasswordOpen && authMode === "login" && (
-        <div style={{position:"fixed",inset:0,background:"rgba(2,6,23,0.74)",display:"flex",alignItems:"center",justifyContent:"center",padding:20,zIndex:30}}>
-          <div style={{width:"100%",maxWidth:430,borderRadius:24,background:"linear-gradient(180deg,rgba(15,23,42,0.98),rgba(10,14,26,0.98))",border:"1px solid rgba(132,204,22,0.18)",boxShadow:"0 32px 100px rgba(0,0,0,0.45)",padding:22}}>
+        <div style={{position:"fixed",inset:0,background:"rgba(2,6,23,0.74)",display:"flex",alignItems:"center",justifyContent:"center",padding:authIsMobile?14:20,zIndex:30}}>
+          <div style={{width:"100%",maxWidth:430,borderRadius:24,background:"linear-gradient(180deg,rgba(15,23,42,0.98),rgba(10,14,26,0.98))",border:"1px solid rgba(132,204,22,0.18)",boxShadow:"0 32px 100px rgba(0,0,0,0.45)",padding:authIsMobile?18:22}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"start",gap:12,marginBottom:16}}>
               <div>
                 <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#d9f99d"}}>Recuperação de acesso</div>
@@ -3347,11 +3389,11 @@ function AuthModal({
             {authError && <div style={{marginBottom:12,padding:"10px 12px",borderRadius:10,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",color:"#fca5a5",fontSize:13}}>{authError}</div>}
             {authNotice && <div style={{marginBottom:12,padding:"10px 12px",borderRadius:10,background:"rgba(132,204,22,0.08)",border:"1px solid rgba(132,204,22,0.2)",color:"#d9f99d",fontSize:13}}>{authNotice}</div>}
 
-            <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-              <button onClick={onPasswordReset} disabled={authLoading} style={{...nBS,flex:1,opacity:authLoading?0.65:1}}>
+            <div style={{display:"flex",gap:10,flexWrap:"wrap",flexDirection:authIsMobile?"column":"row"}}>
+              <button onClick={onPasswordReset} disabled={authLoading} style={{...nBS,flex:1,opacity:authLoading?0.65:1,width:authIsMobile?"100%":"auto"}}>
                 {authLoading ? "Processando..." : "Recuperar senha"}
               </button>
-              <button onClick={() => setForgotPasswordOpen(false)} style={{...pB,padding:"12px 16px",borderColor:"rgba(255,255,255,0.12)",color:"#cbd5e1"}}>
+              <button onClick={() => setForgotPasswordOpen(false)} style={{...pB,padding:"12px 16px",borderColor:"rgba(255,255,255,0.12)",color:"#cbd5e1",width:authIsMobile?"100%":"auto"}}>
                 Fechar
               </button>
             </div>

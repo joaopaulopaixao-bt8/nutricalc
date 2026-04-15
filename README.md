@@ -2,6 +2,15 @@
 
 Sistema de cálculo nutricional e geração automática de dietas com foco em coerência alimentar realista, padrão de refeição brasileiro e evolução futura para área de usuário com histórico de saúde.
 
+## Critério permanente de interface
+
+Toda mudança visual e funcional do NutriCalc precisa sair pronta para desktop e mobile.
+
+- mobile é requisito obrigatório, não acabamento posterior
+- a interface precisa manter estética impecável em telas pequenas
+- não pode haver corte de conteúdo, botões escondidos, overflow lateral ou perda de ação importante
+- nenhuma tela deve ser considerada pronta sem validação visual e funcional em celular
+
 ## Estado atual
 
 Hoje o projeto já entrega:

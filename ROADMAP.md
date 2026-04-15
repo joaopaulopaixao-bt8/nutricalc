@@ -4,6 +4,12 @@
 
 O NutriCalc começou como um gerador de dietas e está evoluindo para um sistema mais completo de acompanhamento nutricional e histórico de saúde.
 
+Regra permanente de interface e entrega:
+- toda tela, fluxo e refinamento visual precisa funcionar também em mobile
+- mobile não é adaptação secundária; é requisito de produto
+- a estética em telas pequenas precisa ser impecável, sem cortes, sobreposição, overflow ou ações escondidas
+- nenhuma funcionalidade será considerada pronta sem validação visual e funcional em desktop e mobile
+
 A visão atual do produto é juntar três camadas:
 - geração inteligente de dietas
 - histórico pessoal de saúde
