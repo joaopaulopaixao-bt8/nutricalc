@@ -1605,23 +1605,30 @@ export default function NutriCalc() {
       const requiredWeight = String(bodyMetricForm.weight || "").trim();
       const requiredHeight = String(bodyMetricForm.height || "").trim();
       const calculatedAge = getAgeFromBirthDate(profileForm.birthDate);
+      const hasAvatarChange = Boolean(profileForm.avatarDataUrl);
+      const hasCoreProfileData =
+        Boolean(String(profileForm.name || "").trim()) &&
+        Boolean(profileForm.sex) &&
+        Boolean(profileForm.birthDate) &&
+        Boolean(requiredWeight) &&
+        Boolean(requiredHeight);
 
-      if (!String(profileForm.name || "").trim()) {
+      if (!hasAvatarChange && !String(profileForm.name || "").trim()) {
         throw new Error("Informe seu nome para continuar.");
       }
-      if (!profileForm.sex) {
+      if (!hasAvatarChange && !profileForm.sex) {
         throw new Error("Selecione seu sexo para calcular a dieta corretamente.");
       }
-      if (!profileForm.birthDate) {
+      if (!hasAvatarChange && !profileForm.birthDate) {
         throw new Error("Informe sua data de nascimento para calcular sua idade.");
       }
-      if (!requiredWeight || !requiredHeight) {
+      if (!hasAvatarChange && (!requiredWeight || !requiredHeight)) {
         throw new Error("Preencha peso e altura antes de continuar.");
       }
 
       const payload = await updateCurrentUser({
-        name: profileForm.name,
-        email: profileForm.email,
+        name: profileForm.name || undefined,
+        email: profileForm.email || undefined,
         sex: profileForm.sex || null,
         birthDate: profileForm.birthDate || null,
         avatarDataUrl: profileForm.avatarDataUrl || undefined,
@@ -1630,11 +1637,16 @@ export default function NutriCalc() {
       let nextUser = payload?.user || null;
 
       const shouldSaveMetric =
+        hasCoreProfileData &&
         !authUser ||
-        Number(authUser.weight ?? "") !== Number(requiredWeight) ||
-        Number(authUser.height ?? "") !== Number(requiredHeight) ||
-        Number(authUser.bodyFatPercentage ?? "") !== Number(bodyMetricForm.bodyFatPercentage || "") ||
-        String(authUser.birthDate || "").slice(0, 10) !== String(profileForm.birthDate || "");
+        (
+          hasCoreProfileData && (
+            Number(authUser.weight ?? "") !== Number(requiredWeight) ||
+            Number(authUser.height ?? "") !== Number(requiredHeight) ||
+            Number(authUser.bodyFatPercentage ?? "") !== Number(bodyMetricForm.bodyFatPercentage || "") ||
+            String(authUser.birthDate || "").slice(0, 10) !== String(profileForm.birthDate || "")
+          )
+        );
 
       if (shouldSaveMetric) {
         const metricPayload = await createBodyMetric({
@@ -1647,7 +1659,10 @@ export default function NutriCalc() {
           setBodyMetrics((prev) => [metricPayload.metric, ...prev].slice(0, 120));
         }
         if (metricPayload?.user) {
-          nextUser = metricPayload.user;
+          nextUser = {
+            ...metricPayload.user,
+            avatarUrl: metricPayload.user.avatarUrl || nextUser?.avatarUrl || authUser?.avatarUrl || null,
+          };
         }
       }
 
@@ -1680,8 +1695,14 @@ export default function NutriCalc() {
           age: calculatedAge || nextUser.age || "",
           sex: nextUser.sex || prev.sex || "M",
         }));
-        setProfileNotice("Perfil salvo com sucesso. Agora você já pode montar sua dieta.");
-        setProfileOpen(false);
+        setProfileNotice(
+          hasAvatarChange && !hasCoreProfileData
+            ? "Avatar salvo com sucesso."
+            : "Perfil salvo com sucesso. Agora você já pode montar sua dieta.",
+        );
+        if (hasCoreProfileData) {
+          setProfileOpen(false);
+        }
       }
     } catch (error) {
       setProfileError(error.message);
