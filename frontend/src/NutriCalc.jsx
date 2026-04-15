@@ -934,6 +934,17 @@ export default function NutriCalc() {
     setProfileForm((prev) => ({ ...prev, [key]: value }));
   }, []);
 
+  const readFileAsDataUrl = useCallback((file) => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      resolve(typeof reader.result === "string" ? reader.result : "");
+    };
+    reader.onerror = () => {
+      reject(new Error("Nao foi possivel ler a imagem selecionada."));
+    };
+    reader.readAsDataURL(file);
+  }), []);
+
   const updateBodyMetricForm = useCallback((key, value) => {
     setBodyMetricForm((prev) => ({ ...prev, [key]: value }));
   }, []);
@@ -1587,15 +1598,41 @@ export default function NutriCalc() {
     }
   }, []);
 
-  const handleProfileAvatarChange = useCallback((file) => {
+  const handleProfileAvatarChange = useCallback(async (file) => {
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = typeof reader.result === "string" ? reader.result : "";
-      setProfileForm((prev) => ({ ...prev, avatarDataUrl: result }));
-    };
-    reader.readAsDataURL(file);
-  }, []);
+    setProfileLoading(true);
+    setProfileError("");
+    setProfileNotice("");
+    try {
+      const avatarDataUrl = await readFileAsDataUrl(file);
+      setProfileForm((prev) => ({ ...prev, avatarDataUrl }));
+      const payload = await updateCurrentUser({ avatarDataUrl });
+      if (payload?.user) {
+        setAuthUser(payload.user);
+        setUserName((current) => current || payload.user.name || "");
+        setAuthForm((prev) => ({
+          ...prev,
+          name: payload.user.name || prev.name || "",
+          email: payload.user.email || prev.email || "",
+          resetEmail: payload.user.email || prev.resetEmail || "",
+        }));
+        setProfileForm((prev) => ({
+          ...prev,
+          name: payload.user.name || prev.name || "",
+          email: payload.user.email || prev.email || "",
+          sex: payload.user.sex || prev.sex || "",
+          birthDate: payload.user.birthDate ? String(payload.user.birthDate).slice(0, 10) : prev.birthDate,
+          avatarDataUrl: "",
+        }));
+        setProfileNotice("Avatar salvo com sucesso.");
+      }
+    } catch (error) {
+      setProfileForm((prev) => ({ ...prev, avatarDataUrl: "" }));
+      setProfileError(error.message);
+    } finally {
+      setProfileLoading(false);
+    }
+  }, [readFileAsDataUrl]);
 
   const handleProfileSave = useCallback(async () => {
     setProfileLoading(true);

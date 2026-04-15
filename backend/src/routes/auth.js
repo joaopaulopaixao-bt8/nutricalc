@@ -34,6 +34,26 @@ function isGoogleHostedAvatarUrl(value) {
   }
 }
 
+async function stabilizeGoogleAvatar(user) {
+  if (!user?.id || !user.googleId || !user.avatarUrl || !isGoogleHostedAvatarUrl(user.avatarUrl)) {
+    return user;
+  }
+
+  try {
+    const persistedAvatarUrl = await importAvatarFromRemoteUrl(user.avatarUrl, user.id);
+    if (!persistedAvatarUrl || persistedAvatarUrl === user.avatarUrl) {
+      return user;
+    }
+
+    return prisma.user.update({
+      where: { id: user.id },
+      data: { avatarUrl: persistedAvatarUrl },
+    });
+  } catch (error) {
+    return user;
+  }
+}
+
 async function createSession(userId, provider = "password", requestIp = null) {
   const sessionToken = buildSessionToken();
   const now = new Date();
@@ -90,7 +110,8 @@ async function syncUserBodyMetrics(userId) {
 }
 
 router.get("/me", requireAuth, async (req, res) => {
-  const user = await prisma.user.findUnique({ where: { id: req.authUser.id } });
+  const currentUser = await prisma.user.findUnique({ where: { id: req.authUser.id } });
+  const user = await stabilizeGoogleAvatar(currentUser);
   return res.json({ user: sanitizeUser(user) });
 });
 
@@ -585,6 +606,7 @@ router.post("/login", async (req, res) => {
         lastAccessIp: requestIp,
       },
     });
+    user = await stabilizeGoogleAvatar(user);
 
     const session = await createSession(user.id, "password", requestIp);
     setSessionCookie(res, session.rawToken);
