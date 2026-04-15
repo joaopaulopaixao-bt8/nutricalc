@@ -3,6 +3,7 @@ const { createClient } = require("@supabase/supabase-js");
 
 const DEFAULT_BUCKET = process.env.SUPABASE_AVATAR_BUCKET || "avatars";
 let supabaseClient = null;
+let bucketReadyPromise = null;
 
 const MIME_TO_EXTENSION = {
   "image/jpeg": "jpg",
@@ -31,6 +32,7 @@ async function uploadAvatarBuffer(buffer, mimeType, userId) {
   }
 
   const supabase = getSupabaseClient();
+  await ensureAvatarBucketExists();
   const fileName = `${userId}-${crypto.randomBytes(8).toString("hex")}.${extension}`;
   const storagePath = `users/${userId}/${fileName}`;
   const { error } = await supabase.storage.from(DEFAULT_BUCKET).upload(storagePath, buffer, {
@@ -72,6 +74,40 @@ function getPublicBaseUrl() {
     throw new Error("Configure SUPABASE_URL para montar a URL publica do avatar.");
   }
   return supabaseUrl.replace(/\/+$/, "");
+}
+
+async function ensureAvatarBucketExists() {
+  if (bucketReadyPromise) {
+    return bucketReadyPromise;
+  }
+
+  bucketReadyPromise = (async () => {
+    const supabase = getSupabaseClient();
+
+    const { data: existingBucket, error: getBucketError } = await supabase.storage.getBucket(DEFAULT_BUCKET);
+    if (!getBucketError && existingBucket) {
+      return existingBucket;
+    }
+
+    const { data: createdBucket, error: createBucketError } = await supabase.storage.createBucket(DEFAULT_BUCKET, {
+      public: true,
+      fileSizeLimit: 2 * 1024 * 1024,
+      allowedMimeTypes: Object.keys(MIME_TO_EXTENSION),
+    });
+
+    if (createBucketError) {
+      const message = createBucketError.message || "";
+      const alreadyExists = /already exists|duplicate/i.test(message);
+      if (!alreadyExists) {
+        bucketReadyPromise = null;
+        throw new Error(`Nao foi possivel preparar o bucket de avatar: ${message}`);
+      }
+    }
+
+    return createdBucket || true;
+  })();
+
+  return bucketReadyPromise;
 }
 
 function buildPublicAvatarUrl(storagePath) {
