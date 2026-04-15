@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://nutricalc-api.onrender.com/api/:path*"
+    },
+    {
+      "source": "/uploads/avatars/:path*",
+      "destination": "https://nutricalc-api.onrender.com/uploads/avatars/:path*"
+    }
+  ]
+}

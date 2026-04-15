@@ -403,7 +403,21 @@ function resolveMediaUrl(value) {
   if (/^https?:\/\//i.test(value) || value.startsWith("data:")) {
     return value;
   }
-  const baseUrl = import.meta.env.VITE_API_URL || "";
+  const baseUrl = (() => {
+    if (typeof window !== "undefined") {
+      const { hostname } = window.location;
+      const isLocalHost =
+        hostname === "localhost" ||
+        hostname === "127.0.0.1" ||
+        hostname.startsWith("192.168.") ||
+        hostname.startsWith("10.") ||
+        hostname.startsWith("172.");
+      if (!isLocalHost) {
+        return "";
+      }
+    }
+    return import.meta.env.VITE_API_URL || "";
+  })();
   if (baseUrl) {
     return `${baseUrl}${value.startsWith("/") ? value : `/${value}`}`;
   }

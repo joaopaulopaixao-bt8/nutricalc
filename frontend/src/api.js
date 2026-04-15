@@ -1,4 +1,24 @@
-const API_URL = import.meta.env.VITE_API_URL || "";
+function resolveApiBaseUrl() {
+  if (typeof window !== "undefined") {
+    const { hostname } = window.location;
+    const isLocalHost =
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname.startsWith("192.168.") ||
+      hostname.startsWith("10.") ||
+      hostname.startsWith("172.");
+
+    // In production/staging on the published site, prefer same-origin requests.
+    // This avoids cross-site auth cookies breaking on mobile browsers.
+    if (!isLocalHost) {
+      return "";
+    }
+  }
+
+  return import.meta.env.VITE_API_URL || "";
+}
+
+const API_URL = resolveApiBaseUrl();
 
 async function parseResponse(res) {
   const text = await res.text();
