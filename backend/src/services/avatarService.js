@@ -140,6 +140,39 @@ async function checkAvatarStorageHealth() {
   }
 }
 
+async function runAvatarStorageWriteCheck() {
+  const supabase = getSupabaseClient();
+  await ensureAvatarBucketExists();
+
+  // Tiny 1x1 PNG used only to verify write/delete permissions on the bucket.
+  const pngBuffer = Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9s3FoX8AAAAASUVORK5CYII=",
+    "base64",
+  );
+  const storagePath = `_health/check-${Date.now()}-${crypto.randomBytes(4).toString("hex")}.png`;
+
+  const uploadResult = await supabase.storage.from(DEFAULT_BUCKET).upload(storagePath, pngBuffer, {
+    contentType: "image/png",
+    upsert: false,
+  });
+
+  if (uploadResult.error) {
+    throw new Error(`Falha no upload de teste: ${uploadResult.error.message}`);
+  }
+
+  const removeResult = await supabase.storage.from(DEFAULT_BUCKET).remove([storagePath]);
+  if (removeResult.error) {
+    throw new Error(`Falha ao remover arquivo de teste: ${removeResult.error.message}`);
+  }
+
+  return {
+    bucket: DEFAULT_BUCKET,
+    uploaded: true,
+    removed: true,
+    publicUrlSample: buildPublicAvatarUrl(storagePath),
+  };
+}
+
 function extractStoragePath(avatarUrl) {
   if (!avatarUrl || typeof avatarUrl !== "string") return "";
 
@@ -206,5 +239,6 @@ module.exports = {
   ensureAvatarDirectory,
   importAvatarFromRemoteUrl,
   removeAvatarByUrl,
+  runAvatarStorageWriteCheck,
   saveAvatarFromDataUrl,
 };

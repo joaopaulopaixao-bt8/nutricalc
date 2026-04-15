@@ -2,7 +2,7 @@ const express = require("express");
 const { generateDiet } = require("../services/dietEngine");
 const { DEFAULT_DIET_GENERATION_CONFIG } = require("../config/dietGenerationConfig");
 const prisma = require("../lib/prisma");
-const { checkAvatarStorageHealth } = require("../services/avatarService");
+const { checkAvatarStorageHealth, runAvatarStorageWriteCheck } = require("../services/avatarService");
 
 const router = express.Router();
 
@@ -26,6 +26,15 @@ router.get("/health/avatar-storage", async (req, res) => {
   try {
     const health = await checkAvatarStorageHealth();
     res.json(health);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get("/health/avatar-storage/write-check", async (req, res) => {
+  try {
+    const result = await runAvatarStorageWriteCheck();
+    res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
