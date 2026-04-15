@@ -3672,17 +3672,17 @@ function ProfileModal({
             </div>
           </div>
 
-          <div style={{display:"flex",gap:10,marginTop:12}}>
-            <button onClick={onBodyMetricSave} disabled={bodyMetricsLoading} style={{...nBS,flex:"none",padding:"12px 18px",opacity:bodyMetricsLoading?0.65:1}}>
-              {bodyMetricsLoading ? "Salvando..." : editingBodyMetricId ? "Salvar alteração" : "Salvar registro corporal"}
+          <div style={{display:"flex",gap:10,marginTop:12,flexWrap:"wrap"}}>
+            <button onClick={onBodyMetricSave} disabled={bodyMetricsLoading} style={{...nBS,flex:profileIsMobile?"1 1 calc(50% - 5px)":"none",minWidth:profileIsMobile?0:"auto",padding:"12px 18px",opacity:bodyMetricsLoading?0.65:1}}>
+              {bodyMetricsLoading ? "Salvando..." : editingBodyMetricId ? "Salvar alteração" : "Salvar registro"}
             </button>
             {editingBodyMetricId && (
-              <button onClick={onBodyMetricCancelEdit} style={{...pB,flex:"none",padding:"12px 18px",borderColor:"rgba(255,255,255,0.12)",color:"#cbd5e1"}}>
+              <button onClick={onBodyMetricCancelEdit} style={{...pB,flex:profileIsMobile?"1 1 calc(50% - 5px)":"none",minWidth:profileIsMobile?0:"auto",padding:"12px 18px",borderColor:"rgba(255,255,255,0.12)",color:"#cbd5e1"}}>
                 Cancelar edição
               </button>
             )}
-            <button onClick={onBodyFatCalcOpen} style={{...pB,flex:"none",padding:"12px 18px",borderColor:"rgba(56,189,248,0.25)",color:"#38bdf8",background:"rgba(56,189,248,0.08)"}}>
-              Calcular meu percentual
+            <button onClick={onBodyFatCalcOpen} style={{...pB,flex:profileIsMobile?"1 1 calc(50% - 5px)":"none",minWidth:profileIsMobile?0:"auto",padding:"12px 18px",borderColor:"rgba(56,189,248,0.25)",color:"#38bdf8",background:"rgba(56,189,248,0.08)"}}>
+              Calcular % de gordura
             </button>
           </div>
 
@@ -3987,18 +3987,31 @@ function ProfileModal({
           </div>
         </div>
 
-        {bodyFatCalcOpen && (
-          <div style={{marginTop:18,padding:"16px",borderRadius:16,background:"rgba(56,189,248,0.06)",border:"1px solid rgba(56,189,248,0.18)"}}>
+        {profileError && <div style={{marginTop:14,padding:"10px 12px",borderRadius:10,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",color:"#fca5a5",fontSize:13}}>{profileError}</div>}
+        {profileNotice && <div style={{marginTop:14,padding:"10px 12px",borderRadius:10,background:"rgba(132,204,22,0.08)",border:"1px solid rgba(132,204,22,0.2)",color:"#d9f99d",fontSize:13}}>{profileNotice}</div>}
+
+        <div style={{display:"flex",gap:10,marginTop:20}}>
+          {!setupRequired && <button onClick={onClose} style={{...pB,flex:1,padding:"12px 16px",borderColor:"rgba(255,255,255,0.12)",color:"#cbd5e1"}}>Voltar ao painel</button>}
+          <button onClick={onSave} disabled={profileLoading} style={{...nBS,flex:1,opacity:profileLoading?0.65:1}}>
+            {profileLoading ? "Salvando..." : setupRequired ? "Salvar e continuar" : "Salvar perfil"}
+          </button>
+        </div>
+        </div>
+      </div>
+
+      {bodyFatCalcOpen && (
+        <div style={{position:"fixed",inset:0,zIndex:40,background:"rgba(2,6,23,0.78)",display:"flex",alignItems:profileIsMobile?"flex-end":"center",justifyContent:"center",padding:profileIsMobile?"12px":"24px"}}>
+          <div style={{width:"100%",maxWidth:profileIsMobile?"100%":"760px",maxHeight:profileIsMobile?"88vh":"min(88vh, 760px)",overflowY:"auto",borderRadius:profileIsMobile?"24px 24px 0 0":"24px",padding:profileIsMobile?"18px 14px 18px":"22px 22px 20px",background:"linear-gradient(180deg,rgba(15,23,42,0.99),rgba(10,14,26,0.98))",border:"1px solid rgba(56,189,248,0.18)",boxShadow:"0 32px 100px rgba(0,0,0,0.45)"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"start",gap:12,marginBottom:12}}>
               <div>
                 <div style={{fontSize:12,letterSpacing:"0.12em",textTransform:"uppercase",color:"#38bdf8",fontWeight:800}}>Estimativa corporal</div>
-                <div style={{fontSize:18,fontWeight:800}}>Calculadora Navy</div>
-                <div style={{fontSize:12,color:"#94a3b8",marginTop:4}}>Estimativa baseada na fórmula da Marinha dos EUA. É um bom ponto de partida, mas pode variar em relação à avaliação presencial.</div>
+                <div style={{fontSize:profileIsMobile?20:22,fontWeight:800,marginTop:6}}>Calculadora Navy</div>
+                <div style={{fontSize:12,color:"#94a3b8",marginTop:6,lineHeight:1.55}}>Estimativa baseada na fórmula da Marinha dos EUA. É um bom ponto de partida, mas pode variar em relação à avaliação presencial.</div>
               </div>
-              <button onClick={onBodyFatCalcClose} style={{background:"transparent",border:"none",color:"#94a3b8",fontSize:22,cursor:"pointer"}}>×</button>
+              <button onClick={onBodyFatCalcClose} style={{width:36,height:36,borderRadius:12,border:"1px solid rgba(255,255,255,0.08)",background:"rgba(255,255,255,0.03)",color:"#cbd5e1",fontSize:22,cursor:"pointer",flexShrink:0}}>×</button>
             </div>
 
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+            <div style={{display:"grid",gridTemplateColumns:profileIsMobile?"1fr":"repeat(2,minmax(0,1fr))",gap:12}}>
               <div>
                 <label style={lS}>Sexo</label>
                 <CustomSelect
@@ -4032,16 +4045,16 @@ function ProfileModal({
             </div>
 
             <div style={{display:"flex",gap:10,marginTop:12,flexWrap:"wrap"}}>
-              <button onClick={onBodyFatCalculate} disabled={bodyFatCalcLoading} style={{...nBS,flex:"none",padding:"12px 18px",opacity:bodyFatCalcLoading?0.65:1}}>
+              <button onClick={onBodyFatCalculate} disabled={bodyFatCalcLoading} style={{...nBS,flex:profileIsMobile?"1 1 100%":"none",width:profileIsMobile?"100%":"auto",padding:"12px 18px",opacity:bodyFatCalcLoading?0.65:1}}>
                 {bodyFatCalcLoading ? "Calculando..." : "Calcular"}
               </button>
               {bodyFatCalcResult && (
                 <>
-                  <button onClick={onUseCalculatedBodyFat} style={{...pB,flex:"none",padding:"12px 18px",borderColor:"rgba(132,204,22,0.25)",color:"#a3e635",background:"rgba(132,204,22,0.08)"}}>
+                  <button onClick={onUseCalculatedBodyFat} style={{...pB,flex:profileIsMobile?"1 1 100%":"none",width:profileIsMobile?"100%":"auto",padding:"12px 18px",borderColor:"rgba(132,204,22,0.25)",color:"#a3e635",background:"rgba(132,204,22,0.08)"}}>
                     Usar este valor no perfil
                   </button>
-                  <button onClick={onSaveCalculatedBodyFat} disabled={bodyMetricsLoading} style={{...pB,flex:"none",padding:"12px 18px",borderColor:"rgba(255,255,255,0.12)",color:"#cbd5e1"}}>
-                    Salvar no histórico
+                  <button onClick={onSaveCalculatedBodyFat} disabled={bodyMetricsLoading} style={{...pB,flex:profileIsMobile?"1 1 100%":"none",width:profileIsMobile?"100%":"auto",padding:"12px 18px",borderColor:"rgba(255,255,255,0.12)",color:"#cbd5e1"}}>
+                    Salvar registro
                   </button>
                 </>
               )}
@@ -4052,23 +4065,12 @@ function ProfileModal({
               <div style={{marginTop:12,padding:"12px 14px",borderRadius:12,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)"}}>
                 <div style={{fontSize:11,color:"#38bdf8",textTransform:"uppercase",letterSpacing:"0.08em"}}>Resultado estimado</div>
                 <div style={{fontSize:28,fontWeight:800,color:"#e2e8f0",marginTop:4}}>{bodyFatCalcResult.bodyFatPercentage}%</div>
-                <div style={{fontSize:12,color:"#94a3b8",marginTop:6}}>{bodyFatCalcResult.note}</div>
+                <div style={{fontSize:12,color:"#94a3b8",marginTop:6,lineHeight:1.55}}>{bodyFatCalcResult.note}</div>
               </div>
             )}
           </div>
-        )}
-
-        {profileError && <div style={{marginTop:14,padding:"10px 12px",borderRadius:10,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",color:"#fca5a5",fontSize:13}}>{profileError}</div>}
-        {profileNotice && <div style={{marginTop:14,padding:"10px 12px",borderRadius:10,background:"rgba(132,204,22,0.08)",border:"1px solid rgba(132,204,22,0.2)",color:"#d9f99d",fontSize:13}}>{profileNotice}</div>}
-
-        <div style={{display:"flex",gap:10,marginTop:20}}>
-          {!setupRequired && <button onClick={onClose} style={{...pB,flex:1,padding:"12px 16px",borderColor:"rgba(255,255,255,0.12)",color:"#cbd5e1"}}>Voltar ao painel</button>}
-          <button onClick={onSave} disabled={profileLoading} style={{...nBS,flex:1,opacity:profileLoading?0.65:1}}>
-            {profileLoading ? "Salvando..." : setupRequired ? "Salvar e continuar" : "Salvar perfil"}
-          </button>
         </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
