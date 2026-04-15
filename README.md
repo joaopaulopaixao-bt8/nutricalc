@@ -4,7 +4,7 @@ Sistema de cálculo nutricional e geração automática de dietas com foco em co
 
 ## Critério permanente de interface
 
-Toda mudança visual e funcional do NutriCalc precisa sair pronta para desktop e mobile.
+Toda mudança visual e funcional do NutriCalc precisa sair pronta para desktop e mobile. Funcionamento impecável em mobile é imprescindível.
 
 - mobile é requisito obrigatório, não acabamento posterior
 - a interface precisa manter estética impecável em telas pequenas

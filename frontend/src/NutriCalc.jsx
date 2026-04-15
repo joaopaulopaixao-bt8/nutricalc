@@ -2219,7 +2219,7 @@ export default function NutriCalc() {
       <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
       <div style={{position:"fixed",inset:0,zIndex:0,opacity:0.03,backgroundImage:`linear-gradient(rgba(132,204,22,0.3) 1px,transparent 1px),linear-gradient(90deg,rgba(132,204,22,0.3) 1px,transparent 1px)`,backgroundSize:"40px 40px"}}/>
 
-      <header style={{position:"relative",zIndex:10,padding:appIsMobile?"14px 14px 12px":"20px 24px",borderBottom:"1px solid rgba(132,204,22,0.15)",display:"flex",alignItems:appIsMobile?"stretch":"center",justifyContent:"space-between",flexDirection:appIsMobile?"column":"row",gap:appIsMobile?12:16}}>
+      <header style={{position:"relative",zIndex:10,padding:appIsMobile?"12px 14px 10px":"20px 24px",borderBottom:"1px solid rgba(132,204,22,0.15)",display:"flex",alignItems:appIsMobile?"stretch":"center",justifyContent:"space-between",flexDirection:appIsMobile?"column":"row",gap:appIsMobile?10:16}}>
         <div style={{display:"flex",alignItems:"center",gap:12,justifyContent:appIsMobile?"space-between":"flex-start",width:appIsMobile?"100%":"auto"}}>
           <div style={{width:36,height:36,borderRadius:8,background:"linear-gradient(135deg,#84cc16,#65a30d)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,fontWeight:900,color:"#0f172a"}}>N</div>
           <span style={{fontSize:20,fontWeight:700,letterSpacing:"-0.02em"}}>Nutri<span style={{color:"#84cc16"}}>Calc</span></span>
@@ -2228,7 +2228,7 @@ export default function NutriCalc() {
         <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap",width:appIsMobile?"100%":"auto",justifyContent:appIsMobile?"flex-start":"flex-end"}}>
           {authUser ? (
             <>
-              <div style={{display:"flex",alignItems:"center",gap:10,padding:"8px 12px",borderRadius:14,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",width:appIsMobile?"100%":"auto",minWidth:0}}>
+              <div style={{display:"flex",alignItems:"center",gap:10,padding:appIsMobile?"8px 10px":"8px 12px",borderRadius:14,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",width:appIsMobile?"100%":"auto",minWidth:0}}>
                 <div style={{width:34,height:34,borderRadius:"50%",overflow:"hidden",background:"linear-gradient(135deg,#1e293b,#334155)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:800,color:"#a3e635"}}>
                   {authUser.avatarUrl ? <img src={resolveMediaUrl(authUser.avatarUrl)} alt={authUser.name || "Usuario"} style={{width:"100%",height:"100%",objectFit:"cover"}} /> : (authUser.name || "U").slice(0, 1).toUpperCase()}
                 </div>
@@ -2237,8 +2237,8 @@ export default function NutriCalc() {
                   <div style={{fontSize:11,color:"#94a3b8",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{authUser.email || "Conta ativa"}</div>
                 </div>
               </div>
-              <button onClick={() => { setProfileOpen(true); setProfileError(""); setProfileNotice(""); }} style={{...pB,padding:"10px 14px",borderColor:"rgba(132,204,22,0.2)",color:"#a3e635",background:"rgba(132,204,22,0.08)",flex:appIsMobile?"1 1 calc(50% - 5px)":"none",minWidth:appIsMobile?0:"auto"}}>Perfil</button>
-              <button onClick={handleLogout} style={{...pB,padding:"10px 14px",borderColor:"rgba(255,255,255,0.12)",color:"#cbd5e1",flex:appIsMobile?"1 1 calc(50% - 5px)":"none",minWidth:appIsMobile?0:"auto"}}>Sair</button>
+              <button onClick={() => { setProfileOpen(true); setProfileError(""); setProfileNotice(""); }} style={{...pB,padding:appIsMobile?"10px 12px":"10px 14px",borderColor:"rgba(132,204,22,0.2)",color:"#a3e635",background:"rgba(132,204,22,0.08)",flex:appIsMobile?"1 1 calc(50% - 26px)":"none",minWidth:appIsMobile?0:"auto"}}>Perfil</button>
+              <button onClick={handleLogout} style={{...pB,padding:appIsMobile?"10px 12px":"10px 14px",borderColor:"rgba(255,255,255,0.12)",color:"#cbd5e1",flex:appIsMobile?"1 1 calc(50% - 26px)":"none",minWidth:appIsMobile?0:"auto"}}>Sair</button>
             </>
           ) : (
             <div style={{fontSize:13,color:"#94a3b8"}}>Acesso protegido</div>
@@ -2248,7 +2248,7 @@ export default function NutriCalc() {
               setSettingsTab("prioridades");
               setSettingsOpen((prev) => !prev);
             }}
-            style={{width:42,height:42,borderRadius:12,border:"1px solid rgba(132,204,22,0.2)",background:settingsOpen?"rgba(132,204,22,0.14)":"rgba(255,255,255,0.04)",color:settingsOpen?"#a3e635":"#cbd5e1",cursor:"pointer",fontSize:18,marginLeft:appIsMobile?0:"auto"}}
+            style={{width:42,height:42,borderRadius:12,border:"1px solid rgba(132,204,22,0.2)",background:settingsOpen?"rgba(132,204,22,0.14)":"rgba(255,255,255,0.04)",color:settingsOpen?"#a3e635":"#cbd5e1",cursor:"pointer",fontSize:18,marginLeft:appIsMobile?0:"auto",flexShrink:0}}
             title="Configurações da geração"
           >
             ⚙
@@ -2802,24 +2802,24 @@ function PublicHeader({ currentPage, onCreateAccount, onEnter, onNavigatePage, v
     background: "rgba(255,255,255,0.03)",
     color: "#cbd5e1",
     borderRadius: 999,
-    padding: "10px 16px",
+    padding: viewport.isMobile ? "10px 14px" : "10px 16px",
     cursor: "pointer",
     fontSize: 13,
     fontWeight: 600,
   };
 
   return (
-    <header style={{position:"sticky",top:0,zIndex:5,padding:viewport.isMobile?"10px 14px 6px":"18px 24px 8px",backdropFilter:viewport.isMobile?"blur(10px)":"blur(18px)",background:viewport.isMobile?"linear-gradient(180deg,rgba(8,17,31,0.92),rgba(8,17,31,0.72))":"transparent"}}>
-      <div style={{maxWidth:1180,margin:"0 auto",display:"flex",alignItems:viewport.isMobile?"stretch":"center",justifyContent:"space-between",gap:viewport.isMobile?14:18,flexWrap:"wrap",flexDirection:viewport.isMobile?"column":"row"}}>
+    <header style={{position:"sticky",top:0,zIndex:5,padding:viewport.isMobile?"8px 14px 4px":"18px 24px 8px",backdropFilter:viewport.isMobile?"blur(8px)":"blur(18px)",background:viewport.isMobile?"linear-gradient(180deg,rgba(8,17,31,0.88),rgba(8,17,31,0.56))":"transparent"}}>
+      <div style={{maxWidth:1180,margin:"0 auto",display:"flex",alignItems:viewport.isMobile?"stretch":"center",justifyContent:"space-between",gap:viewport.isMobile?12:18,flexWrap:"wrap",flexDirection:viewport.isMobile?"column":"row"}}>
         <button onClick={() => onNavigatePage("landing")} style={{display:"flex",alignItems:"center",gap:12,background:"transparent",border:"none",color:"#e2e8f0",cursor:"pointer",padding:0}}>
           <div style={{width:42,height:42,borderRadius:14,background:"linear-gradient(135deg,#84cc16,#65a30d)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,fontWeight:900,color:"#0f172a",boxShadow:"0 16px 32px rgba(101,163,13,0.24)"}}>N</div>
           <div style={{textAlign:"left"}}>
             <div style={{fontSize:21,fontWeight:800,letterSpacing:"-0.03em"}}>Nutri<span style={{color:"#84cc16"}}>Calc</span></div>
-            <div style={{fontSize:12,color:"#94a3b8"}}>Planejamento alimentar com histórico pessoal</div>
+            <div style={{fontSize:viewport.isMobile?11:12,color:"#94a3b8"}}>Planejamento alimentar com histórico pessoal</div>
           </div>
         </button>
 
-        <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap",justifyContent:viewport.isMobile?"flex-start":"flex-end"}}>
+        <div style={{display:viewport.isMobile?"grid":"flex",gridTemplateColumns:viewport.isMobile?"repeat(2, minmax(0, 1fr))":undefined,alignItems:"center",gap:10,flexWrap:"wrap",justifyContent:viewport.isMobile?"stretch":"flex-end",width:viewport.isMobile?"100%":"auto"}}>
           {[
             { key: "methodology", label: "Metodologia" },
             { key: "privacy", label: "Privacidade" },
@@ -2833,13 +2833,14 @@ function PublicHeader({ currentPage, onCreateAccount, onEnter, onNavigatePage, v
                 borderColor: currentPage === item.key ? "rgba(132,204,22,0.34)" : "rgba(255,255,255,0.09)",
                 background: currentPage === item.key ? "rgba(132,204,22,0.12)" : navButtonStyle.background,
                 color: currentPage === item.key ? "#d9f99d" : navButtonStyle.color,
+                width: viewport.isMobile ? "100%" : "auto",
               }}
             >
               {item.label}
             </button>
           ))}
-          <button onClick={onEnter} style={{...navButtonStyle,borderColor:"rgba(132,204,22,0.26)",color:"#d9f99d"}}>Entrar</button>
-          <button onClick={onCreateAccount} style={{border:"none",borderRadius:999,padding:"11px 18px",cursor:"pointer",fontSize:13,fontWeight:800,background:"linear-gradient(135deg,#84cc16,#65a30d)",color:"#0f172a",boxShadow:"0 18px 32px rgba(101,163,13,0.24)"}}>Criar conta</button>
+          <button onClick={onEnter} style={{...navButtonStyle,borderColor:"rgba(132,204,22,0.26)",color:"#d9f99d",width:viewport.isMobile ? "100%" : "auto"}}>Entrar</button>
+          <button onClick={onCreateAccount} style={{border:"none",borderRadius:999,padding:"11px 18px",cursor:"pointer",fontSize:13,fontWeight:800,background:"linear-gradient(135deg,#84cc16,#65a30d)",color:"#0f172a",boxShadow:"0 18px 32px rgba(101,163,13,0.24)",width:viewport.isMobile ? "100%" : "auto",gridColumn:viewport.isMobile ? "1 / -1" : "auto"}}>Criar conta</button>
         </div>
       </div>
     </header>
@@ -2862,20 +2863,20 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
 
   return (
     <>
-      <section style={{padding:viewport.isMobile?"22px 0 18px":"34px 0 26px"}}>
+      <section style={{padding:viewport.isMobile?"18px 0 16px":"34px 0 26px"}}>
         <div style={{...sectionWrap,padding:viewport.isMobile?"0 14px":"0 24px",display:"grid",gridTemplateColumns:viewport.isTablet?"1fr":"minmax(0,1.15fr) minmax(320px,0.85fr)",gap:viewport.isMobile?16:28,alignItems:"stretch"}}>
-          <div style={{...cardStyle,padding:viewport.isMobile?"22px 18px":"32px 30px"}}>
-            <div style={{display:"inline-flex",alignItems:"center",gap:10,padding:"9px 14px",borderRadius:999,background:"rgba(132,204,22,0.1)",border:"1px solid rgba(132,204,22,0.16)",fontSize:12,fontWeight:800,letterSpacing:"0.08em",textTransform:"uppercase",color:"#d9f99d"}}>
+          <div style={{...cardStyle,padding:viewport.isMobile?"20px 16px":"32px 30px"}}>
+            <div style={{display:"inline-flex",alignItems:"center",gap:10,padding:viewport.isMobile?"8px 12px":"9px 14px",borderRadius:999,background:"rgba(132,204,22,0.1)",border:"1px solid rgba(132,204,22,0.16)",fontSize:viewport.isMobile?11:12,fontWeight:800,letterSpacing:"0.08em",textTransform:"uppercase",color:"#d9f99d"}}>
               Nutrição com histórico e acompanhamento
             </div>
-            <h1 style={{fontSize:viewport.isMobile?"clamp(32px,11vw,42px)":"clamp(40px,6vw,68px)",lineHeight:viewport.isMobile?1.02:0.95,letterSpacing:"-0.06em",margin:"18px 0 16px",maxWidth:720}}>
+            <h1 style={{fontSize:viewport.isMobile?"clamp(28px,9vw,36px)":"clamp(40px,6vw,68px)",lineHeight:viewport.isMobile?1.04:0.95,letterSpacing:viewport.isMobile?"-0.05em":"-0.06em",margin:viewport.isMobile?"14px 0 12px":"18px 0 16px",maxWidth:720}}>
               Seu planejamento alimentar em um painel claro, privado e pronto para evoluir com você.
             </h1>
-            <p style={{fontSize:viewport.isMobile?16:18,lineHeight:1.65,color:"#cbd5e1",maxWidth:700,margin:0}}>
+            <p style={{fontSize:viewport.isMobile?15:18,lineHeight:viewport.isMobile?1.6:1.65,color:"#cbd5e1",maxWidth:700,margin:0}}>
               O NutriCalc reúne cálculo energético, geração de dieta, relatórios e histórico corporal em uma única conta. Você entra, organiza seu perfil e acompanha a evolução sem perder contexto entre uma sessão e outra.
             </p>
 
-            <div style={{display:"flex",gap:12,marginTop:26,flexWrap:"wrap",flexDirection:viewport.isMobile?"column":"row"}}>
+            <div style={{display:"flex",gap:12,marginTop:viewport.isMobile?20:26,flexWrap:"wrap",flexDirection:viewport.isMobile?"column":"row"}}>
               <button onClick={onEnter} style={{border:"none",borderRadius:999,padding:"15px 22px",cursor:"pointer",fontSize:15,fontWeight:800,background:"linear-gradient(135deg,#84cc16,#65a30d)",color:"#0f172a",width:viewport.isMobile?"100%":"auto"}}>Entrar</button>
               <button onClick={onCreateAccount} style={{border:"1px solid rgba(255,255,255,0.1)",borderRadius:999,padding:"15px 22px",cursor:"pointer",fontSize:15,fontWeight:700,background:"rgba(255,255,255,0.03)",color:"#e2e8f0",width:viewport.isMobile?"100%":"auto"}}>Criar conta</button>
               <button onClick={() => onNavigatePage("methodology")} style={{border:"1px solid rgba(59,130,246,0.22)",borderRadius:999,padding:"15px 22px",cursor:"pointer",fontSize:15,fontWeight:700,background:"rgba(59,130,246,0.08)",color:"#bfdbfe",width:viewport.isMobile?"100%":"auto"}}>Ver metodologia</button>
@@ -2895,11 +2896,11 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
             </div>
           </div>
 
-          <div style={{...cardStyle,padding:viewport.isMobile?18:24,display:"flex",flexDirection:"column",justifyContent:"space-between",gap:18}}>
+          <div style={{...cardStyle,padding:viewport.isMobile?"16px":"24px",display:"flex",flexDirection:"column",justifyContent:"space-between",gap:viewport.isMobile?14:18}}>
             <div style={{display:"grid",gap:14}}>
               <div style={{padding:"18px 18px 16px",borderRadius:22,background:"linear-gradient(135deg, rgba(132,204,22,0.12), rgba(59,130,246,0.08))",border:"1px solid rgba(132,204,22,0.18)"}}>
                 <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#d9f99d"}}>Dentro do sistema</div>
-                <div style={{fontSize:24,fontWeight:800,marginTop:8,lineHeight:1.15}}>A conta vira o centro do acompanhamento, não só um acesso técnico.</div>
+                <div style={{fontSize:viewport.isMobile?21:24,fontWeight:800,marginTop:8,lineHeight:1.15}}>A conta vira o centro do acompanhamento, não só um acesso técnico.</div>
               </div>
               {[
                 ["Perfil pessoal", "Nome, dados corporais, avatar e auditoria básica ajudam a manter um histórico consistente."],
@@ -2993,11 +2994,11 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
         </div>
       </section>
 
-      <section style={{padding:"18px 0 10px"}}>
+      <section style={{padding:viewport.isMobile?"12px 0 8px":"18px 0 10px"}}>
         <div style={{...sectionWrap}}>
-          <div style={{...cardStyle,padding:"28px 26px"}}>
+          <div style={{...cardStyle,padding:viewport.isMobile?"22px 18px":"28px 26px"}}>
             <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#d9f99d"}}>Como funciona</div>
-            <div style={{fontSize:32,fontWeight:800,letterSpacing:"-0.04em",marginTop:10}}>Um fluxo simples para sair do acesso e chegar ao acompanhamento.</div>
+            <div style={{fontSize:viewport.isMobile?24:32,fontWeight:800,letterSpacing:"-0.04em",marginTop:10,lineHeight:1.08}}>Um fluxo simples para sair do acesso e chegar ao acompanhamento.</div>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:14,marginTop:22}}>
               {[
                 ["1. Entrar ou criar conta", "A landing apresenta o produto e leva a pessoa para autenticação só quando ela decide continuar."],
@@ -3040,12 +3041,12 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
 function PublicInfoPage({ eyebrow, title, intro, sections, onCreateAccount, onEnter, viewport }) {
   const summaryCards = sections.slice(0, 3).map((section) => section.title);
   return (
-    <section style={{padding:"34px 0 56px"}}>
+    <section style={{padding:viewport.isMobile?"20px 0 36px":"34px 0 56px"}}>
       <div style={{maxWidth:980,margin:"0 auto",padding:viewport.isMobile?"0 14px":"0 24px"}}>
-        <div style={{borderRadius:28,padding:"30px 28px",border:"1px solid rgba(255,255,255,0.08)",background:"linear-gradient(180deg, rgba(15,23,42,0.92), rgba(8,14,24,0.86))",boxShadow:"0 30px 80px rgba(0,0,0,0.28)"}}>
+        <div style={{borderRadius:28,padding:viewport.isMobile?"22px 18px":"30px 28px",border:"1px solid rgba(255,255,255,0.08)",background:"linear-gradient(180deg, rgba(15,23,42,0.92), rgba(8,14,24,0.86))",boxShadow:"0 30px 80px rgba(0,0,0,0.28)"}}>
           <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:800,color:"#d9f99d"}}>{eyebrow}</div>
-          <h1 style={{fontSize:"clamp(34px,5vw,52px)",lineHeight:0.98,letterSpacing:"-0.05em",margin:"12px 0 14px"}}>{title}</h1>
-          <p style={{fontSize:17,lineHeight:1.7,color:"#cbd5e1",margin:"0 0 24px",maxWidth:780}}>{intro}</p>
+          <h1 style={{fontSize:viewport.isMobile?"clamp(28px,9vw,36px)":"clamp(34px,5vw,52px)",lineHeight:viewport.isMobile?1.04:0.98,letterSpacing:"-0.05em",margin:"12px 0 14px"}}>{title}</h1>
+          <p style={{fontSize:viewport.isMobile?15:17,lineHeight:viewport.isMobile?1.65:1.7,color:"#cbd5e1",margin:"0 0 24px",maxWidth:780}}>{intro}</p>
 
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:12,marginBottom:24}}>
             {summaryCards.map((label) => (
@@ -3320,16 +3321,16 @@ function AuthModal({
   }, []);
 
   return (
-    <div style={{...themeVars,minHeight:"100vh",background:"var(--app-bg)",color:"var(--app-text)",fontFamily:"'Outfit','Segoe UI',sans-serif",padding:authIsMobile?"18px 14px":"32px 20px",display:"flex",alignItems:"center",justifyContent:"center"}}>
-      <div style={{width:"100%",maxWidth:460,borderRadius:24,background:"linear-gradient(180deg,rgba(15,23,42,0.98),rgba(10,14,26,0.98))",border:"1px solid rgba(132,204,22,0.18)",boxShadow:"0 32px 100px rgba(0,0,0,0.45)",padding:authIsMobile?18:24}}>
+    <div style={{...themeVars,minHeight:"100vh",background:"var(--app-bg)",color:"var(--app-text)",fontFamily:"'Outfit','Segoe UI',sans-serif",padding:authIsMobile?"14px 14px 18px":"32px 20px",display:"flex",alignItems:"center",justifyContent:"center"}}>
+      <div style={{width:"100%",maxWidth:460,borderRadius:24,background:"linear-gradient(180deg,rgba(15,23,42,0.98),rgba(10,14,26,0.98))",border:"1px solid rgba(132,204,22,0.18)",boxShadow:"0 32px 100px rgba(0,0,0,0.45)",padding:authIsMobile?"16px":"24px"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"start",gap:12,marginBottom:18}}>
           <div>
             <button onClick={onBackToLanding} style={{display:"inline-flex",alignItems:"center",gap:8,background:"transparent",border:"none",padding:0,cursor:"pointer",color:"#93c5fd",fontSize:12,fontWeight:700,marginBottom:12}}>
               ← Voltar para a apresentação
             </button>
-            <div style={{fontSize:30,fontWeight:900,letterSpacing:"-0.04em"}}>Nutri<span style={{color:"#84cc16"}}>Calc</span></div>
-            <div style={{fontSize:authIsMobile?18:20,fontWeight:700,letterSpacing:"-0.02em",marginTop:8,lineHeight:1.2}}>{authMode === "register" ? "Criar sua conta" : "Acesse sua conta"}</div>
-            <div style={{fontSize:13,color:"#94a3b8",marginTop:6}}>
+            <div style={{fontSize:authIsMobile?27:30,fontWeight:900,letterSpacing:"-0.04em"}}>Nutri<span style={{color:"#84cc16"}}>Calc</span></div>
+            <div style={{fontSize:authIsMobile?17:20,fontWeight:700,letterSpacing:"-0.02em",marginTop:8,lineHeight:1.2}}>{authMode === "register" ? "Criar sua conta" : "Acesse sua conta"}</div>
+            <div style={{fontSize:authIsMobile?12:13,color:"#94a3b8",marginTop:6,lineHeight:1.55}}>
               {authMode === "register" ? "Entre no sistema para salvar dietas, relatórios e evolução corporal." : "Faça login para continuar de onde parou e centralizar seu histórico."}
             </div>
           </div>
@@ -3399,7 +3400,7 @@ function AuthModal({
             </div>
 
             {googleClientId ? (
-              <div ref={googleButtonRef} style={{display:"flex",justifyContent:"center",minHeight:44,marginBottom:10,overflow:"hidden"}} />
+              <div ref={googleButtonRef} style={{display:"flex",justifyContent:"center",minHeight:44,marginBottom:10,overflow:"hidden",width:"100%"}} />
             ) : (
               <div style={{marginBottom:10,padding:"10px 12px",borderRadius:10,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",color:"#94a3b8",fontSize:12}}>
                 Login com Google preparado. Basta definir <code>VITE_GOOGLE_CLIENT_ID</code> no frontend e <code>GOOGLE_CLIENT_ID</code> no backend.
@@ -3420,7 +3421,7 @@ function AuthModal({
               </div>
             )}
 
-            <div style={{marginTop:14,padding:"10px 12px",borderRadius:10,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",color:"#94a3b8",fontSize:12}}>
+            <div style={{marginTop:14,padding:authIsMobile?"10px 12px":"10px 12px",borderRadius:10,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",color:"#94a3b8",fontSize:12,lineHeight:1.55}}>
               Seus dados de saúde, dietas, relatórios e evolução corporal ficam vinculados apenas à sua conta. As páginas públicas de privacidade, termos e metodologia já fazem parte da entrada do produto.
             </div>
           </>
@@ -3435,11 +3436,11 @@ function AuthModal({
 
       {forgotPasswordOpen && authMode === "login" && (
         <div style={{position:"fixed",inset:0,background:"rgba(2,6,23,0.74)",display:"flex",alignItems:"center",justifyContent:"center",padding:authIsMobile?14:20,zIndex:30}}>
-          <div style={{width:"100%",maxWidth:430,borderRadius:24,background:"linear-gradient(180deg,rgba(15,23,42,0.98),rgba(10,14,26,0.98))",border:"1px solid rgba(132,204,22,0.18)",boxShadow:"0 32px 100px rgba(0,0,0,0.45)",padding:authIsMobile?18:22}}>
+          <div style={{width:"100%",maxWidth:430,borderRadius:24,background:"linear-gradient(180deg,rgba(15,23,42,0.98),rgba(10,14,26,0.98))",border:"1px solid rgba(132,204,22,0.18)",boxShadow:"0 32px 100px rgba(0,0,0,0.45)",padding:authIsMobile?"16px":"22px"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"start",gap:12,marginBottom:16}}>
               <div>
                 <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#d9f99d"}}>Recuperação de acesso</div>
-                <div style={{fontSize:22,fontWeight:800,letterSpacing:"-0.03em",marginTop:8}}>Recuperar senha</div>
+                <div style={{fontSize:authIsMobile?20:22,fontWeight:800,letterSpacing:"-0.03em",marginTop:8}}>Recuperar senha</div>
                 <div style={{fontSize:13,lineHeight:1.6,color:"#94a3b8",marginTop:8}}>
                   Informe o email da sua conta. Se ele estiver cadastrado, enviaremos as instruções para redefinir a senha.
                 </div>
@@ -3531,6 +3532,7 @@ function ProfileModal({
 }) {
   const previewAvatar = profileForm.avatarDataUrl || resolveMediaUrl(currentAvatarUrl);
   const calculatedAge = getAgeFromBirthDate(profileForm.birthDate || authUser.birthDate || "");
+  const profileIsMobile = typeof window !== "undefined" ? window.innerWidth < 768 : false;
   const periodOptions = [
     { value: 30, label: "30 dias" },
     { value: 90, label: "90 dias" },
@@ -3543,27 +3545,27 @@ function ProfileModal({
 
   return (
     <div style={{...themeVars,minHeight:"100vh",background:"var(--app-bg)",color:"var(--app-text)",fontFamily:"'Outfit','Segoe UI',sans-serif"}}>
-      <div style={{maxWidth:1120,margin:"0 auto",padding:"24px 20px 40px"}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"start",gap:12,marginBottom:18,position:"sticky",top:0,zIndex:5,padding:"12px 0 18px",background:"linear-gradient(180deg,rgba(10,14,26,0.98) 0%,rgba(10,14,26,0.92) 75%,rgba(10,14,26,0) 100%)"}}>
+      <div style={{maxWidth:1120,margin:"0 auto",padding:profileIsMobile ? "16px 14px 28px" : "24px 20px 40px"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"start",gap:12,marginBottom:18,position:"sticky",top:0,zIndex:5,padding:profileIsMobile ? "8px 0 12px" : "12px 0 18px",background:"linear-gradient(180deg,rgba(10,14,26,0.98) 0%,rgba(10,14,26,0.9) 72%,rgba(10,14,26,0) 100%)",flexDirection:profileIsMobile ? "column" : "row"}}>
           <div>
             <div style={{fontSize:12,letterSpacing:"0.12em",textTransform:"uppercase",color:"#84cc16",fontWeight:800}}>Perfil</div>
-            <div style={{fontSize:32,fontWeight:800,letterSpacing:"-0.03em"}}>Minha conta</div>
-            <div style={{fontSize:13,color:"#94a3b8",marginTop:6}}>
+            <div style={{fontSize:profileIsMobile ? 26 : 32,fontWeight:800,letterSpacing:"-0.03em"}}>Minha conta</div>
+            <div style={{fontSize:13,color:"#94a3b8",marginTop:6,lineHeight:1.55,maxWidth:720}}>
               {setupRequired
                 ? "Preencha seus dados principais uma vez para liberar a montagem da dieta com tudo já preenchido."
                 : "Atualize seus dados, acompanhe sua evolução e reabra dietas e relatórios sem perder o contexto."}
             </div>
           </div>
-          {!setupRequired && <button onClick={onClose} style={{...pB,padding:"12px 16px",borderColor:"rgba(255,255,255,0.12)",color:"#cbd5e1",background:"rgba(255,255,255,0.04)"}}>Voltar ao painel</button>}
+          {!setupRequired && <button onClick={onClose} style={{...pB,padding:"12px 16px",borderColor:"rgba(255,255,255,0.12)",color:"#cbd5e1",background:"rgba(255,255,255,0.04)",width:profileIsMobile ? "100%" : "auto"}}>Voltar ao painel</button>}
         </div>
 
-        <div style={{padding:"24px",borderRadius:24,background:"linear-gradient(180deg,rgba(15,23,42,0.98),rgba(10,14,26,0.98))",border:"1px solid rgba(132,204,22,0.18)",boxShadow:"0 32px 100px rgba(0,0,0,0.35)"}}>
+        <div style={{padding:profileIsMobile ? "18px 14px" : "24px",borderRadius:24,background:"linear-gradient(180deg,rgba(15,23,42,0.98),rgba(10,14,26,0.98))",border:"1px solid rgba(132,204,22,0.18)",boxShadow:"0 32px 100px rgba(0,0,0,0.35)"}}>
 
-        <div style={{display:"flex",gap:16,alignItems:"center",marginBottom:18,flexWrap:"wrap"}}>
-          <div style={{width:84,height:84,borderRadius:"50%",overflow:"hidden",background:"linear-gradient(135deg,#1e293b,#334155)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,fontWeight:800,color:"#a3e635",border:"1px solid rgba(255,255,255,0.08)"}}>
+        <div style={{display:"flex",gap:16,alignItems:"center",marginBottom:18,flexWrap:"wrap",flexDirection:profileIsMobile ? "column" : "row"}}>
+          <div style={{width:profileIsMobile ? 76 : 84,height:profileIsMobile ? 76 : 84,borderRadius:"50%",overflow:"hidden",background:"linear-gradient(135deg,#1e293b,#334155)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,fontWeight:800,color:"#a3e635",border:"1px solid rgba(255,255,255,0.08)"}}>
             {previewAvatar ? <img src={previewAvatar} alt="Avatar" style={{width:"100%",height:"100%",objectFit:"cover"}} /> : (profileForm.name || "U").slice(0, 1).toUpperCase()}
           </div>
-          <div style={{display:"flex",flexDirection:"column",gap:8,flex:1,minWidth:220}}>
+          <div style={{display:"flex",flexDirection:"column",gap:8,flex:1,minWidth:220,width:profileIsMobile ? "100%" : "auto"}}>
             <label style={{...pB,padding:"10px 14px",display:"inline-flex",alignItems:"center",justifyContent:"center",borderColor:"rgba(132,204,22,0.2)",color:"#a3e635",background:"rgba(132,204,22,0.08)"}}>
               Escolher foto
               <input type="file" accept="image/png,image/jpeg,image/webp" style={{display:"none"}} onChange={(e) => onAvatarSelected(e.target.files?.[0])} />

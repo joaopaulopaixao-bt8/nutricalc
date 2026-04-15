@@ -7,6 +7,7 @@ O NutriCalc começou como um gerador de dietas e está evoluindo para um sistema
 Regra permanente de interface e entrega:
 - toda tela, fluxo e refinamento visual precisa funcionar também em mobile
 - mobile não é adaptação secundária; é requisito de produto
+- funcionamento impecável em mobile é imprescindível em toda entrega
 - a estética em telas pequenas precisa ser impecável, sem cortes, sobreposição, overflow ou ações escondidas
 - nenhuma funcionalidade será considerada pronta sem validação visual e funcional em desktop e mobile
 
