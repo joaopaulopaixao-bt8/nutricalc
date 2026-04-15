@@ -212,6 +212,35 @@ const ROLE_LABELS = {
   accessory: "Acessório",
 };
 
+const PUBLIC_PAGES = new Set(["landing", "auth", "privacy", "terms", "methodology"]);
+
+function getPublicPageFromHash() {
+  if (typeof window === "undefined") return "landing";
+
+  const normalized = window.location.hash.replace(/^#\/?/, "").trim().toLowerCase();
+  if (!normalized) return "landing";
+  if (normalized === "entrar" || normalized === "login" || normalized === "cadastro") return "auth";
+  if (normalized === "privacidade") return "privacy";
+  if (normalized === "termos") return "terms";
+  if (normalized === "metodologia" || normalized === "fontes") return "methodology";
+  return "landing";
+}
+
+function getHashForPublicPage(page) {
+  switch (page) {
+    case "auth":
+      return "#/entrar";
+    case "privacy":
+      return "#/privacidade";
+    case "terms":
+      return "#/termos";
+    case "methodology":
+      return "#/metodologia";
+    default:
+      return "#/";
+  }
+}
+
 function buildUniformMealDistribution(shares) {
   return shares.map(share => ({ prot: share, carb: share, fat: share }));
 }
@@ -724,6 +753,7 @@ export default function NutriCalc() {
   const [userName, setUserName] = useState("");
   const [authUser, setAuthUser] = useState(null);
   const [authBootstrapLoading, setAuthBootstrapLoading] = useState(true);
+  const [publicPage, setPublicPage] = useState(() => getPublicPageFromHash());
   const [authMode, setAuthMode] = useState("login");
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState("");
@@ -893,6 +923,28 @@ export default function NutriCalc() {
     setBodyFatCalcForm((prev) => ({ ...prev, [key]: value }));
   }, []);
 
+  const navigatePublicPage = useCallback((page) => {
+    const nextPage = PUBLIC_PAGES.has(page) ? page : "landing";
+    if (typeof window !== "undefined") {
+      const nextHash = getHashForPublicPage(nextPage);
+      if (window.location.hash !== nextHash) {
+        window.location.hash = nextHash;
+      }
+    }
+    setPublicPage(nextPage);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+
+    const syncPublicPage = () => {
+      setPublicPage(getPublicPageFromHash());
+    };
+
+    window.addEventListener("hashchange", syncPublicPage);
+    return () => window.removeEventListener("hashchange", syncPublicPage);
+  }, []);
+
   const updateDietHistoryFilter = useCallback((key, value) => {
     setDietHistoryFilters((prev) => ({ ...prev, [key]: value }));
   }, []);
@@ -987,6 +1039,7 @@ export default function NutriCalc() {
 
   useEffect(() => {
     if (!resetTokenFromUrl) return;
+    setPublicPage("auth");
     setAuthMode("reset");
     setAuthForm((prev) => ({
       ...prev,
@@ -1000,8 +1053,23 @@ export default function NutriCalc() {
   }, [resetTokenFromUrl]);
 
   useEffect(() => {
-    document.title = authUser ? "NutriCalc" : "NutriCalc | Acesso";
-  }, [authUser]);
+    if (authUser) {
+      document.title = "NutriCalc";
+      return;
+    }
+
+    if (publicPage === "privacy") {
+      document.title = "NutriCalc | Privacidade";
+    } else if (publicPage === "terms") {
+      document.title = "NutriCalc | Termos";
+    } else if (publicPage === "methodology") {
+      document.title = "NutriCalc | Metodologia";
+    } else if (publicPage === "auth") {
+      document.title = "NutriCalc | Acesso";
+    } else {
+      document.title = "NutriCalc | Planejamento alimentar";
+    }
+  }, [authUser, publicPage]);
 
   useEffect(() => {
     if (!authUser) return;
@@ -1975,24 +2043,27 @@ export default function NutriCalc() {
 
   if (!authUser) {
     return (
-      <AuthModal
+      <PublicExperience
         authError={authError}
         authForm={authForm}
         authLoading={authLoading}
         authMode={authMode}
         authNotice={authNotice}
         googleClientId={googleClientId}
-        onChangeMode={(mode) => {
+        onChangeAuthMode={(mode) => {
+          navigatePublicPage("auth");
           setAuthMode(mode);
           setAuthError("");
           setAuthNotice("");
         }}
         onGoogleCredential={handleGoogleLogin}
+        onNavigatePage={navigatePublicPage}
         onPasswordReset={handlePasswordReset}
         onResetPasswordSubmit={handleResetPasswordSubmit}
         onSubmit={handleAuthSubmit}
-        themeVars={themeVars}
         onUpdateField={updateAuthForm}
+        publicPage={publicPage}
+        themeVars={themeVars}
       />
     );
   }
@@ -2540,6 +2611,523 @@ export default function NutriCalc() {
   );
 }
 
+function PublicExperience({
+  authError,
+  authForm,
+  authLoading,
+  authMode,
+  authNotice,
+  googleClientId,
+  onChangeAuthMode,
+  onGoogleCredential,
+  onNavigatePage,
+  onPasswordReset,
+  onResetPasswordSubmit,
+  onSubmit,
+  onUpdateField,
+  publicPage,
+  themeVars,
+}) {
+  const publicShellStyle = {
+    ...themeVars,
+    minHeight: "100vh",
+    background:
+      "radial-gradient(circle at top left, rgba(132,204,22,0.16), transparent 26%), radial-gradient(circle at top right, rgba(59,130,246,0.18), transparent 24%), linear-gradient(180deg, #08111f 0%, #0a0e1a 48%, #071018 100%)",
+    color: "var(--app-text)",
+    fontFamily: "'Outfit','Segoe UI',sans-serif",
+    position: "relative",
+    overflow: "hidden",
+  };
+
+  const handlePrimaryCta = (mode) => {
+    onChangeAuthMode(mode);
+  };
+
+  const sharedLayoutProps = {
+    onEnter: () => handlePrimaryCta("login"),
+    onCreateAccount: () => handlePrimaryCta("register"),
+    onNavigatePage,
+  };
+
+  if (publicPage === "auth") {
+    return (
+      <AuthModal
+        authError={authError}
+        authForm={authForm}
+        authLoading={authLoading}
+        authMode={authMode}
+        authNotice={authNotice}
+        googleClientId={googleClientId}
+        onBackToLanding={() => onNavigatePage("landing")}
+        onChangeMode={onChangeAuthMode}
+        onGoogleCredential={onGoogleCredential}
+        onNavigatePage={onNavigatePage}
+        onPasswordReset={onPasswordReset}
+        onResetPasswordSubmit={onResetPasswordSubmit}
+        onSubmit={onSubmit}
+        themeVars={themeVars}
+        onUpdateField={onUpdateField}
+      />
+    );
+  }
+
+  let content = null;
+  if (publicPage === "privacy") {
+    content = <PrivacyPage {...sharedLayoutProps} />;
+  } else if (publicPage === "terms") {
+    content = <TermsPage {...sharedLayoutProps} />;
+  } else if (publicPage === "methodology") {
+    content = <MethodologyPage {...sharedLayoutProps} />;
+  } else {
+    content = <MarketingHome {...sharedLayoutProps} />;
+  }
+
+  return (
+    <div style={publicShellStyle}>
+      <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+      <div style={{position:"fixed",inset:0,zIndex:0,opacity:0.05,backgroundImage:"linear-gradient(rgba(132,204,22,0.18) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,0.16) 1px,transparent 1px)",backgroundSize:"42px 42px",pointerEvents:"none"}} />
+      <PublicHeader {...sharedLayoutProps} currentPage={publicPage} />
+      <div style={{position:"relative",zIndex:1}}>{content}</div>
+      <PublicFooter {...sharedLayoutProps} />
+    </div>
+  );
+}
+
+function PublicHeader({ currentPage, onCreateAccount, onEnter, onNavigatePage }) {
+  const navButtonStyle = {
+    border: "1px solid rgba(255,255,255,0.09)",
+    background: "rgba(255,255,255,0.03)",
+    color: "#cbd5e1",
+    borderRadius: 999,
+    padding: "10px 16px",
+    cursor: "pointer",
+    fontSize: 13,
+    fontWeight: 600,
+  };
+
+  return (
+    <header style={{position:"sticky",top:0,zIndex:5,padding:"18px 24px 8px",backdropFilter:"blur(18px)"}}>
+      <div style={{maxWidth:1180,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",gap:18,flexWrap:"wrap"}}>
+        <button onClick={() => onNavigatePage("landing")} style={{display:"flex",alignItems:"center",gap:12,background:"transparent",border:"none",color:"#e2e8f0",cursor:"pointer",padding:0}}>
+          <div style={{width:42,height:42,borderRadius:14,background:"linear-gradient(135deg,#84cc16,#65a30d)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,fontWeight:900,color:"#0f172a",boxShadow:"0 16px 32px rgba(101,163,13,0.24)"}}>N</div>
+          <div style={{textAlign:"left"}}>
+            <div style={{fontSize:21,fontWeight:800,letterSpacing:"-0.03em"}}>Nutri<span style={{color:"#84cc16"}}>Calc</span></div>
+            <div style={{fontSize:12,color:"#94a3b8"}}>Planejamento alimentar com histórico pessoal</div>
+          </div>
+        </button>
+
+        <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
+          {[
+            { key: "methodology", label: "Metodologia" },
+            { key: "privacy", label: "Privacidade" },
+            { key: "terms", label: "Termos" },
+          ].map((item) => (
+            <button
+              key={item.key}
+              onClick={() => onNavigatePage(item.key)}
+              style={{
+                ...navButtonStyle,
+                borderColor: currentPage === item.key ? "rgba(132,204,22,0.34)" : "rgba(255,255,255,0.09)",
+                background: currentPage === item.key ? "rgba(132,204,22,0.12)" : navButtonStyle.background,
+                color: currentPage === item.key ? "#d9f99d" : navButtonStyle.color,
+              }}
+            >
+              {item.label}
+            </button>
+          ))}
+          <button onClick={onEnter} style={{...navButtonStyle,borderColor:"rgba(132,204,22,0.26)",color:"#d9f99d"}}>Entrar</button>
+          <button onClick={onCreateAccount} style={{border:"none",borderRadius:999,padding:"11px 18px",cursor:"pointer",fontSize:13,fontWeight:800,background:"linear-gradient(135deg,#84cc16,#65a30d)",color:"#0f172a",boxShadow:"0 18px 32px rgba(101,163,13,0.24)"}}>Criar conta</button>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function MarketingHome({ onCreateAccount, onEnter, onNavigatePage }) {
+  const sectionWrap = { maxWidth: 1180, margin: "0 auto", padding: "0 24px" };
+  const cardStyle = {
+    borderRadius: 24,
+    border: "1px solid rgba(255,255,255,0.08)",
+    background: "linear-gradient(180deg, rgba(15,23,42,0.88), rgba(9,14,26,0.78))",
+    boxShadow: "0 30px 80px rgba(0,0,0,0.28)",
+  };
+  const softCardStyle = {
+    borderRadius: 22,
+    border: "1px solid rgba(255,255,255,0.08)",
+    background: "rgba(255,255,255,0.03)",
+  };
+
+  return (
+    <>
+      <section style={{padding:"34px 0 26px"}}>
+        <div style={{...sectionWrap,display:"grid",gridTemplateColumns:"minmax(0,1.15fr) minmax(320px,0.85fr)",gap:28,alignItems:"stretch"}}>
+          <div style={{...cardStyle,padding:"32px 30px"}}>
+            <div style={{display:"inline-flex",alignItems:"center",gap:10,padding:"9px 14px",borderRadius:999,background:"rgba(132,204,22,0.1)",border:"1px solid rgba(132,204,22,0.16)",fontSize:12,fontWeight:800,letterSpacing:"0.08em",textTransform:"uppercase",color:"#d9f99d"}}>
+              Nutrição com histórico e acompanhamento
+            </div>
+            <h1 style={{fontSize:"clamp(40px,6vw,68px)",lineHeight:0.95,letterSpacing:"-0.06em",margin:"18px 0 16px",maxWidth:720}}>
+              Seu planejamento alimentar em um painel claro, privado e pronto para evoluir com você.
+            </h1>
+            <p style={{fontSize:18,lineHeight:1.65,color:"#cbd5e1",maxWidth:700,margin:0}}>
+              O NutriCalc reúne cálculo energético, geração de dieta, relatórios e histórico corporal em uma única conta. Você entra, organiza seu perfil e acompanha a evolução sem perder contexto entre uma sessão e outra.
+            </p>
+
+            <div style={{display:"flex",gap:12,marginTop:26,flexWrap:"wrap"}}>
+              <button onClick={onEnter} style={{border:"none",borderRadius:999,padding:"15px 22px",cursor:"pointer",fontSize:15,fontWeight:800,background:"linear-gradient(135deg,#84cc16,#65a30d)",color:"#0f172a"}}>Entrar</button>
+              <button onClick={onCreateAccount} style={{border:"1px solid rgba(255,255,255,0.1)",borderRadius:999,padding:"15px 22px",cursor:"pointer",fontSize:15,fontWeight:700,background:"rgba(255,255,255,0.03)",color:"#e2e8f0"}}>Criar conta</button>
+              <button onClick={() => onNavigatePage("methodology")} style={{border:"1px solid rgba(59,130,246,0.22)",borderRadius:999,padding:"15px 22px",cursor:"pointer",fontSize:15,fontWeight:700,background:"rgba(59,130,246,0.08)",color:"#bfdbfe"}}>Ver metodologia</button>
+            </div>
+
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:12,marginTop:28}}>
+              {[
+                { value: "Conta individual", label: "Acesso pessoal com histórico privado" },
+                { value: "Fluxo contínuo", label: "Dietas, relatórios e evolução no mesmo lugar" },
+                { value: "Base técnica", label: "Metodologia, regras e contexto explicados publicamente" },
+              ].map((item) => (
+                <div key={item.value} style={{padding:"16px 18px",borderRadius:18,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)"}}>
+                  <div style={{fontSize:15,fontWeight:800,color:"#f8fafc"}}>{item.value}</div>
+                  <div style={{fontSize:13,lineHeight:1.5,color:"#94a3b8",marginTop:6}}>{item.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={{...cardStyle,padding:24,display:"flex",flexDirection:"column",justifyContent:"space-between",gap:18}}>
+            <div style={{display:"grid",gap:14}}>
+              <div style={{padding:"18px 18px 16px",borderRadius:22,background:"linear-gradient(135deg, rgba(132,204,22,0.12), rgba(59,130,246,0.08))",border:"1px solid rgba(132,204,22,0.18)"}}>
+                <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#d9f99d"}}>Dentro do sistema</div>
+                <div style={{fontSize:24,fontWeight:800,marginTop:8,lineHeight:1.15}}>A conta vira o centro do acompanhamento, não só um acesso técnico.</div>
+              </div>
+              {[
+                ["Perfil pessoal", "Nome, dados corporais, avatar e auditoria básica ajudam a manter um histórico consistente."],
+                ["Dietas e relatórios", "O sistema salva o que foi gerado para evitar repetição e permitir revisão com contexto."],
+                ["Evolução corporal", "Peso, altura, idade e percentual de gordura ficam organizados para comparação ao longo do tempo."],
+              ].map(([title, description]) => (
+                <div key={title} style={{padding:"16px 18px",borderRadius:18,background:"rgba(15,23,42,0.62)",border:"1px solid rgba(255,255,255,0.08)"}}>
+                  <div style={{fontSize:15,fontWeight:800,color:"#f8fafc"}}>{title}</div>
+                  <div style={{fontSize:13,lineHeight:1.6,color:"#94a3b8",marginTop:6}}>{description}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{padding:"16px 18px",borderRadius:18,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)"}}>
+              <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#93c5fd"}}>Aviso importante</div>
+              <div style={{fontSize:14,lineHeight:1.6,color:"#cbd5e1",marginTop:8}}>
+                O NutriCalc apoia organização e planejamento alimentar. Ele não substitui avaliação de nutricionista, médico ou outro profissional de saúde.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section style={{padding:"12px 0 10px"}}>
+        <div style={{...sectionWrap}}>
+          <div style={{...cardStyle,padding:"28px 26px"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"end",gap:20,flexWrap:"wrap"}}>
+              <div>
+                <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#93c5fd"}}>O que a pessoa encontra aqui</div>
+                <div style={{fontSize:30,fontWeight:800,letterSpacing:"-0.04em",marginTop:10}}>Uma entrada pública que explica o sistema antes de pedir login.</div>
+              </div>
+              <div style={{fontSize:14,lineHeight:1.7,color:"#94a3b8",maxWidth:420}}>
+                Em vez de jogar a pessoa direto na autenticação, a home passa propósito, benefícios, segurança e contexto metodológico antes da decisão de entrar.
+              </div>
+            </div>
+
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16,marginTop:22}}>
+              {[
+                { title: "Monte seu perfil", text: "Crie uma conta, complete os dados essenciais e deixe a base pronta para o sistema trabalhar com contexto." },
+                { title: "Gere e salve dietas", text: "Centralize planos, relatórios e revisões sem depender de planilhas ou anotações soltas." },
+                { title: "Acompanhe sua evolução", text: "Use o histórico corporal e de relatórios para enxergar continuidade e tomar decisões melhores." },
+                { title: "Proteja o histórico", text: "Os dados ficam vinculados à sua conta, com acesso individual e rastros básicos de atividade." },
+              ].map((item) => (
+                <div key={item.title} style={{...softCardStyle,padding:"22px 20px"}}>
+                  <div style={{fontSize:17,fontWeight:800,color:"#f8fafc"}}>{item.title}</div>
+                  <div style={{fontSize:14,lineHeight:1.65,color:"#94a3b8",marginTop:10}}>{item.text}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section style={{padding:"10px 0 10px"}}>
+        <div style={{...sectionWrap,display:"grid",gridTemplateColumns:"minmax(0,0.9fr) minmax(320px,1.1fr)",gap:18}}>
+          <div style={{...cardStyle,padding:"26px 24px"}}>
+            <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#d9f99d"}}>Para quem o NutriCalc faz sentido</div>
+            <div style={{fontSize:30,fontWeight:800,letterSpacing:"-0.04em",marginTop:10}}>Pessoas que querem organizar alimentação com continuidade e clareza.</div>
+            <div style={{fontSize:15,lineHeight:1.75,color:"#94a3b8",marginTop:14}}>
+              A proposta conversa melhor com quem quer sair do improviso e centralizar histórico, relatórios e métricas em um painel só, sem perder o fio entre um acesso e outro.
+            </div>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16}}>
+            {[
+              ["Quem quer autonomia organizada", "Útil para quem precisa estruturar rotina alimentar e revisar decisões com calma."],
+              ["Quem acompanha evolução corporal", "Ajuda a olhar tendência e histórico, não só um valor isolado do dia."],
+              ["Quem valoriza transparência", "A entrada pública explica metodologia, privacidade e limites do sistema antes do login."],
+              ["Quem quer contexto em uma conta só", "Dietas, relatórios e dados do perfil continuam acessíveis dentro do mesmo ambiente."],
+            ].map(([title, text]) => (
+              <div key={title} style={{...softCardStyle,padding:"20px 18px"}}>
+                <div style={{fontSize:16,fontWeight:800,color:"#f8fafc"}}>{title}</div>
+                <div style={{fontSize:14,lineHeight:1.65,color:"#94a3b8",marginTop:8}}>{text}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section style={{padding:"16px 0 12px"}}>
+        <div style={{...sectionWrap,display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16}}>
+          {[
+            { title: "Privacidade por conta", text: "A home já prepara a leitura do produto como espaço pessoal, com dados vinculados ao usuário autenticado." },
+            { title: "Base técnica visível", text: "Metodologia e fontes ganham espaço próprio para reduzir sensação de caixa-preta." },
+            { title: "Fluxo de acesso mais humano", text: "Primeiro o sistema se apresenta. Só depois a pessoa decide entrar ou criar conta." },
+            { title: "Posicionamento mais profissional", text: "A entrada deixa claro o valor do produto e também os limites da ferramenta." },
+          ].map((item) => (
+            <div key={item.title} style={{...cardStyle,padding:"22px 20px"}}>
+              <div style={{fontSize:17,fontWeight:800,color:"#f8fafc"}}>{item.title}</div>
+              <div style={{fontSize:14,lineHeight:1.65,color:"#94a3b8",marginTop:10}}>{item.text}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section style={{padding:"18px 0 10px"}}>
+        <div style={{...sectionWrap}}>
+          <div style={{...cardStyle,padding:"28px 26px"}}>
+            <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#d9f99d"}}>Como funciona</div>
+            <div style={{fontSize:32,fontWeight:800,letterSpacing:"-0.04em",marginTop:10}}>Um fluxo simples para sair do acesso e chegar ao acompanhamento.</div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:14,marginTop:22}}>
+              {[
+                ["1. Entrar ou criar conta", "A landing apresenta o produto e leva a pessoa para autenticação só quando ela decide continuar."],
+                ["2. Completar o perfil", "Nome, sexo, data de nascimento, peso e altura deixam o cálculo mais consistente."],
+                ["3. Gerar e revisar", "O sistema monta a dieta, permite salvar relatório e manter a análise acessível."],
+                ["4. Acompanhar o histórico", "Você volta para revisar métricas, dietas anteriores e relatórios criados."],
+              ].map(([title, text]) => (
+                <div key={title} style={{padding:"18px 18px",borderRadius:18,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)"}}>
+                  <div style={{fontSize:15,fontWeight:800,color:"#f8fafc"}}>{title}</div>
+                  <div style={{fontSize:13,lineHeight:1.65,color:"#94a3b8",marginTop:8}}>{text}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section style={{padding:"18px 0 52px"}}>
+        <div style={{...sectionWrap}}>
+          <div style={{...cardStyle,padding:"28px 26px",display:"grid",gridTemplateColumns:"minmax(0,1fr) auto",gap:18,alignItems:"center"}}>
+            <div>
+              <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#93c5fd"}}>Transparência do produto</div>
+              <div style={{fontSize:30,fontWeight:800,letterSpacing:"-0.04em",marginTop:10}}>Fase 1 pronta para receber páginas institucionais públicas.</div>
+              <div style={{fontSize:15,lineHeight:1.7,color:"#94a3b8",marginTop:10,maxWidth:760}}>
+                Esta home já encaminha para as páginas de privacidade, termos e metodologia. Assim a pessoa entende o produto antes de criar conta e encontra contexto legal e técnico sem precisar entrar no sistema.
+              </div>
+            </div>
+            <div style={{display:"flex",gap:10,flexWrap:"wrap",justifyContent:"flex-end"}}>
+              <button onClick={() => onNavigatePage("privacy")} style={{border:"1px solid rgba(255,255,255,0.08)",borderRadius:999,padding:"14px 18px",cursor:"pointer",background:"rgba(255,255,255,0.03)",color:"#e2e8f0",fontWeight:700}}>Privacidade</button>
+              <button onClick={() => onNavigatePage("terms")} style={{border:"1px solid rgba(255,255,255,0.08)",borderRadius:999,padding:"14px 18px",cursor:"pointer",background:"rgba(255,255,255,0.03)",color:"#e2e8f0",fontWeight:700}}>Termos</button>
+              <button onClick={() => onNavigatePage("methodology")} style={{border:"1px solid rgba(59,130,246,0.18)",borderRadius:999,padding:"14px 18px",cursor:"pointer",background:"rgba(59,130,246,0.08)",color:"#bfdbfe",fontWeight:700}}>Metodologia</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+function PublicInfoPage({ eyebrow, title, intro, sections, onCreateAccount, onEnter }) {
+  const summaryCards = sections.slice(0, 3).map((section) => section.title);
+  return (
+    <section style={{padding:"34px 0 56px"}}>
+      <div style={{maxWidth:980,margin:"0 auto",padding:"0 24px"}}>
+        <div style={{borderRadius:28,padding:"30px 28px",border:"1px solid rgba(255,255,255,0.08)",background:"linear-gradient(180deg, rgba(15,23,42,0.92), rgba(8,14,24,0.86))",boxShadow:"0 30px 80px rgba(0,0,0,0.28)"}}>
+          <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:800,color:"#d9f99d"}}>{eyebrow}</div>
+          <h1 style={{fontSize:"clamp(34px,5vw,52px)",lineHeight:0.98,letterSpacing:"-0.05em",margin:"12px 0 14px"}}>{title}</h1>
+          <p style={{fontSize:17,lineHeight:1.7,color:"#cbd5e1",margin:"0 0 24px",maxWidth:780}}>{intro}</p>
+
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:12,marginBottom:24}}>
+            {summaryCards.map((label) => (
+              <div key={label} style={{padding:"14px 16px",borderRadius:18,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)"}}>
+                <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:"0.08em",fontWeight:800,color:"#93c5fd"}}>Tópico central</div>
+                <div style={{fontSize:15,fontWeight:800,color:"#f8fafc",marginTop:6,lineHeight:1.35}}>{label}</div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:26}}>
+            <button onClick={onEnter} style={{border:"none",borderRadius:999,padding:"14px 20px",cursor:"pointer",fontSize:14,fontWeight:800,background:"linear-gradient(135deg,#84cc16,#65a30d)",color:"#0f172a"}}>Entrar</button>
+            <button onClick={onCreateAccount} style={{border:"1px solid rgba(255,255,255,0.09)",borderRadius:999,padding:"14px 20px",cursor:"pointer",fontSize:14,fontWeight:700,background:"rgba(255,255,255,0.03)",color:"#e2e8f0"}}>Criar conta</button>
+          </div>
+
+          <div style={{display:"grid",gap:16}}>
+            {sections.map((section) => (
+              <div key={section.title} style={{padding:"20px 20px 18px",borderRadius:22,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)"}}>
+                <div style={{fontSize:18,fontWeight:800,color:"#f8fafc"}}>{section.title}</div>
+                {section.paragraphs.map((paragraph) => (
+                  <p key={paragraph} style={{fontSize:14,lineHeight:1.7,color:"#94a3b8",margin:"10px 0 0"}}>
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PrivacyPage(props) {
+  return (
+    <PublicInfoPage
+      {...props}
+      eyebrow="Política de privacidade"
+      title="Como o NutriCalc trata dados de acesso, perfil, histórico e informações do uso."
+      intro="A proposta desta página é explicar de forma direta o que o produto guarda, para que usa esses dados e como isso se conecta à experiência real do sistema. É uma base pública de transparência, escrita para ser entendida antes mesmo do login."
+      sections={[
+        {
+          title: "Quais dados entram no sistema",
+          paragraphs: [
+            "O NutriCalc trabalha com dados de conta, como nome, email e autenticação, e também com dados de uso ligados ao planejamento alimentar, como peso, altura, idade, percentual de gordura, dietas geradas e relatórios salvos.",
+            "Esses dados ficam vinculados à conta autenticada e não aparecem como histórico público para outras contas no produto.",
+          ],
+        },
+        {
+          title: "Finalidade do uso",
+          paragraphs: [
+            "As informações servem para autenticar o acesso, personalizar o perfil, calcular necessidades energéticas, gerar dietas, salvar relatórios e acompanhar evolução corporal ao longo do tempo.",
+            "Sem esse contexto mínimo, o sistema perde continuidade e deixa de entregar o histórico que faz parte da proposta do produto.",
+          ],
+        },
+        {
+          title: "Sessão, recuperação de senha e acesso",
+          paragraphs: [
+            "O backend já usa cookie de sessão com proteção HTTP-only para manter o acesso autenticado, reduzindo exposição de token no navegador.",
+            "Quando o fluxo de recuperação de senha é acionado, o sistema gera link temporário e pode enviar esse acesso por email transacional configurado para o ambiente de produção.",
+          ],
+        },
+        {
+          title: "Armazenamento e continuidade do histórico",
+          paragraphs: [
+            "Os dados principais ficam persistidos em banco e os avatares são mantidos em storage persistente, evitando dependência de disco efêmero de servidor.",
+            "A presença desta página na entrada pública do sistema reforça transparência antes do login e ajuda a alinhar expectativa de quem está conhecendo o produto agora.",
+          ],
+        },
+      ]}
+    />
+  );
+}
+
+function TermsPage(props) {
+  return (
+    <PublicInfoPage
+      {...props}
+      eyebrow="Termos de uso"
+      title="Condições gerais para uso do NutriCalc como ferramenta de apoio ao planejamento alimentar."
+      intro="Os termos ajudam a posicionar o produto com clareza. A ideia aqui é explicar em linguagem simples qual é o papel do NutriCalc, o que cabe ao usuário e quais limites precisam ficar explícitos desde a entrada pública."
+      sections={[
+        {
+          title: "Natureza da plataforma",
+          paragraphs: [
+            "O NutriCalc é uma aplicação de apoio a planejamento alimentar e organização de dados do usuário. Ele não promete diagnóstico, prescrição clínica nem decisão médica automatizada.",
+            "Qualquer uso em contexto profissional ou de saúde deve respeitar avaliação humana adequada e responsabilidade do usuário ou do profissional envolvido.",
+          ],
+        },
+        {
+          title: "Responsabilidade do usuário",
+          paragraphs: [
+            "O usuário é responsável por revisar os próprios dados, informar medidas corretas e usar os resultados como apoio informativo, não como substituto de orientação especializada.",
+            "Também cabe ao usuário manter a confidencialidade do próprio acesso e usar a plataforma de forma lícita e compatível com sua finalidade.",
+          ],
+        },
+        {
+          title: "Conta, disponibilidade e evolução do produto",
+          paragraphs: [
+            "O sistema pode evoluir em interface, regras e metodologia ao longo do tempo. Isso inclui ajustes de conteúdo institucional, textos legais, critérios de geração e componentes de segurança.",
+            "A disponibilidade do serviço depende da infraestrutura online e dos fornecedores integrados usados pelo produto.",
+          ],
+        },
+        {
+          title: "Limites de responsabilidade",
+          paragraphs: [
+            "Os resultados do NutriCalc devem ser interpretados dentro do contexto de planejamento alimentar e acompanhamento individual. Eles não substituem consulta com nutricionista, médico ou outro profissional de saúde.",
+            "Esta página ainda pode ganhar redação jurídica final, mas já entrega o posicionamento correto e transparente para a camada pública do sistema.",
+          ],
+        },
+      ]}
+    />
+  );
+}
+
+function MethodologyPage(props) {
+  return (
+    <PublicInfoPage
+      {...props}
+      eyebrow="Metodologia e fontes"
+      title="De onde vêm os cálculos, critérios e referências usados pelo NutriCalc."
+      intro="Esta página existe para reduzir a sensação de caixa-preta. A proposta é mostrar que o sistema combina dados de perfil, base alimentar estruturada e regras próprias de composição para gerar planos, relatórios e histórico com continuidade."
+      sections={[
+        {
+          title: "Base de cálculo e contexto do perfil",
+          paragraphs: [
+            "O NutriCalc parte dos dados de perfil e atividade para estimar gasto energético e orientar a montagem do plano alimentar. O sistema também usa percentual de gordura quando esse dado está disponível ou é calculado no fluxo interno.",
+            "A lógica de perfil serve para contextualizar objetivo, distribuição de macros, quantidade de refeições e histórico salvo por usuário.",
+          ],
+        },
+        {
+          title: "Base alimentar e composição da dieta",
+          paragraphs: [
+            "A dieta é montada a partir de uma base de alimentos categorizada e enriquecida com grupos, subgrupos, limites de porção e adequação por tipo de refeição.",
+            "Além das referências alimentares, o motor aplica critérios internos de distribuição entre refeições, presets de macros e preferências de geração para tornar o resultado coerente no uso prático.",
+          ],
+        },
+        {
+          title: "Histórico, relatórios e continuidade",
+          paragraphs: [
+            "O sistema salva dietas, relatórios e medições corporais para evitar que cada acesso comece do zero. Essa continuidade é parte da metodologia de produto, não só da interface.",
+            "A proposta não é apenas gerar uma resposta pontual, mas permitir revisão, comparação e acompanhamento ao longo do tempo.",
+          ],
+        },
+        {
+          title: "Transparência agora e próximos refinamentos",
+          paragraphs: [
+            "Nesta Fase 1, a página já explica a estrutura geral do sistema e abre espaço para uma versão futura mais detalhada, com fórmulas nomeadas, fontes públicas listadas e notas metodológicas adicionais.",
+            "Isso já melhora bastante a comunicação da home e ajuda a pessoa a entender a seriedade do produto antes de entrar na área autenticada.",
+          ],
+        },
+      ]}
+    />
+  );
+}
+
+function PublicFooter({ onCreateAccount, onEnter, onNavigatePage }) {
+  const linkStyle = {
+    background: "transparent",
+    border: "none",
+    color: "#94a3b8",
+    cursor: "pointer",
+    padding: 0,
+    fontSize: 13,
+  };
+
+  return (
+    <footer style={{position:"relative",zIndex:2,padding:"0 24px 26px"}}>
+      <div style={{maxWidth:1180,margin:"0 auto",paddingTop:20,borderTop:"1px solid rgba(255,255,255,0.08)",display:"flex",justifyContent:"space-between",alignItems:"center",gap:16,flexWrap:"wrap"}}>
+        <div>
+          <div style={{fontSize:14,fontWeight:800}}>NutriCalc</div>
+          <div style={{fontSize:13,color:"#94a3b8",marginTop:6}}>Planejamento alimentar, relatórios e histórico pessoal em uma única conta.</div>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:14,flexWrap:"wrap"}}>
+          <button onClick={() => onNavigatePage("privacy")} style={linkStyle}>Privacidade</button>
+          <button onClick={() => onNavigatePage("terms")} style={linkStyle}>Termos</button>
+          <button onClick={() => onNavigatePage("methodology")} style={linkStyle}>Metodologia</button>
+          <button onClick={onEnter} style={linkStyle}>Entrar</button>
+          <button onClick={onCreateAccount} style={{...linkStyle,color:"#d9f99d",fontWeight:700}}>Criar conta</button>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
 function AuthModal({
   authError,
   authForm,
@@ -2547,8 +3135,10 @@ function AuthModal({
   authMode,
   authNotice,
   googleClientId,
+  onBackToLanding,
   onChangeMode,
   onGoogleCredential,
+  onNavigatePage,
   onPasswordReset,
   onResetPasswordSubmit,
   onSubmit,
@@ -2556,6 +3146,7 @@ function AuthModal({
   onUpdateField,
 }) {
   const googleButtonRef = useRef(null);
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
 
   useEffect(() => {
     if (!googleClientId || !googleButtonRef.current) return;
@@ -2608,11 +3199,20 @@ function AuthModal({
     };
   }, [authMode, googleClientId, onGoogleCredential]);
 
+  useEffect(() => {
+    if (authMode !== "login") {
+      setForgotPasswordOpen(false);
+    }
+  }, [authMode]);
+
   return (
     <div style={{...themeVars,minHeight:"100vh",background:"var(--app-bg)",color:"var(--app-text)",fontFamily:"'Outfit','Segoe UI',sans-serif",padding:"32px 20px",display:"flex",alignItems:"center",justifyContent:"center"}}>
       <div style={{width:"100%",maxWidth:460,borderRadius:24,background:"linear-gradient(180deg,rgba(15,23,42,0.98),rgba(10,14,26,0.98))",border:"1px solid rgba(132,204,22,0.18)",boxShadow:"0 32px 100px rgba(0,0,0,0.45)",padding:24}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"start",gap:12,marginBottom:18}}>
           <div>
+            <button onClick={onBackToLanding} style={{display:"inline-flex",alignItems:"center",gap:8,background:"transparent",border:"none",padding:0,cursor:"pointer",color:"#93c5fd",fontSize:12,fontWeight:700,marginBottom:12}}>
+              ← Voltar para a apresentação
+            </button>
             <div style={{fontSize:30,fontWeight:900,letterSpacing:"-0.04em"}}>Nutri<span style={{color:"#84cc16"}}>Calc</span></div>
             <div style={{fontSize:20,fontWeight:700,letterSpacing:"-0.02em",marginTop:8}}>{authMode === "register" ? "Criar sua conta" : "Acesse sua conta"}</div>
             <div style={{fontSize:13,color:"#94a3b8",marginTop:6}}>
@@ -2692,25 +3292,72 @@ function AuthModal({
               </div>
             )}
 
-            <div style={{marginTop:14,paddingTop:14,borderTop:"1px solid rgba(255,255,255,0.08)"}}>
-              <div style={{fontSize:12,fontWeight:700,color:"#cbd5e1",marginBottom:8}}>Recuperação de senha</div>
-              <div style={{display:"flex",gap:8,alignItems:"end",flexWrap:"wrap"}}>
-                <div style={{flex:1,minWidth:180}}>
-                  <label style={lS}>Email para recuperação</label>
-                  <input value={authForm.resetEmail} onChange={(e) => onUpdateField("resetEmail", e.target.value)} placeholder="Digite seu email" style={iS} />
-                </div>
-                <button onClick={onPasswordReset} disabled={authLoading} style={{...pB,padding:"12px 16px",borderColor:"rgba(132,204,22,0.2)",color:"#a3e635",background:"rgba(132,204,22,0.08)"}}>
-                  Gerar link
+            {authMode === "login" && (
+              <div style={{display:"flex",justifyContent:"center",marginTop:10}}>
+                <button
+                  onClick={() => {
+                    onUpdateField("resetEmail", authForm.resetEmail || authForm.email || "");
+                    setForgotPasswordOpen(true);
+                  }}
+                  style={{background:"transparent",border:"none",padding:0,cursor:"pointer",fontSize:13,fontWeight:700,color:"#93c5fd"}}
+                >
+                  Esqueceu sua senha?
                 </button>
               </div>
-            </div>
+            )}
 
             <div style={{marginTop:14,padding:"10px 12px",borderRadius:10,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",color:"#94a3b8",fontSize:12}}>
-              Seus dados de saúde e histórico ficam vinculados apenas à sua conta. Quando formos publicar externamente, o envio real de email, domínio público e políticas de privacidade entram no checklist de produção.
+              Seus dados de saúde, dietas, relatórios e evolução corporal ficam vinculados apenas à sua conta. As páginas públicas de privacidade, termos e metodologia já fazem parte da entrada do produto.
             </div>
           </>
         )}
+
+        <div style={{display:"flex",justifyContent:"space-between",gap:10,flexWrap:"wrap",marginTop:16,paddingTop:16,borderTop:"1px solid rgba(255,255,255,0.08)"}}>
+          <button onClick={() => onNavigatePage("privacy")} style={{background:"transparent",border:"none",padding:0,cursor:"pointer",fontSize:12,color:"#94a3b8"}}>Privacidade</button>
+          <button onClick={() => onNavigatePage("terms")} style={{background:"transparent",border:"none",padding:0,cursor:"pointer",fontSize:12,color:"#94a3b8"}}>Termos</button>
+          <button onClick={() => onNavigatePage("methodology")} style={{background:"transparent",border:"none",padding:0,cursor:"pointer",fontSize:12,color:"#94a3b8"}}>Metodologia</button>
+        </div>
       </div>
+
+      {forgotPasswordOpen && authMode === "login" && (
+        <div style={{position:"fixed",inset:0,background:"rgba(2,6,23,0.74)",display:"flex",alignItems:"center",justifyContent:"center",padding:20,zIndex:30}}>
+          <div style={{width:"100%",maxWidth:430,borderRadius:24,background:"linear-gradient(180deg,rgba(15,23,42,0.98),rgba(10,14,26,0.98))",border:"1px solid rgba(132,204,22,0.18)",boxShadow:"0 32px 100px rgba(0,0,0,0.45)",padding:22}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"start",gap:12,marginBottom:16}}>
+              <div>
+                <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#d9f99d"}}>Recuperação de acesso</div>
+                <div style={{fontSize:22,fontWeight:800,letterSpacing:"-0.03em",marginTop:8}}>Recuperar senha</div>
+                <div style={{fontSize:13,lineHeight:1.6,color:"#94a3b8",marginTop:8}}>
+                  Informe o email da sua conta. Se ele estiver cadastrado, enviaremos as instruções para redefinir a senha.
+                </div>
+              </div>
+              <button
+                onClick={() => setForgotPasswordOpen(false)}
+                style={{width:34,height:34,borderRadius:12,border:"1px solid rgba(255,255,255,0.08)",background:"rgba(255,255,255,0.03)",color:"#cbd5e1",cursor:"pointer",fontSize:18}}
+                aria-label="Fechar recuperação de senha"
+              >
+                ×
+              </button>
+            </div>
+
+            <div style={{marginBottom:14}}>
+              <label style={lS}>Email para recuperação</label>
+              <input value={authForm.resetEmail} onChange={(e) => onUpdateField("resetEmail", e.target.value)} placeholder="Digite seu email" style={iS} />
+            </div>
+
+            {authError && <div style={{marginBottom:12,padding:"10px 12px",borderRadius:10,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",color:"#fca5a5",fontSize:13}}>{authError}</div>}
+            {authNotice && <div style={{marginBottom:12,padding:"10px 12px",borderRadius:10,background:"rgba(132,204,22,0.08)",border:"1px solid rgba(132,204,22,0.2)",color:"#d9f99d",fontSize:13}}>{authNotice}</div>}
+
+            <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+              <button onClick={onPasswordReset} disabled={authLoading} style={{...nBS,flex:1,opacity:authLoading?0.65:1}}>
+                {authLoading ? "Processando..." : "Recuperar senha"}
+              </button>
+              <button onClick={() => setForgotPasswordOpen(false)} style={{...pB,padding:"12px 16px",borderColor:"rgba(255,255,255,0.12)",color:"#cbd5e1"}}>
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
