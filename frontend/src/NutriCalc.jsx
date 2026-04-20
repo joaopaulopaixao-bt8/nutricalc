@@ -883,7 +883,10 @@ export default function NutriCalc() {
     authUser?.weight === "" ||
     authUser?.height === null ||
     authUser?.height === undefined ||
-    authUser?.height === ""
+    authUser?.height === "" ||
+    authUser?.bodyFatPercentage === null ||
+    authUser?.bodyFatPercentage === undefined ||
+    authUser?.bodyFatPercentage === ""
   );
   const numericWeight = Number(ud.weight) || 0;
   const numericHeight = Number(ud.height) || 0;
@@ -1648,7 +1651,8 @@ export default function NutriCalc() {
         Boolean(profileForm.sex) &&
         Boolean(profileForm.birthDate) &&
         Boolean(requiredWeight) &&
-        Boolean(requiredHeight);
+        Boolean(requiredHeight) &&
+        Boolean(String(bodyMetricForm.bodyFatPercentage ?? "").trim());
 
       if (!hasAvatarChange && !String(profileForm.name || "").trim()) {
         throw new Error("Informe seu nome para continuar.");
@@ -1662,6 +1666,9 @@ export default function NutriCalc() {
       if (!hasAvatarChange && (!requiredWeight || !requiredHeight)) {
         throw new Error("Preencha peso e altura antes de continuar.");
       }
+      if (!hasAvatarChange && !String(bodyMetricForm.bodyFatPercentage ?? "").trim()) {
+        throw new Error("Informe seu percentual de gordura antes de continuar.");
+      }
 
       const payload = await updateCurrentUser({
         name: profileForm.name || undefined,
@@ -1674,8 +1681,7 @@ export default function NutriCalc() {
       let nextUser = payload?.user || null;
 
       const shouldSaveMetric =
-        hasCoreProfileData &&
-        !authUser ||
+        (hasCoreProfileData && !authUser) ||
         (
           hasCoreProfileData && (
             Number(authUser.weight ?? "") !== Number(requiredWeight) ||
@@ -3542,6 +3548,34 @@ function ProfileModal({
   const orderedMetrics = [...bodyMetrics].sort((a, b) => new Date(b.recordedAt) - new Date(a.recordedAt));
   const weightTrend = computeMetricTrend(bodyMetrics, "weight");
   const bodyFatTrend = computeMetricTrend(bodyMetrics, "bodyFatPercentage");
+  const [profileSettingsOpen, setProfileSettingsOpen] = useState(false);
+  const [expandedSections, setExpandedSections] = useState(() => ({
+    saude: false,
+    evolucao: false,
+    dietas: false,
+    relatorios: false,
+  }));
+  const hasIncompleteBodyData =
+    bodyMetricForm.weight === "" ||
+    bodyMetricForm.weight === null ||
+    bodyMetricForm.weight === undefined ||
+    bodyMetricForm.height === "" ||
+    bodyMetricForm.height === null ||
+    bodyMetricForm.height === undefined ||
+    bodyMetricForm.bodyFatPercentage === "" ||
+    bodyMetricForm.bodyFatPercentage === null ||
+    bodyMetricForm.bodyFatPercentage === undefined;
+  const toggleProfileSection = (section) => {
+    setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
+  };
+  const sectionToggleStyle = {
+    ...pB,
+    padding: "8px 12px",
+    fontSize: 12,
+    borderColor: "rgba(255,255,255,0.12)",
+    color: "#cbd5e1",
+    background: "rgba(255,255,255,0.03)",
+  };
 
   return (
     <div style={{...themeVars,minHeight:"100vh",background:"var(--app-bg)",color:"var(--app-text)",fontFamily:"'Outfit','Segoe UI',sans-serif"}}>
@@ -3556,7 +3590,37 @@ function ProfileModal({
                 : "Atualize seus dados, acompanhe sua evolução e reabra dietas e relatórios sem perder o contexto."}
             </div>
           </div>
-          {!setupRequired && <button onClick={onClose} style={{...pB,padding:"12px 16px",borderColor:"rgba(255,255,255,0.12)",color:"#cbd5e1",background:"rgba(255,255,255,0.04)",width:profileIsMobile ? "100%" : "auto"}}>Voltar ao painel</button>}
+          <div style={{display:"flex",gap:10,width:profileIsMobile ? "100%" : "auto",justifyContent:profileIsMobile ? "stretch" : "flex-end",position:"relative"}}>
+            <button
+              onClick={() => setProfileSettingsOpen((prev) => !prev)}
+              title="Configurações da conta"
+              style={{width:44,height:44,borderRadius:12,border:"1px solid rgba(132,204,22,0.2)",background:profileSettingsOpen?"rgba(132,204,22,0.14)":"rgba(255,255,255,0.04)",color:profileSettingsOpen?"#a3e635":"#cbd5e1",cursor:"pointer",fontSize:18,flexShrink:0}}
+            >
+              ⚙
+            </button>
+            {!setupRequired && <button onClick={onClose} style={{...pB,padding:"12px 16px",borderColor:"rgba(255,255,255,0.12)",color:"#cbd5e1",background:"rgba(255,255,255,0.04)",flex:profileIsMobile ? 1 : "initial"}}>Voltar ao painel</button>}
+            {profileSettingsOpen && (
+              <div style={{position:"absolute",top:"calc(100% + 10px)",right:0,zIndex:20,width:profileIsMobile ? "calc(100vw - 28px)" : 360,padding:"14px",borderRadius:16,background:"rgba(15,23,42,0.98)",border:"1px solid rgba(132,204,22,0.18)",boxShadow:"0 24px 70px rgba(0,0,0,0.42)"}}>
+                <div style={{fontSize:12,letterSpacing:"0.12em",textTransform:"uppercase",color:"#84cc16",fontWeight:800}}>Configuração</div>
+                <div style={{fontSize:18,fontWeight:800,marginTop:4}}>Segurança e privacidade</div>
+                <div style={{display:"grid",gridTemplateColumns:"1fr",gap:8,marginTop:12}}>
+                  {[
+                    { label:"Último login", value: formatAuditDate(authUser.lastLoginAt) },
+                    { label:"Último acesso", value: formatAuditDate(authUser.lastAccessAt) },
+                    { label:"IP recente", value: authUser.lastAccessIp || "—" },
+                  ].map((item) => (
+                    <div key={item.label} style={{padding:"10px 12px",borderRadius:12,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)"}}>
+                      <div style={{fontSize:10,color:"#64748b",textTransform:"uppercase",letterSpacing:"0.08em"}}>{item.label}</div>
+                      <div style={{fontSize:13,fontWeight:700,color:"#e2e8f0",marginTop:4,lineHeight:1.4}}>{item.value}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{marginTop:10,fontSize:12,color:"#94a3b8",lineHeight:1.5}}>
+                  Seus dados, dietas e relatórios ficam privados por usuário. Alteração de senha e preferências avançadas podem entrar aqui quando forem expandidas.
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         <div style={{padding:profileIsMobile ? "18px 14px" : "24px",borderRadius:24,background:"linear-gradient(180deg,rgba(15,23,42,0.98),rgba(10,14,26,0.98))",border:"1px solid rgba(132,204,22,0.18)",boxShadow:"0 32px 100px rgba(0,0,0,0.35)"}}>
@@ -3604,58 +3668,22 @@ function ProfileModal({
             </div>
           </div>
 
-        {setupRequired && (
-          <div style={{marginTop:14,padding:"12px 14px",borderRadius:12,background:"rgba(132,204,22,0.08)",border:"1px solid rgba(132,204,22,0.18)",fontSize:13,color:"#d9f99d"}}>
-            Para montar sua dieta pela primeira vez, preencha nome, sexo, data de nascimento, peso e altura. A idade é calculada automaticamente.
-          </div>
-        )}
-
-        <div style={{marginTop:18,padding:"14px",borderRadius:14,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)"}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",gap:12,marginBottom:10,flexWrap:"wrap"}}>
-            <div>
-              <div style={{fontSize:12,letterSpacing:"0.12em",textTransform:"uppercase",color:"#f87171",fontWeight:800}}>Segurança</div>
-              <div style={{fontSize:18,fontWeight:800}}>Segurança e privacidade</div>
-            </div>
-            <div style={{fontSize:12,color:"#94a3b8"}}>Auditoria básica da conta</div>
-          </div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:10}}>
-            {[
-              { label:"Último login", value: formatAuditDate(authUser.lastLoginAt) },
-              { label:"Último acesso", value: formatAuditDate(authUser.lastAccessAt) },
-              { label:"IP recente", value: authUser.lastAccessIp || "—" },
-            ].map((item) => (
-              <div key={item.label} style={{padding:"10px 12px",borderRadius:12,background:"rgba(15,23,42,0.6)",border:"1px solid rgba(255,255,255,0.06)"}}>
-                <div style={{fontSize:10,color:"#64748b",textTransform:"uppercase",letterSpacing:"0.08em"}}>{item.label}</div>
-                <div style={{fontSize:13,fontWeight:700,color:"#e2e8f0",marginTop:4,lineHeight:1.4}}>{item.value}</div>
-              </div>
-            ))}
-          </div>
-          <div style={{marginTop:10,fontSize:12,color:"#94a3b8",lineHeight:1.5}}>
-            Seus dados de perfil, evolução, dietas e relatórios ficam privados por usuário. O acesso é autenticado e o histórico salvo não aparece para outras contas.
-          </div>
-        </div>
-
-        <div style={{marginTop:20,paddingTop:18,borderTop:"1px solid rgba(255,255,255,0.08)"}}>
+        <div style={{marginTop:18,padding:"14px",borderRadius:14,background:hasIncompleteBodyData ? "rgba(132,204,22,0.08)" : "rgba(255,255,255,0.03)",border:hasIncompleteBodyData ? "1px solid rgba(132,204,22,0.2)" : "1px solid rgba(255,255,255,0.08)"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",gap:12,marginBottom:12,flexWrap:"wrap"}}>
             <div>
-              <div style={{fontSize:12,letterSpacing:"0.12em",textTransform:"uppercase",color:"#84cc16",fontWeight:800}}>Saúde</div>
-              <div style={{fontSize:18,fontWeight:800}}>Histórico corporal</div>
+              <div style={{fontSize:12,letterSpacing:"0.12em",textTransform:"uppercase",color:"#84cc16",fontWeight:800}}>Dados atuais</div>
+              <div style={{fontSize:18,fontWeight:800}}>Medidas para calcular a dieta</div>
             </div>
-            <div style={{fontSize:12,color:"#94a3b8"}}>Último estado salvo do perfil</div>
+            <div style={{fontSize:12,color:"#94a3b8"}}>Esses dados alimentam o primeiro passo da dieta.</div>
           </div>
-
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:8,marginBottom:14}}>
-            {[{label:"Peso",value:authUser.weight ? `${authUser.weight} kg` : "—"},{label:"Altura",value:authUser.height ? `${authUser.height} cm` : "—"},{label:"Idade",value:authUser.age ? `${authUser.age} anos` : "—"},{label:"Gordura",value:authUser.bodyFatPercentage ? `${authUser.bodyFatPercentage}%` : "—"}].map((item) => (
-              <div key={item.label} style={{padding:"10px 12px",borderRadius:12,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)"}}>
-                <div style={{fontSize:10,color:"#64748b",textTransform:"uppercase",letterSpacing:"0.08em"}}>{item.label}</div>
-                <div style={{fontSize:15,fontWeight:700,color:"#e2e8f0",marginTop:4}}>{item.value}</div>
-              </div>
-            ))}
-          </div>
-
+          {hasIncompleteBodyData && (
+            <div style={{marginBottom:12,padding:"10px 12px",borderRadius:10,background:"rgba(15,23,42,0.45)",border:"1px solid rgba(132,204,22,0.18)",color:"#d9f99d",fontSize:13}}>
+              Complete peso, altura e percentual de gordura para liberar a geração com o perfil já preenchido.
+            </div>
+          )}
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:12}}>
             <div>
-              <label style={lS}>Peso (kg)</label>
+              <label style={lS}>Peso atual (kg)</label>
               <input value={bodyMetricForm.weight} onChange={(e) => onUpdateBodyMetricField("weight", e.target.value)} placeholder="Ex: 82.4" style={iS} />
             </div>
             <div>
@@ -3671,23 +3699,50 @@ function ProfileModal({
               <input value={bodyMetricForm.bodyFatPercentage} onChange={(e) => onUpdateBodyMetricField("bodyFatPercentage", e.target.value)} placeholder="Ex: 14.5" style={iS} />
             </div>
           </div>
-
           <div style={{display:"flex",gap:10,marginTop:12,flexWrap:"wrap"}}>
-            <button onClick={onBodyMetricSave} disabled={bodyMetricsLoading} style={{...nBS,flex:profileIsMobile?"1 1 calc(50% - 5px)":"none",minWidth:profileIsMobile?0:"auto",padding:"12px 18px",opacity:bodyMetricsLoading?0.65:1}}>
-              {bodyMetricsLoading ? "Salvando..." : editingBodyMetricId ? "Salvar alteração" : "Salvar registro"}
+            <button onClick={onBodyMetricSave} disabled={bodyMetricsLoading} style={{...pB,flex:profileIsMobile?"1 1 100%":"none",padding:"12px 18px",borderColor:"rgba(132,204,22,0.25)",color:"#d9f99d",background:"rgba(132,204,22,0.08)",opacity:bodyMetricsLoading?0.65:1}}>
+              {bodyMetricsLoading ? "Salvando..." : editingBodyMetricId ? "Salvar alteração corporal" : "Salvar registro corporal"}
             </button>
             {editingBodyMetricId && (
-              <button onClick={onBodyMetricCancelEdit} style={{...pB,flex:profileIsMobile?"1 1 calc(50% - 5px)":"none",minWidth:profileIsMobile?0:"auto",padding:"12px 18px",borderColor:"rgba(255,255,255,0.12)",color:"#cbd5e1"}}>
+              <button onClick={onBodyMetricCancelEdit} style={{...pB,flex:profileIsMobile?"1 1 100%":"none",padding:"12px 18px",borderColor:"rgba(255,255,255,0.12)",color:"#cbd5e1"}}>
                 Cancelar edição
               </button>
             )}
-            <button onClick={onBodyFatCalcOpen} style={{...pB,flex:profileIsMobile?"1 1 calc(50% - 5px)":"none",minWidth:profileIsMobile?0:"auto",padding:"12px 18px",borderColor:"rgba(56,189,248,0.25)",color:"#38bdf8",background:"rgba(56,189,248,0.08)"}}>
+            <button onClick={onBodyFatCalcOpen} style={{...pB,flex:profileIsMobile?"1 1 100%":"none",padding:"12px 18px",borderColor:"rgba(56,189,248,0.25)",color:"#38bdf8",background:"rgba(56,189,248,0.08)"}}>
               Calcular % de gordura
             </button>
           </div>
-
           {bodyMetricError && <div style={{marginTop:12,padding:"10px 12px",borderRadius:10,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",color:"#fca5a5",fontSize:13}}>{bodyMetricError}</div>}
           {bodyMetricNotice && <div style={{marginTop:12,padding:"10px 12px",borderRadius:10,background:"rgba(132,204,22,0.08)",border:"1px solid rgba(132,204,22,0.2)",color:"#d9f99d",fontSize:13}}>{bodyMetricNotice}</div>}
+        </div>
+
+        {setupRequired && (
+          <div style={{marginTop:14,padding:"12px 14px",borderRadius:12,background:"rgba(132,204,22,0.08)",border:"1px solid rgba(132,204,22,0.18)",fontSize:13,color:"#d9f99d"}}>
+            Para montar sua dieta pela primeira vez, preencha nome, sexo, data de nascimento, peso, altura e percentual de gordura. A idade é calculada automaticamente.
+          </div>
+        )}
+
+        <div style={{marginTop:20,paddingTop:18,borderTop:"1px solid rgba(255,255,255,0.08)"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",gap:12,marginBottom:12,flexWrap:"wrap"}}>
+            <div>
+              <div style={{fontSize:12,letterSpacing:"0.12em",textTransform:"uppercase",color:"#84cc16",fontWeight:800}}>Saúde</div>
+              <div style={{fontSize:18,fontWeight:800}}>Histórico corporal</div>
+            </div>
+            <button onClick={() => toggleProfileSection("saude")} style={sectionToggleStyle}>
+              {expandedSections.saude ? "Recolher" : "Expandir"}
+            </button>
+          </div>
+
+          {expandedSections.saude && (
+            <>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:8,marginBottom:14}}>
+            {[{label:"Peso",value:authUser.weight ? `${authUser.weight} kg` : "—"},{label:"Altura",value:authUser.height ? `${authUser.height} cm` : "—"},{label:"Idade",value:authUser.age ? `${authUser.age} anos` : "—"},{label:"Gordura",value:authUser.bodyFatPercentage ? `${authUser.bodyFatPercentage}%` : "—"}].map((item) => (
+              <div key={item.label} style={{padding:"10px 12px",borderRadius:12,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)"}}>
+                <div style={{fontSize:10,color:"#64748b",textTransform:"uppercase",letterSpacing:"0.08em"}}>{item.label}</div>
+                <div style={{fontSize:15,fontWeight:700,color:"#e2e8f0",marginTop:4}}>{item.value}</div>
+              </div>
+            ))}
+          </div>
 
           <div style={{marginTop:14,maxHeight:320,overflowY:"auto",display:"flex",flexDirection:"column",gap:10,paddingRight:4}}>
             {orderedMetrics.length === 0 && !bodyMetricsLoading && (
@@ -3748,6 +3803,8 @@ function ProfileModal({
               </div>
             ))}
           </div>
+            </>
+          )}
         </div>
 
         <div style={{marginTop:20,paddingTop:18,borderTop:"1px solid rgba(255,255,255,0.08)"}}>
@@ -3756,7 +3813,12 @@ function ProfileModal({
               <div style={{fontSize:12,letterSpacing:"0.12em",textTransform:"uppercase",color:"#f59e0b",fontWeight:800}}>Evolução</div>
               <div style={{fontSize:18,fontWeight:800}}>Minha evolução</div>
             </div>
-            <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+            <div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
+              <button onClick={() => toggleProfileSection("evolucao")} style={sectionToggleStyle}>
+                {expandedSections.evolucao ? "Recolher" : "Expandir"}
+              </button>
+              {expandedSections.evolucao && (
+              <>
               {periodOptions.map((option) => (
                 <button
                   key={String(option.value)}
@@ -3773,9 +3835,13 @@ function ProfileModal({
                   {option.label}
                 </button>
               ))}
+              </>
+              )}
             </div>
           </div>
 
+          {expandedSections.evolucao && (
+            <>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:8,marginBottom:14}}>
             {[
               { label:"Peso inicial", value: formatMetricValue(weightTrend.firstValue, " kg") },
@@ -3806,6 +3872,8 @@ function ProfileModal({
               emptyText="Quando houver registros de gordura, o gráfico vai aparecer aqui."
             />
           </div>
+            </>
+          )}
         </div>
 
         <div style={{marginTop:20,paddingTop:18,borderTop:"1px solid rgba(255,255,255,0.08)"}}>
@@ -3814,9 +3882,14 @@ function ProfileModal({
               <div style={{fontSize:12,letterSpacing:"0.12em",textTransform:"uppercase",color:"#a78bfa",fontWeight:800}}>Dietas</div>
               <div style={{fontSize:18,fontWeight:800}}>Minhas dietas</div>
             </div>
-            <div style={{fontSize:12,color:"#94a3b8"}}>Reabra dietas salvas com o snapshot corporal usado na geração.</div>
+            <button onClick={() => toggleProfileSection("dietas")} style={sectionToggleStyle}>
+              {expandedSections.dietas ? "Recolher" : "Expandir"}
+            </button>
           </div>
 
+          {expandedSections.dietas && (
+            <>
+          <div style={{fontSize:12,color:"#94a3b8",marginBottom:12}}>Reabra dietas salvas com o snapshot corporal usado na geração.</div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:10,marginBottom:14}}>
             <div>
               <label style={lS}>Objetivo</label>
@@ -3913,6 +3986,8 @@ function ProfileModal({
               </div>
             ))}
           </div>
+            </>
+          )}
         </div>
 
         <div style={{marginTop:20,paddingTop:18,borderTop:"1px solid rgba(255,255,255,0.08)"}}>
@@ -3921,9 +3996,14 @@ function ProfileModal({
               <div style={{fontSize:12,letterSpacing:"0.12em",textTransform:"uppercase",color:"#f97316",fontWeight:800}}>Relatórios</div>
               <div style={{fontSize:18,fontWeight:800}}>Meus relatórios</div>
             </div>
-            <div style={{fontSize:12,color:"#94a3b8"}}>Cada clique em gerar relatório pode virar um item salvo e reaberto depois.</div>
+            <button onClick={() => toggleProfileSection("relatorios")} style={sectionToggleStyle}>
+              {expandedSections.relatorios ? "Recolher" : "Expandir"}
+            </button>
           </div>
 
+          {expandedSections.relatorios && (
+            <>
+          <div style={{fontSize:12,color:"#94a3b8",marginBottom:12}}>Cada clique em gerar relatório pode virar um item salvo e reaberto depois.</div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:10,marginBottom:14}}>
             <div>
               <label style={lS}>Objetivo</label>
@@ -3985,6 +4065,8 @@ function ProfileModal({
               </div>
             ))}
           </div>
+            </>
+          )}
         </div>
 
         {profileError && <div style={{marginTop:14,padding:"10px 12px",borderRadius:10,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",color:"#fca5a5",fontSize:13}}>{profileError}</div>}
