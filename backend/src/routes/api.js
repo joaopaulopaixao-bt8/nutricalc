@@ -6,13 +6,39 @@ const { checkAvatarStorageHealth, runAvatarStorageWriteCheck } = require("../ser
 
 const router = express.Router();
 
+const DIET_TYPES = new Set(["traditional", "carnivore", "carnivore_eggs_dairy"]);
+
+function normalizeDietType(value) {
+  return DIET_TYPES.has(value) ? value : "traditional";
+}
+
+function isCompatibleWithDiet(item, dietType) {
+  if (dietType === "traditional") return true;
+  return Array.isArray(item.dietTags) && item.dietTags.includes(dietType);
+}
+
 // ---- FOODS ----
 router.get("/foods", async (req, res) => {
   try {
     const { category } = req.query;
-    const where = category ? { category } : {};
+    const dietType = normalizeDietType(req.query.dietType);
+    const where = {
+      ...(category ? { category } : {}),
+      ...(dietType !== "traditional" ? { dietTags: { has: dietType } } : {}),
+    };
     const foods = await prisma.food.findMany({ where, orderBy: { name: "asc" } });
     res.json(foods);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.get("/recipes", async (req, res) => {
+  try {
+    const dietType = normalizeDietType(req.query.dietType);
+    const where = dietType === "traditional" ? {} : { dietTags: { has: dietType } };
+    const recipes = await prisma.recipe.findMany({ where, orderBy: { name: "asc" } });
+    res.json(recipes);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -65,20 +91,40 @@ router.post("/generate", async (req, res) => {
     const {
       targetKcal, protGrams, carbGrams, fatGrams,
       numMeals, mealDistribution, selectedFoodIds, favoriteIds,
-      generationConfig,
+      generationConfig, dietType: rawDietType, selectedRecipeIds, fixedMeals,
       // User data for saving
       userName, weight, height, age, sex, activityLevel, bodyFatPercentage,
       objective, objectivePct, protPerKg, carbPerKg, fatPerKg,
     } = req.body;
+    const dietType = normalizeDietType(rawDietType);
 
     // Fetch selected foods from DB
     const foods = await prisma.food.findMany({
       where: { id: { in: selectedFoodIds } },
     });
+    const compatibleFoods = foods.filter((food) => isCompatibleWithDiet(food, dietType));
+    if (compatibleFoods.length !== foods.length) {
+      return res.status(400).json({ error: "A seleção contém alimentos incompatíveis com o estilo alimentar escolhido." });
+    }
+
+    const requestedRecipeIds = Array.isArray(selectedRecipeIds) ? selectedRecipeIds : [];
+    const recipes = requestedRecipeIds.length > 0
+      ? await prisma.recipe.findMany({ where: { id: { in: requestedRecipeIds } } })
+      : [];
+    const compatibleRecipes = recipes.filter((recipe) => isCompatibleWithDiet(recipe, dietType));
+    if (compatibleRecipes.length !== recipes.length) {
+      return res.status(400).json({ error: "A seleção contém receitas incompatíveis com o estilo alimentar escolhido." });
+    }
 
     const result = generateDiet({
       targetKcal, protGrams, carbGrams, fatGrams,
-      numMeals, mealDistribution, foods, favoriteIds, generationConfig,
+      numMeals,
+      mealDistribution,
+      foods: compatibleFoods,
+      favoriteIds,
+      generationConfig,
+      recipes: compatibleRecipes,
+      fixedMeals,
     });
     const enrichedResult = {
       ...result,
@@ -88,6 +134,7 @@ router.post("/generate", async (req, res) => {
         carbGrams,
         fatGrams,
       },
+      dietType,
       objective: objective || "maintenance",
       objectivePct: objectivePct || 0,
       numMeals,
@@ -124,6 +171,7 @@ router.post("/generate", async (req, res) => {
     const diet = await prisma.diet.create({
       data: {
         userId: user.id,
+        dietType,
         objective: objective || "maintenance",
         objectivePct: objectivePct || 0,
         targetKcal,
@@ -140,6 +188,8 @@ router.post("/generate", async (req, res) => {
         mealDistribution,
         selectedFoodIds,
         favoriteIds: favoriteIds || [],
+        selectedRecipeIds: requestedRecipeIds,
+        fixedMeals: fixedMeals || null,
         generatedPlan: enrichedResult,
       },
     });

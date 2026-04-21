@@ -379,6 +379,7 @@ router.get("/me/diets", requireAuth, async (req, res) => {
       take: 40,
       select: {
         id: true,
+        dietType: true,
         objective: true,
         objectivePct: true,
         targetKcal: true,

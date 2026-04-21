@@ -36,9 +36,19 @@ function buildRequestOptions(extra = {}) {
   };
 }
 
-export async function fetchFoods(category) {
-  const url = category ? `${API_URL}/api/foods?category=${category}` : `${API_URL}/api/foods`;
+export async function fetchFoods(category, dietType = "traditional") {
+  const params = new URLSearchParams();
+  if (category) params.set("category", category);
+  if (dietType && dietType !== "traditional") params.set("dietType", dietType);
+  const query = params.toString() ? `?${params.toString()}` : "";
+  const url = `${API_URL}/api/foods${query}`;
   const res = await fetch(url, buildRequestOptions());
+  return parseResponse(res);
+}
+
+export async function fetchRecipes(dietType = "traditional") {
+  const query = dietType && dietType !== "traditional" ? `?dietType=${encodeURIComponent(dietType)}` : "";
+  const res = await fetch(`${API_URL}/api/recipes${query}`, buildRequestOptions());
   return parseResponse(res);
 }
 

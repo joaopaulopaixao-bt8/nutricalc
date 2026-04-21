@@ -63,6 +63,26 @@ const foods = [
   { id:"p58", name:"Peito de frango em cubos", category:"protein", kcal:157, prot:31.2, carb:0, fat:3.5, mealTypes:["principal","lanche"], subGroup:"ave_magra" },
   { id:"p59", name:"Omelete simples", category:"protein", kcal:154, prot:11.8, carb:1.2, fat:11.1, mealTypes:["cafe","lanche"], subGroup:"ovo" },
   { id:"p60", name:"Claras pasteurizadas", category:"protein", kcal:48, prot:10.1, carb:1, fat:0, mealTypes:["cafe","lanche"], subGroup:"ovo" },
+  { id:"p61", name:"Cupim assado", category:"protein", kcal:330, prot:28, carb:0, fat:24, mealTypes:["principal"], subGroup:"bovina" },
+  { id:"p62", name:"Costela bovina assada", category:"protein", kcal:373, prot:26, carb:0, fat:30, mealTypes:["principal"], subGroup:"bovina" },
+  { id:"p63", name:"Picanha grelhada", category:"protein", kcal:289, prot:30, carb:0, fat:19, mealTypes:["principal"], subGroup:"bovina" },
+  { id:"p64", name:"Fraldinha grelhada", category:"protein", kcal:241, prot:31, carb:0, fat:13, mealTypes:["principal"], subGroup:"bovina" },
+  { id:"p65", name:"Paleta bovina cozida", category:"protein", kcal:214, prot:29, carb:0, fat:10.5, mealTypes:["principal"], subGroup:"bovina" },
+  { id:"p66", name:"Contrafilé grelhado", category:"protein", kcal:278, prot:31.5, carb:0, fat:17, mealTypes:["principal"], subGroup:"bovina" },
+  { id:"p67", name:"Cordeiro assado", category:"protein", kcal:260, prot:28, carb:0, fat:16, mealTypes:["principal"], subGroup:"outra" },
+  { id:"p68", name:"Pernil de cordeiro", category:"protein", kcal:243, prot:29, carb:0, fat:13.5, mealTypes:["principal"], subGroup:"outra" },
+  { id:"p69", name:"Lombo de bacalhau", category:"protein", kcal:110, prot:24, carb:0, fat:1.2, mealTypes:["principal"], subGroup:"peixe_magro" },
+  { id:"p70", name:"Cação grelhado", category:"protein", kcal:129, prot:25.6, carb:0, fat:2.8, mealTypes:["principal"], subGroup:"peixe_magro" },
+  { id:"p71", name:"Mexilhão cozido", category:"protein", kcal:86, prot:11.9, carb:3.7, fat:2.2, mealTypes:["principal"], subGroup:"frutos_mar" },
+  { id:"p72", name:"Lula grelhada", category:"protein", kcal:92, prot:15.6, carb:3.1, fat:1.4, mealTypes:["principal"], subGroup:"frutos_mar" },
+  { id:"p73", name:"Ostras cozidas", category:"protein", kcal:81, prot:9.5, carb:4.9, fat:2.3, mealTypes:["principal"], subGroup:"frutos_mar" },
+  { id:"p74", name:"Carne de siri", category:"protein", kcal:95, prot:19.3, carb:0, fat:1.5, mealTypes:["principal"], subGroup:"frutos_mar" },
+  { id:"p75", name:"Coxa de pato assada", category:"protein", kcal:240, prot:23, carb:0, fat:16, mealTypes:["principal"], subGroup:"ave" },
+  { id:"p76", name:"Lombo suíno grelhado", category:"protein", kcal:189, prot:29, carb:0, fat:7.8, mealTypes:["principal"], subGroup:"suina" },
+  { id:"p77", name:"Bisteca suína grelhada", category:"protein", kcal:255, prot:28, carb:0, fat:15.5, mealTypes:["principal"], subGroup:"suina" },
+  { id:"p78", name:"Isca de frango grelhada", category:"protein", kcal:160, prot:31, carb:0, fat:3.7, mealTypes:["principal","lanche"], subGroup:"ave_magra" },
+  { id:"p79", name:"Carne moída 80/20", category:"protein", kcal:254, prot:25.5, carb:0, fat:17, mealTypes:["principal"], subGroup:"bovina" },
+  { id:"p80", name:"Hambúrguer bovino artesanal", category:"protein", kcal:260, prot:24, carb:0, fat:18, mealTypes:["principal","lanche"], subGroup:"bovina" },
 
   // === CARBS ===
   { id:"c1", name:"Arroz branco cozido", category:"carb", kcal:128, prot:2.5, carb:28.1, fat:0.2, mealTypes:["principal"], subGroup:"arroz" },
@@ -125,6 +145,26 @@ const foods = [
   { id:"c58", name:"Batata baroa cozida", category:"carb", kcal:80, prot:0.9, carb:19.6, fat:0.2, mealTypes:["principal"], subGroup:"tuberculo" },
   { id:"c59", name:"Cará cozido", category:"carb", kcal:96, prot:1.5, carb:22.5, fat:0.1, mealTypes:["principal"], subGroup:"tuberculo" },
   { id:"c60", name:"Arroz basmati cozido", category:"carb", kcal:121, prot:3.2, carb:25.2, fat:0.4, mealTypes:["principal"], subGroup:"arroz" },
+  { id:"c61", name:"Batata bolinha cozida", category:"carb", kcal:68, prot:1.6, carb:15.7, fat:0.1, mealTypes:["principal"], subGroup:"tuberculo" },
+  { id:"c62", name:"Purê de batata", category:"carb", kcal:88, prot:1.8, carb:15.6, fat:2.2, mealTypes:["principal"], subGroup:"tuberculo" },
+  { id:"c63", name:"Nhoque de batata cozido", category:"carb", kcal:130, prot:3.8, carb:27, fat:1.1, mealTypes:["principal"], subGroup:"massa" },
+  { id:"c64", name:"Cevadinha cozida", category:"carb", kcal:123, prot:2.3, carb:28.2, fat:0.4, mealTypes:["principal"], subGroup:"cereal" },
+  { id:"c65", name:"Trigo para quibe cozido", category:"carb", kcal:83, prot:3.1, carb:18.6, fat:0.2, mealTypes:["principal"], subGroup:"cereal" },
+  { id:"c66", name:"Cuscuz marroquino cozido", category:"carb", kcal:112, prot:3.8, carb:23.2, fat:0.2, mealTypes:["principal"], subGroup:"cereal" },
+  { id:"c67", name:"Tortilha de trigo", category:"carb", kcal:310, prot:8.4, carb:50, fat:8.2, mealTypes:["lanche","principal"], subGroup:"pao" },
+  { id:"c68", name:"Rap10 integral", category:"carb", kcal:286, prot:8.5, carb:45, fat:8.4, mealTypes:["lanche","principal"], subGroup:"pao" },
+  { id:"c69", name:"Pão australiano", category:"carb", kcal:280, prot:8.5, carb:49, fat:5.2, mealTypes:["cafe","lanche"], subGroup:"pao" },
+  { id:"c70", name:"Pão de centeio", category:"carb", kcal:259, prot:8.5, carb:48, fat:3.3, mealTypes:["cafe","lanche"], subGroup:"pao" },
+  { id:"c71", name:"Tâmara seca", category:"carb", kcal:282, prot:2.5, carb:75, fat:0.4, mealTypes:["cafe","lanche"], subGroup:"fruta" },
+  { id:"c72", name:"Damasco seco", category:"carb", kcal:241, prot:3.4, carb:63, fat:0.5, mealTypes:["cafe","lanche"], subGroup:"fruta" },
+  { id:"c73", name:"Ameixa seca", category:"carb", kcal:240, prot:2.2, carb:64, fat:0.4, mealTypes:["cafe","lanche"], subGroup:"fruta" },
+  { id:"c74", name:"Blueberry", category:"carb", kcal:57, prot:0.7, carb:14.5, fat:0.3, mealTypes:["cafe","lanche","jantar_adj"], subGroup:"fruta" },
+  { id:"c75", name:"Framboesa", category:"carb", kcal:52, prot:1.2, carb:12, fat:0.7, mealTypes:["cafe","lanche","jantar_adj"], subGroup:"fruta" },
+  { id:"c76", name:"Pêssego", category:"carb", kcal:39, prot:0.9, carb:9.5, fat:0.3, mealTypes:["cafe","lanche","jantar_adj"], subGroup:"fruta" },
+  { id:"c77", name:"Abóbora cabotiá", category:"carb", kcal:48, prot:1.4, carb:10.8, fat:0.7, mealTypes:["principal"], subGroup:"legume" },
+  { id:"c78", name:"Chuchu cozido", category:"carb", kcal:19, prot:0.4, carb:4.8, fat:0.1, mealTypes:["principal"], subGroup:"legume" },
+  { id:"c79", name:"Abobrinha cozida", category:"carb", kcal:19, prot:1.1, carb:3.9, fat:0.2, mealTypes:["principal"], subGroup:"legume" },
+  { id:"c80", name:"Lasanha de abobrinha", category:"carb", kcal:96, prot:5.8, carb:8.2, fat:4.8, mealTypes:["principal"], subGroup:"legume" },
 
   // === FATS ===
   { id:"f1", name:"Azeite de oliva", category:"fat", kcal:884, prot:0, carb:0, fat:100, mealTypes:["principal","cafe","lanche"], subGroup:"oleo" },
@@ -187,6 +227,26 @@ const foods = [
   { id:"f58", name:"Pinoli", category:"fat", kcal:673, prot:13.7, carb:13.1, fat:68.4, mealTypes:["lanche","cafe"], subGroup:"oleaginosa" },
   { id:"f59", name:"Pasta de macadâmia", category:"fat", kcal:720, prot:8.1, carb:12.2, fat:74.5, mealTypes:["cafe","lanche"], subGroup:"oleaginosa_pasta" },
   { id:"f60", name:"Óleo de linhaça", category:"fat", kcal:884, prot:0, carb:0, fat:100, mealTypes:["principal"], subGroup:"oleo" },
+  { id:"f61", name:"Banha suína", category:"fat", kcal:902, prot:0, carb:0, fat:100, mealTypes:["principal"], subGroup:"suina" },
+  { id:"f62", name:"Sebo bovino", category:"fat", kcal:902, prot:0, carb:0, fat:100, mealTypes:["principal"], subGroup:"bovina" },
+  { id:"f63", name:"Manteiga com sal", category:"fat", kcal:717, prot:0.9, carb:0.1, fat:81, mealTypes:["cafe","principal"], subGroup:"manteiga" },
+  { id:"f64", name:"Nata", category:"fat", kcal:300, prot:2.3, carb:3.1, fat:30, mealTypes:["cafe","lanche"], subGroup:"laticinio_gord" },
+  { id:"f65", name:"Queijo cheddar", category:"fat", kcal:403, prot:24.9, carb:1.3, fat:33.1, mealTypes:["cafe","lanche","principal"], subGroup:"queijo_gord" },
+  { id:"f66", name:"Queijo gorgonzola", category:"fat", kcal:353, prot:21.4, carb:2.3, fat:28.7, mealTypes:["principal","lanche"], subGroup:"queijo_gord" },
+  { id:"f67", name:"Queijo meia cura", category:"fat", kcal:380, prot:25, carb:2.2, fat:30, mealTypes:["cafe","lanche","principal"], subGroup:"queijo_gord" },
+  { id:"f68", name:"Queijo canastra", category:"fat", kcal:390, prot:24, carb:2, fat:32, mealTypes:["cafe","lanche"], subGroup:"queijo_gord" },
+  { id:"f69", name:"Torresmo", category:"fat", kcal:544, prot:61, carb:0, fat:31, mealTypes:["principal","lanche"], subGroup:"suina" },
+  { id:"f70", name:"Panceta assada", category:"fat", kcal:518, prot:24, carb:0, fat:46, mealTypes:["principal"], subGroup:"suina" },
+  { id:"f71", name:"Maionese caseira", category:"fat", kcal:680, prot:1, carb:1, fat:75, mealTypes:["principal","lanche"], subGroup:"outro" },
+  { id:"f72", name:"Creme de ricota", category:"fat", kcal:180, prot:8, carb:4, fat:14, mealTypes:["cafe","lanche"], subGroup:"laticinio_gord" },
+  { id:"f73", name:"Requeijão light", category:"fat", kcal:180, prot:9, carb:3.2, fat:14, mealTypes:["cafe","lanche"], subGroup:"laticinio_gord" },
+  { id:"f74", name:"Óleo MCT", category:"fat", kcal:884, prot:0, carb:0, fat:100, mealTypes:["cafe","lanche"], subGroup:"oleo" },
+  { id:"f75", name:"Azeite trufado", category:"fat", kcal:884, prot:0, carb:0, fat:100, mealTypes:["principal"], subGroup:"oleo" },
+  { id:"f76", name:"Pasta de avelã sem açúcar", category:"fat", kcal:650, prot:14, carb:18, fat:61, mealTypes:["cafe","lanche"], subGroup:"oleaginosa_pasta" },
+  { id:"f77", name:"Amêndoa laminada", category:"fat", kcal:579, prot:21, carb:22, fat:50, mealTypes:["cafe","lanche"], subGroup:"oleaginosa" },
+  { id:"f78", name:"Farinha de amêndoas", category:"fat", kcal:571, prot:21, carb:21, fat:50, mealTypes:["cafe","lanche"], subGroup:"oleaginosa" },
+  { id:"f79", name:"Semente de cânhamo", category:"fat", kcal:553, prot:31.6, carb:8.7, fat:48.8, mealTypes:["cafe","lanche"], subGroup:"semente" },
+  { id:"f80", name:"Óleo de macadâmia", category:"fat", kcal:884, prot:0, carb:0, fat:100, mealTypes:["principal"], subGroup:"oleo" },
 ];
 
 const CARB_GI_BY_ID = {
@@ -250,6 +310,26 @@ const CARB_GI_BY_ID = {
   c58: "alto",
   c59: "medio",
   c60: "medio",
+  c61: "medio",
+  c62: "alto",
+  c63: "alto",
+  c64: "baixo",
+  c65: "medio",
+  c66: "medio",
+  c67: "medio",
+  c68: "medio",
+  c69: "medio",
+  c70: "baixo",
+  c71: "medio",
+  c72: "baixo",
+  c73: "baixo",
+  c74: "baixo",
+  c75: "baixo",
+  c76: "baixo",
+  c77: "baixo",
+  c78: "baixo",
+  c79: "baixo",
+  c80: "baixo",
 };
 
 const ACCESSORY_IDS = new Set([
@@ -266,11 +346,111 @@ const FLEX_IDS = new Set([
   "f59",
 ]);
 
+const STRICT_CARNIVORE_SUBGROUPS = new Set([
+  "ave_magra", "ave", "bovina_magra", "bovina", "peixe_magro", "peixe_gordo", "peixe", "frutos_mar", "suina", "outra", "frio", "embutido", "manteiga",
+]);
+
+const CARNIVORE_WITH_EGGS_DAIRY_SUBGROUPS = new Set([
+  ...STRICT_CARNIVORE_SUBGROUPS,
+  "ovo", "queijo", "queijo_magro", "queijo_gord", "laticinio", "laticinio_gord",
+]);
+
+function getDietTags(food) {
+  const tags = ["traditional"];
+  if (STRICT_CARNIVORE_SUBGROUPS.has(food.subGroup)) {
+    tags.push("carnivore", "carnivore_eggs_dairy");
+  } else if (CARNIVORE_WITH_EGGS_DAIRY_SUBGROUPS.has(food.subGroup)) {
+    tags.push("carnivore_eggs_dairy");
+  }
+  return tags;
+}
+
 const foodsWithPlanningRole = foods.map((food) => ({
   ...food,
+  dietTags: getDietTags(food),
   glycemicIndexLevel: food.category === "carb" ? (CARB_GI_BY_ID[food.id] || "medio") : null,
   planningRole: ACCESSORY_IDS.has(food.id) ? "accessory" : FLEX_IDS.has(food.id) ? "flex" : "core",
 }));
+
+const recipes = [
+  {
+    id: "r1",
+    name: "Wrap de frango desfiado com requeijão",
+    description: "Wrap integral com frango desfiado e requeijão cremoso.",
+    mealTypes: ["lanche", "principal"],
+    dietTags: ["traditional"],
+    ingredients: [{ foodId: "c34", grams: 60 }, { foodId: "p26", grams: 120 }, { foodId: "f21", grams: 25 }],
+  },
+  {
+    id: "r2",
+    name: "Omelete com queijo minas",
+    description: "Ovos com queijo minas para cafe ou lanche.",
+    mealTypes: ["cafe", "lanche"],
+    dietTags: ["traditional", "carnivore_eggs_dairy"],
+    ingredients: [{ foodId: "p18", grams: 100 }, { foodId: "p21", grams: 40 }, { foodId: "f3", grams: 5 }],
+  },
+  {
+    id: "r3",
+    name: "Prato carnívoro bovino",
+    description: "Patinho com ovos e manteiga para uma refeição sem vegetais.",
+    mealTypes: ["principal"],
+    dietTags: ["carnivore_eggs_dairy"],
+    ingredients: [{ foodId: "p4", grams: 180 }, { foodId: "p18", grams: 100 }, { foodId: "f3", grams: 10 }],
+  },
+  {
+    id: "r4",
+    name: "Prato carnívoro estrito",
+    description: "Contrafilé com bacon, sem ovos e sem laticínios.",
+    mealTypes: ["principal"],
+    dietTags: ["carnivore", "carnivore_eggs_dairy"],
+    ingredients: [{ foodId: "p66", grams: 180 }, { foodId: "f35", grams: 35 }],
+  },
+  {
+    id: "r5",
+    name: "Bowl de arroz, frango e legumes",
+    description: "Base tradicional com arroz, frango, cenoura e azeite.",
+    mealTypes: ["principal"],
+    dietTags: ["traditional"],
+    ingredients: [{ foodId: "c1", grams: 140 }, { foodId: "p1", grams: 150 }, { foodId: "c27", grams: 70 }, { foodId: "f1", grams: 8 }],
+  },
+  {
+    id: "r6",
+    name: "Iogurte com whey e banana",
+    description: "Lanche proteico rápido com iogurte, whey e fruta.",
+    mealTypes: ["cafe", "lanche"],
+    dietTags: ["traditional"],
+    ingredients: [{ foodId: "p22", grams: 170 }, { foodId: "p24", grams: 30 }, { foodId: "c11", grams: 90 }],
+  },
+  {
+    id: "r7",
+    name: "Tilápia com batata e azeite",
+    description: "Refeição tradicional leve com peixe, tubérculo e gordura.",
+    mealTypes: ["principal"],
+    dietTags: ["traditional"],
+    ingredients: [{ foodId: "p12", grams: 180 }, { foodId: "c3", grams: 220 }, { foodId: "f1", grams: 10 }],
+  },
+  {
+    id: "r8",
+    name: "Lanche de queijo, presunto e ovos",
+    description: "Opção sem grãos para carnívora com ovos e laticínios.",
+    mealTypes: ["cafe", "lanche"],
+    dietTags: ["carnivore_eggs_dairy"],
+    ingredients: [{ foodId: "p18", grams: 100 }, { foodId: "p33", grams: 50 }, { foodId: "f65", grams: 30 }],
+  },
+];
+
+function getRecipeMacros(recipe, foodMap) {
+  return recipe.ingredients.reduce((acc, ingredient) => {
+    const food = foodMap.get(ingredient.foodId);
+    if (!food) return acc;
+    const ratio = ingredient.grams / 100;
+    acc.kcal += food.kcal * ratio;
+    acc.prot += food.prot * ratio;
+    acc.carb += food.carb * ratio;
+    acc.fat += food.fat * ratio;
+    return acc;
+  }, { kcal: 0, prot: 0, carb: 0, fat: 0 });
+}
 
 async function main() {
   console.log("Seeding TACO database...");
@@ -285,6 +465,30 @@ async function main() {
   }
   
   console.log(`Seeded ${foodsWithPlanningRole.length} foods.`);
+
+  const foodMap = new Map(foodsWithPlanningRole.map((food) => [food.id, food]));
+  for (const recipe of recipes) {
+    const macros = getRecipeMacros(recipe, foodMap);
+    await prisma.recipe.upsert({
+      where: { id: recipe.id },
+      update: {
+        ...recipe,
+        kcal: Math.round(macros.kcal),
+        prot: Number(macros.prot.toFixed(1)),
+        carb: Number(macros.carb.toFixed(1)),
+        fat: Number(macros.fat.toFixed(1)),
+      },
+      create: {
+        ...recipe,
+        kcal: Math.round(macros.kcal),
+        prot: Number(macros.prot.toFixed(1)),
+        carb: Number(macros.carb.toFixed(1)),
+        fat: Number(macros.fat.toFixed(1)),
+      },
+    });
+  }
+
+  console.log(`Seeded ${recipes.length} recipes.`);
 }
 
 main()

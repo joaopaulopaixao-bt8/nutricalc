@@ -997,6 +997,7 @@ function buildMealCandidate({
 function scaleMealFoods(meals, ratio) {
   meals.forEach((meal) => {
     meal.foods.forEach((food) => {
+      if (food.isRecipe) return;
       if (food.role === "protein" && food.sourceRole !== "protein_accessory") return;
       food.grams = clampPortion(food, food.grams * ratio, getFoodLimits(food).min);
       if (food.substitutions) {
@@ -1180,7 +1181,7 @@ function trimDayCalories(meals, targetKcal) {
     let trimmed = false;
 
     const orderedFoods = meals.flatMap((meal) =>
-      meal.foods.map((food) => ({ meal, food }))
+      meal.foods.filter((food) => !food.isRecipe).map((food) => ({ meal, food }))
     ).sort((a, b) => {
       const rank = (item) => {
         if (item.food.role === "fat") return 3;
@@ -1213,6 +1214,45 @@ function trimDayCalories(meals, targetKcal) {
   });
 }
 
+function getRecipeMealItem(recipe) {
+  return {
+    id: recipe.id,
+    name: recipe.name,
+    grams: 100,
+    role: "recipe",
+    sourceRole: "recipe",
+    isRecipe: true,
+    isFavorite: false,
+    prot: recipe.prot,
+    carb: recipe.carb,
+    fat: recipe.fat,
+    kcal: recipe.kcal,
+    subGroup: "recipe",
+    glycemicIndexLevel: null,
+    ingredients: recipe.ingredients || [],
+    substitutions: [],
+  };
+}
+
+function getRecipeMacros(recipe) {
+  return {
+    prot: recipe?.prot || 0,
+    carb: recipe?.carb || 0,
+    fat: recipe?.fat || 0,
+    kcal: recipe?.kcal || 0,
+  };
+}
+
+function subtractRecipeTargets(targets, recipe) {
+  const macros = getRecipeMacros(recipe);
+  return {
+    prot: Math.max(0, targets.prot - macros.prot),
+    carb: Math.max(0, targets.carb - macros.carb),
+    fat: Math.max(0, targets.fat - macros.fat),
+    kcal: Math.max(0, targets.kcal - macros.kcal),
+  };
+}
+
 function generateDiet({
   targetKcal,
   protGrams,
@@ -1223,6 +1263,8 @@ function generateDiet({
   foods,
   favoriteIds,
   generationConfig,
+  recipes = [],
+  fixedMeals = {},
 }) {
   const previousConfig = runtimeConfig;
   runtimeConfig = resolveDietGenerationConfig(generationConfig);
@@ -1233,6 +1275,7 @@ function generateDiet({
     carbs: foods.filter((food) => food.category === "carb"),
     fats: foods.filter((food) => food.category === "fat"),
   };
+  const recipeMap = new Map((recipes || []).map((recipe) => [recipe.id, recipe]));
 
   const meals = [];
   const recentProteins = [];
@@ -1254,13 +1297,22 @@ function generateDiet({
         carbs: foodsForMeal(allFoods.carbs, label),
         fats: foodsForMeal(allFoods.fats, label),
       };
+      const fixedRecipeId = fixedMeals?.[String(i)] || fixedMeals?.[i] || "";
+      const fixedRecipe = fixedRecipeId ? recipeMap.get(fixedRecipeId) : null;
+      const recipeCompatibleWithMeal =
+        fixedRecipe && Array.isArray(fixedRecipe.mealTypes) && foodsForMeal([{
+          mealTypes: fixedRecipe.mealTypes,
+          category: "recipe",
+          subGroup: "recipe",
+        }], label).length > 0;
+      const adjustedTargets = recipeCompatibleWithMeal ? subtractRecipeTargets(targets, fixedRecipe) : targets;
 
       let bestCandidate = null;
       for (let attempt = 0; attempt < 5; attempt++) {
         const candidate = buildMealCandidate({
           label,
           mealIndex: i,
-          targets,
+          targets: adjustedTargets,
           pools,
           recentProteins,
           recentSubGroups,
@@ -1274,7 +1326,10 @@ function generateDiet({
         if (candidate.validation.valid) break;
       }
 
-      const mealFoods = bestCandidate ? bestCandidate.foods : [];
+      const mealFoods = [
+        ...(recipeCompatibleWithMeal ? [getRecipeMealItem(fixedRecipe)] : []),
+        ...(bestCandidate ? bestCandidate.foods : []),
+      ];
       meals.push({ number: i + 1, label, foods: mealFoods });
 
       const mealProtein = mealFoods.find((food) => food.role === "protein");

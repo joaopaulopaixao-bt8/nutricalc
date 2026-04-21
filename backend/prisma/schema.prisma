@@ -17,6 +17,7 @@ model Food {
   fat       Float
   mealTypes String[] // cafe, lanche, principal, jantar_adj
   subGroup  String   // for coherent substitutions
+  dietTags  String[] @default(["traditional"])
   glycemicIndexLevel String?
   planningRole String @default("core") // core, flex, accessory
   createdAt DateTime @default(now())
@@ -25,6 +26,22 @@ model Food {
   @@index([subGroup])
   @@index([glycemicIndexLevel])
   @@index([planningRole])
+}
+
+model Recipe {
+  id          String   @id
+  name        String
+  description String?
+  mealTypes   String[]
+  dietTags    String[] @default(["traditional"])
+  kcal        Float
+  prot        Float
+  carb        Float
+  fat         Float
+  ingredients Json
+  createdAt   DateTime @default(now())
+
+  @@index([kcal])
 }
 
 model User {
@@ -99,6 +116,7 @@ model Diet {
   id             String   @id @default(cuid())
   userId         String
   user           User     @relation(fields: [userId], references: [id])
+  dietType       String   @default("traditional")
   objective      String
   objectivePct   Int
   targetKcal     Int
@@ -115,6 +133,8 @@ model Diet {
   mealDistribution Json
   selectedFoodIds  String[]
   favoriteIds      String[]
+  selectedRecipeIds String[] @default([])
+  fixedMeals        Json?
   generatedPlan    Json?
   reports          Report[]
   createdAt      DateTime @default(now())
