@@ -1530,6 +1530,13 @@ export default function NutriCalc() {
     const nextConfig = DIET_TYPES.find((item) => item.key === nextDietType) || DIET_TYPES[0];
     setMc(nextConfig.macroPresets[0].values);
     setBaseChoiceTab("foods");
+    setSelIds(new Set());
+    setFavIds(new Set());
+    setSelectedRecipeIds(new Set());
+    setFixedMeals({});
+    setFSearch("");
+    setFFilter("all");
+    setCarbGlycemicFilter("all");
   }, []);
 
   const togSel = useCallback(id => {
@@ -1601,7 +1608,7 @@ export default function NutriCalc() {
       setExpSubs(new Set());
       setShowSL(null);
     } catch (error) {
-      setGenerateError("Nao foi possivel gerar a dieta pelo backend.");
+      setGenerateError(error.message || "Nao foi possivel gerar a dieta pelo backend.");
     } finally {
       setIsGenerating(false);
     }
@@ -2736,7 +2743,7 @@ export default function NutriCalc() {
           {baseChoiceTab==="recipes"&&(
             <RecipeSelector recipes={recipes} selectedIds={selectedRecipeIds} onToggle={togRecipe} />
           )}
-          <div style={{display:"flex",gap:12,marginTop:24}}><BB onClick={()=>setStep(3)}/><NB onClick={()=>setStep(5)} disabled={!canAdv4} label={canAdv4?"Próximo":"Selecione os mínimos"}/></div>
+          <div style={{display:"flex",gap:12,marginTop:24}}><BB onClick={()=>setStep(3)}/><NB onClick={()=>setStep(5)} disabled={foodsLoading||!canAdv4} label={foodsLoading?"Carregando...":canAdv4?"Próximo":"Selecione os mínimos"}/></div>
         </div>)}
 
         {/* STEP 5 */}
