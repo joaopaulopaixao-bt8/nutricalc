@@ -186,31 +186,38 @@ const DIET_TYPES = [
     key: "traditional",
     label: "Dieta tradicional",
     desc: "Libera a base completa de alimentos e receitas.",
+    allowCarbs: true,
     macroPresets: MACRO_PRESETS,
   },
   {
     key: "carnivore",
     label: "Carnívora estrita",
-    desc: "Carnes, aves, peixes, frutos do mar e gorduras animais.",
+    desc: "Carnes, aves, peixes, frutos do mar e gorduras animais. Sem lista de carboidratos.",
+    allowCarbs: false,
     macroPresets: [
-      { key: "carnivore_moderate", label: "Carnívora moderada", values: { p: 2.2, c: 0.2, f: 1.4 } },
-      { key: "carnivore_fat", label: "Alta gordura", values: { p: 2.0, c: 0.1, f: 1.8 } },
-      { key: "carnivore_protein", label: "Proteína alta", values: { p: 2.6, c: 0.1, f: 1.2 } },
+      { key: "carnivore_moderate", label: "Carnívora moderada", values: { p: 2.2, c: 0, f: 1.8 } },
+      { key: "carnivore_fat", label: "Alta gordura", values: { p: 2.0, c: 0, f: 2.3 } },
+      { key: "carnivore_protein", label: "Proteína alta", values: { p: 2.6, c: 0, f: 1.5 } },
     ],
   },
   {
     key: "carnivore_eggs_dairy",
     label: "Carnívora com ovos e laticínios",
-    desc: "Carnes com ovos, queijos e laticínios compatíveis.",
+    desc: "Carnes com ovos, queijos e laticínios compatíveis. Sem carboidratos tradicionais.",
+    allowCarbs: false,
     macroPresets: [
-      { key: "animal_balanced", label: "Animal equilibrada", values: { p: 2.2, c: 0.3, f: 1.3 } },
-      { key: "animal_fat", label: "Alta gordura", values: { p: 2.0, c: 0.2, f: 1.7 } },
-      { key: "animal_cut", label: "Emagrecimento", values: { p: 2.5, c: 0.2, f: 1.0 } },
+      { key: "animal_balanced", label: "Animal equilibrada", values: { p: 2.2, c: 0, f: 1.7 } },
+      { key: "animal_fat", label: "Alta gordura", values: { p: 2.0, c: 0, f: 2.2 } },
+      { key: "animal_cut", label: "Emagrecimento", values: { p: 2.5, c: 0, f: 1.3 } },
     ],
   },
 ];
 
 const DIET_TYPE_LABELS = Object.fromEntries(DIET_TYPES.map((item) => [item.key, item.label]));
+
+function dietTypeAllowsCarbs(dietType) {
+  return (DIET_TYPES.find((item) => item.key === dietType) || DIET_TYPES[0]).allowCarbs !== false;
+}
 
 const MEAL_SHARE_TEMPLATES = {
   3: [30, 40, 30],
@@ -243,6 +250,13 @@ const ROLE_LABELS = {
   flex: "Flex",
   accessory: "Acessório",
 };
+
+const MEAL_FILTERS = [
+  { key: "all", label: "Todas" },
+  { key: "cafe", label: "Café" },
+  { key: "lanche", label: "Lanches" },
+  { key: "principal", label: "Almoço/Jantar" },
+];
 
 const PUBLIC_PAGES = new Set(["landing", "auth", "privacy", "terms", "methodology"]);
 
@@ -430,6 +444,16 @@ function formatAuditDate(value) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
   return date.toLocaleString("pt-BR");
+}
+
+function getObjectiveLabel(objective) {
+  if (objective === "cutting") return "Plano de emagrecimento";
+  if (objective === "bulk") return "Plano de ganho";
+  return "Plano de manutenção";
+}
+
+function hasRecipeUsage(item) {
+  return Array.isArray(item?.selectedRecipeIds) && item.selectedRecipeIds.length > 0;
 }
 
 function formatMetricSource(source) {
@@ -837,12 +861,16 @@ export default function NutriCalc() {
   const [userReportsError, setUserReportsError] = useState("");
   const [dietHistoryFilters, setDietHistoryFilters] = useState({
     objective: "all",
+    dietType: "all",
     numMeals: "all",
     targetKcalMax: "",
+    hasRecipes: "all",
     days: 90,
   });
   const [reportHistoryFilters, setReportHistoryFilters] = useState({
     objective: "all",
+    dietType: "all",
+    hasDiet: "all",
     days: 90,
   });
   const [bodyMetricError, setBodyMetricError] = useState("");
@@ -890,6 +918,9 @@ export default function NutriCalc() {
   const [diet, setDiet] = useState(null);
   const [expSubs, setExpSubs] = useState(new Set());
   const [fFilter, setFFilter] = useState("all");
+  const [foodMealFilter, setFoodMealFilter] = useState("all");
+  const [foodFavoriteFilter, setFoodFavoriteFilter] = useState("all");
+  const [foodRoleFilter, setFoodRoleFilter] = useState("all");
   const [carbGlycemicFilter, setCarbGlycemicFilter] = useState("all");
   const [fSearch, setFSearch] = useState("");
   const [showSL, setShowSL] = useState(null);
@@ -898,6 +929,8 @@ export default function NutriCalc() {
   const [recipes, setRecipes] = useState([]);
   const [selectedRecipeIds, setSelectedRecipeIds] = useState(new Set());
   const [fixedMeals, setFixedMeals] = useState({});
+  const [recipeMealFilter, setRecipeMealFilter] = useState("all");
+  const [recipeSelectionFilter, setRecipeSelectionFilter] = useState("all");
   const [baseChoiceTab, setBaseChoiceTab] = useState("foods");
   const [foodsLoading, setFoodsLoading] = useState(true);
   const [foodsError, setFoodsError] = useState("");
@@ -1047,7 +1080,7 @@ export default function NutriCalc() {
       try {
         const [protein, carb, fat] = await Promise.all([
           fetchFoods("protein", dietType),
-          fetchFoods("carb", dietType),
+          dietTypeAllowsCarbs(dietType) ? fetchFoods("carb", dietType) : Promise.resolve([]),
           fetchFoods("fat", dietType),
         ]);
 
@@ -1403,6 +1436,7 @@ export default function NutriCalc() {
     () => DIET_TYPES.find((item) => item.key === dietType) || DIET_TYPES[0],
     [dietType],
   );
+  const currentDietAllowsCarbs = currentDietTypeConfig.allowCarbs !== false;
   const activeMacroPresets = currentDietTypeConfig.macroPresets || MACRO_PRESETS;
 
   const activeMacroPreset = useMemo(() => {
@@ -1436,6 +1470,13 @@ export default function NutriCalc() {
     setSelIds((prev) => new Set([...prev].filter((id) => validFoodIds.has(id))));
     setFavIds((prev) => new Set([...prev].filter((id) => validFoodIds.has(id))));
   }, [foodsByCategory]);
+
+  useEffect(() => {
+    if (currentDietAllowsCarbs) return;
+    if (fFilter === "carb") setFFilter("all");
+    if (showSL === "carb") setShowSL(null);
+    setCarbGlycemicFilter("all");
+  }, [currentDietAllowsCarbs, fFilter, showSL]);
 
   useEffect(() => {
     const validRecipeIds = new Set(recipes.map((recipe) => recipe.id));
@@ -1536,6 +1577,11 @@ export default function NutriCalc() {
     setFixedMeals({});
     setFSearch("");
     setFFilter("all");
+    setFoodMealFilter("all");
+    setFoodFavoriteFilter("all");
+    setFoodRoleFilter("all");
+    setRecipeMealFilter("all");
+    setRecipeSelectionFilter("all");
     setCarbGlycemicFilter("all");
   }, []);
 
@@ -2682,14 +2728,21 @@ export default function NutriCalc() {
                 }}
               >
                 <div style={{fontWeight:700,fontSize:13,marginBottom:6}}>{preset.label}</div>
-                <div style={{fontSize:11,color:"#94a3b8",fontFamily:"'JetBrains Mono',monospace"}}>P {preset.values.p} | C {preset.values.c} | G {preset.values.f}</div>
+                <div style={{fontSize:11,color:"#94a3b8",fontFamily:"'JetBrains Mono',monospace"}}>
+                  {currentDietAllowsCarbs ? `P ${preset.values.p} | C ${preset.values.c} | G ${preset.values.f}` : `P ${preset.values.p} | G ${preset.values.f}`}
+                </div>
               </button>
             ))}
           </div>
           <div style={{marginBottom:20,padding:"10px 14px",borderRadius:10,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",fontSize:12,color:"#94a3b8"}}>
             Estilo: <span style={{color:"#84cc16",fontWeight:700}}>{currentDietTypeConfig.label}</span> · Estrutura: <span style={{color:activeMacroPreset==="custom"?"#facc15":"#84cc16",fontWeight:700}}>{activeMacroPreset==="custom"?"Personalizada":activeMacroPresets.find(p=>p.key===activeMacroPreset)?.label}</span>
           </div>
-          {[{key:"p",label:"Proteína",color:"#ef4444",min:1,max:3.5,st:0.1,mul:4},{key:"c",label:"Carboidrato",color:"#f59e0b",min:dietType==="traditional"?0.5:0,max:dietType==="traditional"?7:1.2,st:0.1,mul:4},{key:"f",label:"Gordura",color:"#3b82f6",min:0.3,max:2.2,st:0.05,mul:9}].map(m=>{
+          {!currentDietAllowsCarbs&&(
+            <div style={{marginBottom:12,padding:"10px 14px",borderRadius:10,background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.22)",color:"#fbbf24",fontSize:12,lineHeight:1.45}}>
+              Neste estilo, carboidratos tradicionais ficam fora da montagem. A energia vem de proteínas e gorduras compatíveis.
+            </div>
+          )}
+          {[{key:"p",label:"Proteína",color:"#ef4444",min:1,max:3.5,st:0.1,mul:4},{key:"c",label:"Carboidrato",color:"#f59e0b",min:0.5,max:7,st:0.1,mul:4},{key:"f",label:"Gordura",color:"#3b82f6",min:0.3,max:currentDietAllowsCarbs?2.2:3.5,st:0.05,mul:9}].filter(m=>currentDietAllowsCarbs||m.key!=="c").map(m=>{
             const g=Math.round(mc[m.key]*ud.weight),k=g*m.mul;
             return(<div key={m.key} style={{padding:"16px 20px",borderRadius:12,marginBottom:12,background:`${m.color}08`,border:`1px solid ${m.color}25`}}>
               <div style={{display:"flex",justifyContent:"space-between",marginBottom:10,alignItems:"center"}}><span style={{fontWeight:600,color:m.color}}>{m.label}</span><span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:14}}><span style={{color:m.color,fontWeight:700,fontSize:20}}>{mc[m.key]}</span> g/kg</span></div>
@@ -2720,13 +2773,25 @@ export default function NutriCalc() {
             ))}
           </div>
           <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
-            {[{l:"Proteínas",c:selCount.p,mn:requiredFoodCounts.p,cl:"#ef4444",fv:favC.p,fm:2},{l:"Carboidratos",c:selCount.c,mn:requiredFoodCounts.c,cl:"#f59e0b",fv:favC.c,fm:3},{l:"Gorduras",c:selCount.f,mn:requiredFoodCounts.f,cl:"#3b82f6",fv:favC.f,fm:1}].map(r=>(<div key={r.l} style={{padding:"8px 14px",borderRadius:8,fontSize:12,fontWeight:600,background:r.c>=r.mn?`${r.cl}12`:"rgba(255,255,255,0.05)",border:`1px solid ${r.c>=r.mn?r.cl:"rgba(255,255,255,0.1)"}`,color:r.c>=r.mn?r.cl:"#94a3b8"}}><div>{r.c>=r.mn?"✓":""} {r.c}/{r.mn} {r.l}</div><div style={{fontSize:10,color:"#facc15",marginTop:2}}>★ {r.fv}/{r.fm} fav</div></div>))}
+            {[{l:"Proteínas",c:selCount.p,mn:requiredFoodCounts.p,cl:"#ef4444",fv:favC.p,fm:2,key:"protein"},{l:"Carboidratos",c:selCount.c,mn:requiredFoodCounts.c,cl:"#f59e0b",fv:favC.c,fm:3,key:"carb"},{l:"Gorduras",c:selCount.f,mn:requiredFoodCounts.f,cl:"#3b82f6",fv:favC.f,fm:1,key:"fat"}].filter(r=>currentDietAllowsCarbs||r.key!=="carb").map(r=>(<div key={r.l} style={{padding:"8px 14px",borderRadius:8,fontSize:12,fontWeight:600,background:r.c>=r.mn?`${r.cl}12`:"rgba(255,255,255,0.05)",border:`1px solid ${r.c>=r.mn?r.cl:"rgba(255,255,255,0.1)"}`,color:r.c>=r.mn?r.cl:"#94a3b8"}}><div>{r.c>=r.mn?"✓":""} {r.c}/{r.mn} {r.l}</div><div style={{fontSize:10,color:"#facc15",marginTop:2}}>★ {r.fv}/{r.fm} fav</div></div>))}
           </div>
+          {!currentDietAllowsCarbs&&(
+            <div style={{marginBottom:12,padding:"10px 14px",borderRadius:10,background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.22)",color:"#fbbf24",fontSize:12,lineHeight:1.45}}>
+              Carboidratos tradicionais foram removidos deste estilo. Selecione proteínas, gorduras e receitas compatíveis.
+            </div>
+          )}
           {baseChoiceTab==="foods"&&(<>
-          <div style={{display:"flex",gap:6,marginBottom:12}}>
-            {[{k:"all",l:"Todos"},{k:"protein",l:"Proteínas",c:"#ef4444"},{k:"carb",l:"Carboidratos",c:"#f59e0b"},{k:"fat",l:"Gorduras",c:"#3b82f6"}].map(f=>(<button key={f.k} onClick={()=>setFFilter(f.k)} style={{...pB,padding:"6px 14px",fontSize:12,background:fFilter===f.k?(f.c?`${f.c}15`:"rgba(132,204,22,0.1)"):"transparent",borderColor:fFilter===f.k?(f.c||"#84cc16"):"rgba(255,255,255,0.08)",color:fFilter===f.k?(f.c||"#84cc16"):"#64748b"}}>{f.l}</button>))}
+          <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
+            {[{k:"all",l:"Todos"},{k:"protein",l:"Proteínas",c:"#ef4444"},{k:"carb",l:"Carboidratos",c:"#f59e0b"},{k:"fat",l:"Gorduras",c:"#3b82f6"}].filter(f=>currentDietAllowsCarbs||f.k!=="carb").map(f=>(<button key={f.k} onClick={()=>setFFilter(f.k)} style={{...pB,padding:"6px 14px",fontSize:12,background:fFilter===f.k?(f.c?`${f.c}15`:"rgba(132,204,22,0.1)"):"transparent",borderColor:fFilter===f.k?(f.c||"#84cc16"):"rgba(255,255,255,0.08)",color:fFilter===f.k?(f.c||"#84cc16"):"#64748b"}}>{f.l}</button>))}
           </div>
-          {(fFilter==="all"||fFilter==="carb")&&(
+          <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
+            {MEAL_FILTERS.map(f=>(<button key={f.key} onClick={()=>setFoodMealFilter(f.key)} style={{...pB,padding:"6px 12px",fontSize:11,background:foodMealFilter===f.key?"rgba(132,204,22,0.12)":"transparent",borderColor:foodMealFilter===f.key?"#84cc16":"rgba(255,255,255,0.08)",color:foodMealFilter===f.key?"#a3e635":"#64748b"}}>{f.label}</button>))}
+            {[{k:"all",l:"Todos"},{k:"favorites",l:"Favoritos"},{k:"selected",l:"Selecionados"}].map(f=>(<button key={f.k} onClick={()=>setFoodFavoriteFilter(f.k)} style={{...pB,padding:"6px 12px",fontSize:11,background:foodFavoriteFilter===f.k?"rgba(250,204,21,0.12)":"transparent",borderColor:foodFavoriteFilter===f.k?"#facc15":"rgba(255,255,255,0.08)",color:foodFavoriteFilter===f.k?"#facc15":"#64748b"}}>{f.l}</button>))}
+          </div>
+          <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
+            {[{k:"all",l:"Todos os papéis"},{k:"core",l:"Principais"},{k:"flex",l:"Flex"},{k:"accessory",l:"Acessórios"}].map(f=>(<button key={f.k} onClick={()=>setFoodRoleFilter(f.k)} style={{...pB,padding:"6px 12px",fontSize:11,background:foodRoleFilter===f.k?"rgba(56,189,248,0.12)":"transparent",borderColor:foodRoleFilter===f.k?"#38bdf8":"rgba(255,255,255,0.08)",color:foodRoleFilter===f.k?"#38bdf8":"#64748b"}}>{f.l}</button>))}
+          </div>
+          {currentDietAllowsCarbs&&(fFilter==="all"||fFilter==="carb")&&(
             <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
               {[{k:"all",l:"Todos"},{k:"baixo",l:"IG baixo"},{k:"medio",l:"IG médio"},{k:"alto",l:"IG alto"}].map(f=>(
                 <button key={f.k} onClick={()=>setCarbGlycemicFilter(f.k)} style={{...pB,padding:"6px 12px",fontSize:11,background:carbGlycemicFilter===f.k?"rgba(56,189,248,0.14)":"transparent",borderColor:carbGlycemicFilter===f.k?"#38bdf8":"rgba(255,255,255,0.08)",color:carbGlycemicFilter===f.k?"#38bdf8":"#64748b"}}>
@@ -2736,12 +2801,18 @@ export default function NutriCalc() {
             </div>
           )}
           <input placeholder="Buscar alimento..." value={fSearch} onChange={e=>setFSearch(e.target.value)} style={{...iS,marginBottom:16,width:"100%",boxSizing:"border-box"}}/>
-          {(fFilter==="all"||fFilter==="protein")&&<FS title="Proteínas" sub="Fav: até 2" color="#ef4444" foods={foodsByCategory.protein} sel={selIds} fav={favIds} onT={togSel} onF={togFav} search={fSearch}/>}
-          {(fFilter==="all"||fFilter==="carb")&&<FS title="Carboidratos" sub="Fav: até 3" color="#f59e0b" foods={foodsByCategory.carb} sel={selIds} fav={favIds} onT={togSel} onF={togFav} search={fSearch} glyFilter={carbGlycemicFilter}/>}
-          {(fFilter==="all"||fFilter==="fat")&&<FS title="Gorduras" sub="Fav: até 1" color="#3b82f6" foods={foodsByCategory.fat} sel={selIds} fav={favIds} onT={togSel} onF={togFav} search={fSearch}/>}
+          {(fFilter==="all"||fFilter==="protein")&&<FS title="Proteínas" sub="Fav: até 2" color="#ef4444" foods={foodsByCategory.protein} sel={selIds} fav={favIds} onT={togSel} onF={togFav} search={fSearch} mealFilter={foodMealFilter} quickFilter={foodFavoriteFilter} roleFilter={foodRoleFilter}/>}
+          {currentDietAllowsCarbs&&(fFilter==="all"||fFilter==="carb")&&<FS title="Carboidratos" sub="Fav: até 3" color="#f59e0b" foods={foodsByCategory.carb} sel={selIds} fav={favIds} onT={togSel} onF={togFav} search={fSearch} glyFilter={carbGlycemicFilter} mealFilter={foodMealFilter} quickFilter={foodFavoriteFilter} roleFilter={foodRoleFilter}/>}
+          {(fFilter==="all"||fFilter==="fat")&&<FS title="Gorduras" sub="Fav: até 1" color="#3b82f6" foods={foodsByCategory.fat} sel={selIds} fav={favIds} onT={togSel} onF={togFav} search={fSearch} mealFilter={foodMealFilter} quickFilter={foodFavoriteFilter} roleFilter={foodRoleFilter}/>}
           </>)}
           {baseChoiceTab==="recipes"&&(
-            <RecipeSelector recipes={recipes} selectedIds={selectedRecipeIds} onToggle={togRecipe} />
+            <>
+              <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
+                {MEAL_FILTERS.map(f=>(<button key={f.key} onClick={()=>setRecipeMealFilter(f.key)} style={{...pB,padding:"6px 12px",fontSize:11,background:recipeMealFilter===f.key?"rgba(132,204,22,0.12)":"transparent",borderColor:recipeMealFilter===f.key?"#84cc16":"rgba(255,255,255,0.08)",color:recipeMealFilter===f.key?"#a3e635":"#64748b"}}>{f.label}</button>))}
+                {[{k:"all",l:"Todas"},{k:"selected",l:"Selecionadas"}].map(f=>(<button key={f.k} onClick={()=>setRecipeSelectionFilter(f.k)} style={{...pB,padding:"6px 12px",fontSize:11,background:recipeSelectionFilter===f.k?"rgba(250,204,21,0.12)":"transparent",borderColor:recipeSelectionFilter===f.k?"#facc15":"rgba(255,255,255,0.08)",color:recipeSelectionFilter===f.k?"#facc15":"#64748b"}}>{f.l}</button>))}
+              </div>
+              <RecipeSelector recipes={recipes} selectedIds={selectedRecipeIds} onToggle={togRecipe} mealFilter={recipeMealFilter} selectionFilter={recipeSelectionFilter} allowCarbs={currentDietAllowsCarbs} />
+            </>
           )}
           <div style={{display:"flex",gap:12,marginTop:24}}><BB onClick={()=>setStep(3)}/><NB onClick={()=>setStep(5)} disabled={foodsLoading||!canAdv4} label={foodsLoading?"Carregando...":canAdv4?"Próximo":"Selecione os mínimos"}/></div>
         </div>)}
@@ -2794,6 +2865,7 @@ export default function NutriCalc() {
             const displayTargetCarb = diet.targetMacros?.carbGrams ?? mg.c;
             const displayTargetFat = diet.targetMacros?.fatGrams ?? mg.f;
             const displayCreatedAt = diet.createdAt ? new Date(diet.createdAt).toLocaleDateString("pt-BR") : "";
+            const resultAllowsCarbs = dietTypeAllowsCarbs(diet.dietType || dietType);
             return (
               <>
           <h1 style={h1S}>Sua dieta</h1>
@@ -2802,10 +2874,10 @@ export default function NutriCalc() {
             {displayCreatedAt ? ` Dieta salva em ${displayCreatedAt}.` : ""}
           </p>
           <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>
-            {[{l:"ESTILO",v:DIET_TYPE_LABELS[diet.dietType || dietType] || "Tradicional",c:"#84cc16"},{l:"META",v:`${displayTargetKcal}`,c:"#84cc16"},{l:"PROT",v:`${displayTargetProt}g`,c:"#ef4444"},{l:"CARB",v:`${displayTargetCarb}g`,c:"#f59e0b"},{l:"GORD",v:`${displayTargetFat}g`,c:"#3b82f6"}].map(c=>(<div key={c.l} style={{flex:1,minWidth:70,padding:"10px 10px",borderRadius:10,background:`${c.c}08`,border:`1px solid ${c.c}25`,textAlign:"center"}}><div style={{fontSize:9,color:c.c,fontWeight:600,letterSpacing:"0.1em"}}>{c.l}</div><div style={{fontSize:15,fontWeight:800,fontFamily:"'JetBrains Mono',monospace",marginTop:2}}>{c.v}</div></div>))}
+            {[{l:"ESTILO",v:DIET_TYPE_LABELS[diet.dietType || dietType] || "Tradicional",c:"#84cc16",key:"style"},{l:"META",v:`${displayTargetKcal}`,c:"#84cc16",key:"kcal"},{l:"PROT",v:`${displayTargetProt}g`,c:"#ef4444",key:"protein"},{l:"CARB",v:`${displayTargetCarb}g`,c:"#f59e0b",key:"carb"},{l:"GORD",v:`${displayTargetFat}g`,c:"#3b82f6",key:"fat"}].filter(c=>resultAllowsCarbs||c.key!=="carb").map(c=>(<div key={c.l} style={{flex:1,minWidth:70,padding:"10px 10px",borderRadius:10,background:`${c.c}08`,border:`1px solid ${c.c}25`,textAlign:"center"}}><div style={{fontSize:9,color:c.c,fontWeight:600,letterSpacing:"0.1em"}}>{c.l}</div><div style={{fontSize:15,fontWeight:800,fontFamily:"'JetBrains Mono',monospace",marginTop:2}}>{c.v}</div></div>))}
           </div>
           <div style={{display:"flex",gap:6,marginBottom:12}}>
-            {[{k:"protein",l:"Lista prot",c:"#ef4444"},{k:"carb",l:"Lista carb",c:"#f59e0b"},{k:"fat",l:"Lista gord",c:"#3b82f6"}].map(s=>(<button key={s.k} onClick={()=>setShowSL(showSL===s.k?null:s.k)} style={{...pB,padding:"6px 10px",fontSize:11,background:showSL===s.k?`${s.c}15`:"transparent",borderColor:showSL===s.k?s.c:"rgba(255,255,255,0.1)",color:showSL===s.k?s.c:"#64748b"}}>{s.l}</button>))}
+            {[{k:"protein",l:"Lista prot",c:"#ef4444"},{k:"carb",l:"Lista carb",c:"#f59e0b"},{k:"fat",l:"Lista gord",c:"#3b82f6"}].filter(s=>resultAllowsCarbs||s.k!=="carb").map(s=>(<button key={s.k} onClick={()=>setShowSL(showSL===s.k?null:s.k)} style={{...pB,padding:"6px 10px",fontSize:11,background:showSL===s.k?`${s.c}15`:"transparent",borderColor:showSL===s.k?s.c:"rgba(255,255,255,0.1)",color:showSL===s.k?s.c:"#64748b"}}>{s.l}</button>))}
           </div>
           {showSL&&diet.subLists&&(<div style={{marginBottom:16,padding:"14px",borderRadius:12,background:`${RC[showSL]}06`,border:`1px solid ${RC[showSL]}20`,maxHeight:240,overflowY:"auto"}}>
             <div style={{fontSize:11,fontWeight:700,color:RC[showSL],marginBottom:8,letterSpacing:"0.05em"}}>SUBSTITUIÇÕES — {RL[showSL]}</div>
@@ -2827,19 +2899,19 @@ export default function NutriCalc() {
                   <div onClick={()=>food.subs?.length>0&&togExp(sk)} style={{padding:"9px 16px",display:"flex",alignItems:"center",gap:8,borderBottom:"1px solid rgba(255,255,255,0.04)",cursor:food.subs?.length>0?"pointer":"default"}}>
                     <span style={{fontSize:8,fontWeight:800,padding:"2px 5px",borderRadius:3,background:`${RC[food.role]}20`,color:RC[food.role],letterSpacing:"0.05em"}}>{RL[food.role]}</span>
                     {food.isFav&&<span style={{color:"#facc15",fontSize:11}}>★</span>}
-                    <div style={{flex:1}}><div style={{fontSize:13,fontWeight:500}}>{food.name}</div><div style={{fontSize:10,color:"#64748b",fontFamily:"'JetBrains Mono',monospace"}}>P:{(food.prot*food.grams/100).toFixed(1)}g C:{(food.carb*food.grams/100).toFixed(1)}g G:{(food.fat*food.grams/100).toFixed(1)}g</div></div>
+                    <div style={{flex:1}}><div style={{fontSize:13,fontWeight:500}}>{food.name}</div><div style={{fontSize:10,color:"#64748b",fontFamily:"'JetBrains Mono',monospace"}}>{resultAllowsCarbs ? `P:${(food.prot*food.grams/100).toFixed(1)}g C:${(food.carb*food.grams/100).toFixed(1)}g G:${(food.fat*food.grams/100).toFixed(1)}g` : `P:${(food.prot*food.grams/100).toFixed(1)}g G:${(food.fat*food.grams/100).toFixed(1)}g`}</div></div>
                     <span style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:600,fontSize:13,color:"#e2e8f0",minWidth:86,textAlign:"right"}}>{formatPortion(food.name, food.grams, food.isRecipe)}</span>
                     {food.subs?.length>0&&<span style={{fontSize:9,color:"#64748b",transform:isE?"rotate(180deg)":"rotate(0)",transition:"transform 0.2s"}}>▼</span>}
                   </div>
                   {isE&&food.subs?.map((sub,si)=>(<div key={si} style={{padding:"5px 16px 5px 44px",background:"rgba(132,204,22,0.02)",borderBottom:"1px solid rgba(255,255,255,0.03)",fontSize:11,display:"flex",alignItems:"center",gap:6}}>
                     <span style={{color:"#84cc16",fontSize:10}}>↻</span><span style={{color:"#94a3b8",flex:1}}>{sub.name}</span>
-                    <span style={{fontFamily:"'JetBrains Mono',monospace",color:"#64748b",fontSize:10}}>P:{(sub.prot*sub.grams/100).toFixed(1)} C:{(sub.carb*sub.grams/100).toFixed(1)} G:{(sub.fat*sub.grams/100).toFixed(1)}</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",color:"#64748b",fontSize:10}}>{resultAllowsCarbs ? `P:${(sub.prot*sub.grams/100).toFixed(1)} C:${(sub.carb*sub.grams/100).toFixed(1)} G:${(sub.fat*sub.grams/100).toFixed(1)}` : `P:${(sub.prot*sub.grams/100).toFixed(1)} G:${(sub.fat*sub.grams/100).toFixed(1)}`}</span>
                     <span style={{fontFamily:"'JetBrains Mono',monospace",color:"#94a3b8",fontSize:10,minWidth:86,textAlign:"right"}}>{formatPortion(sub.name, sub.grams)}</span>
                   </div>))}
                 </div>);
               })}
               <div style={{padding:"7px 16px",display:"flex",justifyContent:"space-between",background:"rgba(255,255,255,0.02)",fontSize:10,color:"#64748b",fontFamily:"'JetBrains Mono',monospace"}}>
-                <span>P:{mt.prot.toFixed(1)}g</span><span>C:{mt.carb.toFixed(1)}g</span><span>G:{mt.fat.toFixed(1)}g</span><span style={{color:"#84cc16",fontWeight:600}}>{mt.kcal} kcal</span>
+                <span>P:{mt.prot.toFixed(1)}g</span>{resultAllowsCarbs&&<span>C:{mt.carb.toFixed(1)}g</span>}<span>G:{mt.fat.toFixed(1)}g</span><span style={{color:"#84cc16",fontWeight:600}}>{mt.kcal} kcal</span>
               </div>
             </div>);
           })}
@@ -2850,7 +2922,7 @@ export default function NutriCalc() {
             return(<div style={{padding:"16px 20px",borderRadius:12,marginTop:8,background:diff<=displayTargetKcal*0.05?"rgba(34,197,94,0.08)":"rgba(239,68,68,0.08)",border:`1px solid ${diff<=displayTargetKcal*0.05?"rgba(34,197,94,0.25)":"rgba(239,68,68,0.25)"}`}}>
               <div style={{textAlign:"center",marginBottom:8,fontSize:11,color:"#64748b",letterSpacing:"0.1em"}}>TOTAL DO DIA</div>
               <div style={{display:"flex",justifyContent:"space-around",fontFamily:"'JetBrains Mono',monospace",fontWeight:600,fontSize:13,flexWrap:"wrap",gap:4}}>
-                <span style={{color:"#ef4444"}}>P:{Math.round(gt.prot)}g</span><span style={{color:"#f59e0b"}}>C:{Math.round(gt.carb)}g</span><span style={{color:"#3b82f6"}}>G:{Math.round(gt.fat)}g</span><span style={{color:"#84cc16",fontSize:17}}>{gt.kcal} kcal</span>
+                <span style={{color:"#ef4444"}}>P:{Math.round(gt.prot)}g</span>{resultAllowsCarbs&&<span style={{color:"#f59e0b"}}>C:{Math.round(gt.carb)}g</span>}<span style={{color:"#3b82f6"}}>G:{Math.round(gt.fat)}g</span><span style={{color:"#84cc16",fontSize:17}}>{gt.kcal} kcal</span>
               </div>
               <div style={{textAlign:"center",marginTop:8,fontSize:12,color:diff<=displayTargetKcal*0.05?"#22c55e":"#ef4444"}}>{diff<=displayTargetKcal*0.05?`✓ Dentro da margem (${pct}%)`:`⚠ ${pct}% de diferença`}</div>
             </div>);
@@ -4079,6 +4151,17 @@ function ProfileModal({
               />
             </div>
             <div>
+              <label style={lS}>Estilo</label>
+              <CustomSelect
+                value={dietHistoryFilters.dietType}
+                onChange={(nextValue) => onUpdateDietHistoryFilter("dietType", nextValue)}
+                options={[
+                  { value: "all", label: "Todos" },
+                  ...DIET_TYPES.map((item) => ({ value: item.key, label: item.label })),
+                ]}
+              />
+            </div>
+            <div>
               <label style={lS}>Refeições</label>
               <CustomSelect
                 value={dietHistoryFilters.numMeals}
@@ -4109,6 +4192,17 @@ function ProfileModal({
               <label style={lS}>Até kcal</label>
               <input value={dietHistoryFilters.targetKcalMax} onChange={(e) => onUpdateDietHistoryFilter("targetKcalMax", e.target.value)} placeholder="Ex: 2200" style={iS} />
             </div>
+            <div>
+              <label style={lS}>Receitas</label>
+              <CustomSelect
+                value={dietHistoryFilters.hasRecipes}
+                onChange={(nextValue) => onUpdateDietHistoryFilter("hasRecipes", nextValue)}
+                options={[
+                  { value: "all", label: "Todas" },
+                  { value: "yes", label: "Com receitas" },
+                ]}
+              />
+            </div>
           </div>
 
           {userDietsError && <div style={{marginBottom:12,padding:"10px 12px",borderRadius:10,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",color:"#fca5a5",fontSize:13}}>{userDietsError}</div>}
@@ -4124,16 +4218,26 @@ function ProfileModal({
                 Suas dietas salvas vão aparecer aqui conforme você gerar novos planos logado.
               </div>
             )}
-            {userDiets.map((savedDiet) => (
+            {userDiets.map((savedDiet, dietIndex) => (
               <div key={savedDiet.id} style={{padding:"14px",borderRadius:14,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)"}}>
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"start",gap:12,marginBottom:10}}>
                   <div>
+                    <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:6}}>
+                      {dietIndex === 0 && <span style={{fontSize:10,color:"#a3e635",background:"rgba(132,204,22,0.1)",border:"1px solid rgba(132,204,22,0.22)",borderRadius:999,padding:"3px 8px",fontWeight:800}}>Mais recente</span>}
+                      {hasRecipeUsage(savedDiet) && <span style={{fontSize:10,color:"#facc15",background:"rgba(250,204,21,0.1)",border:"1px solid rgba(250,204,21,0.22)",borderRadius:999,padding:"3px 8px",fontWeight:800}}>Com receitas</span>}
+                      {savedDiet.fixedMeals && <span style={{fontSize:10,color:"#38bdf8",background:"rgba(56,189,248,0.1)",border:"1px solid rgba(56,189,248,0.22)",borderRadius:999,padding:"3px 8px",fontWeight:800}}>Receita fixa</span>}
+                    </div>
                     <div style={{fontSize:14,fontWeight:800,color:"#e2e8f0"}}>
-                      {savedDiet.objective === "cutting" ? "Plano de emagrecimento" : savedDiet.objective === "bulk" ? "Plano de ganho" : "Plano de manutenção"}
+                      {getObjectiveLabel(savedDiet.objective)}
                     </div>
                     <div style={{fontSize:12,color:"#94a3b8",marginTop:4}}>
                       {new Date(savedDiet.createdAt).toLocaleDateString("pt-BR")} • {savedDiet.numMeals} refeições • {savedDiet.targetKcal} kcal • {DIET_TYPE_LABELS[savedDiet.dietType || "traditional"] || "Dieta tradicional"}
                     </div>
+                    {hasRecipeUsage(savedDiet) && (
+                      <div style={{fontSize:11,color:"#64748b",marginTop:4}}>
+                        {savedDiet.selectedRecipeIds.length} receita(s) selecionada(s)
+                      </div>
+                    )}
                   </div>
                   <div style={{display:"flex",gap:8,flexWrap:"wrap",justifyContent:"flex-end"}}>
                     <button onClick={() => onDietOpen(savedDiet.id)} style={{...pB,padding:"10px 14px",borderColor:"rgba(167,139,250,0.25)",color:"#c4b5fd",background:"rgba(167,139,250,0.08)"}}>
@@ -4193,6 +4297,29 @@ function ProfileModal({
               />
             </div>
             <div>
+              <label style={lS}>Estilo</label>
+              <CustomSelect
+                value={reportHistoryFilters.dietType}
+                onChange={(nextValue) => onUpdateReportHistoryFilter("dietType", nextValue)}
+                options={[
+                  { value: "all", label: "Todos" },
+                  ...DIET_TYPES.map((item) => ({ value: item.key, label: item.label })),
+                ]}
+              />
+            </div>
+            <div>
+              <label style={lS}>Vínculo</label>
+              <CustomSelect
+                value={reportHistoryFilters.hasDiet}
+                onChange={(nextValue) => onUpdateReportHistoryFilter("hasDiet", nextValue)}
+                options={[
+                  { value: "all", label: "Todos" },
+                  { value: "yes", label: "Com dieta vinculada" },
+                  { value: "no", label: "Sem dieta vinculada" },
+                ]}
+              />
+            </div>
+            <div>
               <label style={lS}>Período</label>
               <CustomSelect
                 value={reportHistoryFilters.days}
@@ -4221,12 +4348,21 @@ function ProfileModal({
               </div>
             )}
             {userReports.map((report) => (
-              <div key={report.id} style={{padding:"14px",borderRadius:14,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",display:"flex",justifyContent:"space-between",alignItems:"center",gap:12}}>
+              <div key={report.id} style={{padding:"14px",borderRadius:14,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap"}}>
                 <div>
+                  <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:6}}>
+                    {report.diet ? <span style={{fontSize:10,color:"#fdba74",background:"rgba(249,115,22,0.1)",border:"1px solid rgba(249,115,22,0.22)",borderRadius:999,padding:"3px 8px",fontWeight:800}}>Dieta vinculada</span> : <span style={{fontSize:10,color:"#94a3b8",background:"rgba(148,163,184,0.08)",border:"1px solid rgba(148,163,184,0.16)",borderRadius:999,padding:"3px 8px",fontWeight:800}}>Sem vínculo</span>}
+                    {hasRecipeUsage(report.diet) && <span style={{fontSize:10,color:"#facc15",background:"rgba(250,204,21,0.1)",border:"1px solid rgba(250,204,21,0.22)",borderRadius:999,padding:"3px 8px",fontWeight:800}}>Com receitas</span>}
+                  </div>
                   <div style={{fontSize:14,fontWeight:800,color:"#e2e8f0"}}>{report.title}</div>
                   <div style={{fontSize:12,color:"#94a3b8",marginTop:4}}>
                     {new Date(report.createdAt).toLocaleDateString("pt-BR")} • {report.reportType === "diet_pdf" ? "Relatório de dieta" : report.reportType}
                   </div>
+                  {report.diet && (
+                    <div style={{fontSize:12,color:"#64748b",marginTop:4}}>
+                      {getObjectiveLabel(report.diet.objective)} • {report.diet.targetKcal} kcal • {report.diet.numMeals} refeições • {DIET_TYPE_LABELS[report.diet.dietType || "traditional"] || "Dieta tradicional"}
+                    </div>
+                  )}
                 </div>
                 <div style={{display:"flex",gap:8,flexWrap:"wrap",justifyContent:"flex-end"}}>
                   <button onClick={() => onReportOpen(report.id)} style={{...pB,padding:"10px 14px",borderColor:"rgba(249,115,22,0.25)",color:"#fdba74",background:"rgba(249,115,22,0.08)"}}>
@@ -4392,14 +4528,33 @@ function MetricChart({ color, data, emptyText, title, unit }) {
   );
 }
 
-function FS({title,sub,color,foods,sel,fav,onT,onF,search,glyFilter="all"}){
+function matchesMealFilter(itemMealTypes = [], mealFilter) {
+  if (mealFilter === "all") return true;
+  if (!Array.isArray(itemMealTypes) || itemMealTypes.length === 0) return true;
+  if (itemMealTypes.includes(mealFilter)) return true;
+  return mealFilter === "principal" && itemMealTypes.includes("jantar_adj");
+}
+
+function FS({title,sub,color,foods,sel,fav,onT,onF,search,glyFilter="all",mealFilter="all",quickFilter="all",roleFilter="all"}){
   const searched=search?foods.filter(f=>f.name.toLowerCase().includes(search.toLowerCase())):foods;
-  const fl = glyFilter === "all" ? searched : searched.filter((food) => food.glycemicIndexLevel === glyFilter);
+  const byMeal = searched.filter((food) => matchesMealFilter(food.mt, mealFilter));
+  const byQuick = byMeal.filter((food) => {
+    if (quickFilter === "favorites") return fav.has(food.id);
+    if (quickFilter === "selected") return sel.has(food.id);
+    return true;
+  });
+  const byRole = roleFilter === "all" ? byQuick : byQuick.filter((food) => (food.planningRole || "core") === roleFilter);
+  const fl = glyFilter === "all" ? byRole : byRole.filter((food) => food.glycemicIndexLevel === glyFilter);
   const glyLabel = { baixo: "IG baixo", medio: "IG médio", alto: "IG alto" };
   return(<div style={{marginBottom:24}}>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:10,paddingBottom:6,borderBottom:`1px solid ${color}30`}}>
       <span style={{fontSize:13,fontWeight:700,color,letterSpacing:"0.05em"}}>{title} ({fl.length})</span><span style={{fontSize:10,color:"#64748b"}}>{sub}</span>
     </div>
+    {!fl.length&&(
+      <div style={{padding:"12px",borderRadius:10,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",fontSize:12,color:"#94a3b8",marginBottom:8}}>
+        Nenhum alimento encontrado com os filtros atuais.
+      </div>
+    )}
     <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(210px,1fr))",gap:5,maxHeight:300,overflowY:"auto",paddingRight:4}}>
       {fl.map(food=>{const s=sel.has(food.id),f=fav.has(food.id);
         return(<div key={food.id} style={{display:"flex",alignItems:"center",gap:5,padding:"6px 8px",borderRadius:8,background:s?`${color}12`:"rgba(255,255,255,0.02)",border:`1px solid ${f?"#facc15":s?color:"rgba(255,255,255,0.06)"}`,transition:"all 0.15s"}}>
@@ -4421,7 +4576,7 @@ function FS({title,sub,color,foods,sel,fav,onT,onF,search,glyFilter="all"}){
   </div>);
 }
 
-function RecipeSelector({ recipes, selectedIds, onToggle }) {
+function RecipeSelector({ recipes, selectedIds, onToggle, mealFilter = "all", selectionFilter = "all", allowCarbs = true }) {
   if (!recipes.length) {
     return (
       <div style={{padding:"16px",borderRadius:12,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",fontSize:13,color:"#94a3b8"}}>
@@ -4430,9 +4585,20 @@ function RecipeSelector({ recipes, selectedIds, onToggle }) {
     );
   }
 
+  const filteredRecipes = recipes.filter((recipe) => {
+    const matchesMeal = matchesMealFilter(recipe.mealTypes || [], mealFilter);
+    const matchesSelection = selectionFilter === "selected" ? selectedIds.has(recipe.id) : true;
+    return matchesMeal && matchesSelection;
+  });
+
   return (
     <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:10}}>
-      {recipes.map((recipe) => {
+      {!filteredRecipes.length&&(
+        <div style={{padding:"16px",borderRadius:12,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",fontSize:13,color:"#94a3b8"}}>
+          Nenhuma receita encontrada com os filtros atuais.
+        </div>
+      )}
+      {filteredRecipes.map((recipe) => {
         const selected = selectedIds.has(recipe.id);
         return (
           <button
@@ -4458,7 +4624,7 @@ function RecipeSelector({ recipes, selectedIds, onToggle }) {
                 { label:"P", value:`${recipe.prot || 0}g` },
                 { label:"C", value:`${recipe.carb || 0}g` },
                 { label:"G", value:`${recipe.fat || 0}g` },
-              ].map((item) => (
+              ].filter((item)=>allowCarbs||item.label!=="C").map((item) => (
                 <div key={item.label} style={{padding:"7px 6px",borderRadius:8,background:"rgba(15,23,42,0.5)",border:"1px solid rgba(255,255,255,0.06)",textAlign:"center"}}>
                   <div style={{fontSize:9,color:"#64748b",textTransform:"uppercase"}}>{item.label}</div>
                   <div style={{fontSize:12,fontWeight:800,color:"#e2e8f0",marginTop:2}}>{item.value}</div>

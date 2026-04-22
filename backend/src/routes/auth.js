@@ -356,17 +356,20 @@ router.post("/me/body-fat/navy", requireAuth, async (req, res) => {
 
 router.get("/me/diets", requireAuth, async (req, res) => {
   try {
-    const { objective, numMeals, targetKcalMax, days } = req.query;
+    const { objective, dietType, numMeals, targetKcalMax, days, hasRecipes } = req.query;
     const parsedMeals = Number(numMeals) || null;
     const parsedTargetKcalMax = Number(targetKcalMax) || null;
     const parsedDays = Number(days) || 0;
+    const filterHasRecipes = hasRecipes === "yes";
 
     const diets = await prisma.diet.findMany({
       where: {
         userId: req.authUser.id,
         ...(objective && objective !== "all" ? { objective } : {}),
+        ...(dietType && dietType !== "all" ? { dietType } : {}),
         ...(parsedMeals ? { numMeals: parsedMeals } : {}),
         ...(parsedTargetKcalMax ? { targetKcal: { lte: parsedTargetKcalMax } } : {}),
+        ...(filterHasRecipes ? { selectedRecipeIds: { isEmpty: false } } : {}),
         ...(parsedDays > 0
           ? {
               createdAt: {
@@ -384,6 +387,8 @@ router.get("/me/diets", requireAuth, async (req, res) => {
         objectivePct: true,
         targetKcal: true,
         numMeals: true,
+        selectedRecipeIds: true,
+        fixedMeals: true,
         createdAt: true,
         snapshotWeight: true,
         snapshotHeight: true,
@@ -431,13 +436,16 @@ router.delete("/me/diets/:id", requireAuth, async (req, res) => {
 
 router.get("/me/reports", requireAuth, async (req, res) => {
   try {
-    const { objective, days } = req.query;
+    const { objective, dietType, days, hasDiet } = req.query;
     const parsedDays = Number(days) || 0;
 
     const reports = await prisma.report.findMany({
       where: {
         userId: req.authUser.id,
         ...(objective && objective !== "all" ? { objective } : {}),
+        ...(hasDiet === "yes" ? { dietId: { not: null } } : {}),
+        ...(hasDiet === "no" ? { dietId: null } : {}),
+        ...(dietType && dietType !== "all" ? { diet: { is: { dietType } } } : {}),
         ...(parsedDays > 0
           ? {
               createdAt: {
@@ -455,6 +463,17 @@ router.get("/me/reports", requireAuth, async (req, res) => {
         reportType: true,
         objective: true,
         createdAt: true,
+        diet: {
+          select: {
+            id: true,
+            dietType: true,
+            objective: true,
+            targetKcal: true,
+            numMeals: true,
+            selectedRecipeIds: true,
+            createdAt: true,
+          },
+        },
       },
     });
 

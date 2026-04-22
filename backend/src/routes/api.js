@@ -7,13 +7,19 @@ const { checkAvatarStorageHealth, runAvatarStorageWriteCheck } = require("../ser
 const router = express.Router();
 
 const DIET_TYPES = new Set(["traditional", "carnivore", "carnivore_eggs_dairy"]);
+const CARB_FREE_DIET_TYPES = new Set(["carnivore", "carnivore_eggs_dairy"]);
 
 function normalizeDietType(value) {
   return DIET_TYPES.has(value) ? value : "traditional";
 }
 
+function allowsCarbCategory(dietType) {
+  return !CARB_FREE_DIET_TYPES.has(dietType);
+}
+
 function isCompatibleWithDiet(item, dietType) {
   if (dietType === "traditional") return true;
+  if (!allowsCarbCategory(dietType) && item.category === "carb") return false;
   return Array.isArray(item.dietTags) && item.dietTags.includes(dietType);
 }
 
@@ -22,6 +28,10 @@ router.get("/foods", async (req, res) => {
   try {
     const { category } = req.query;
     const dietType = normalizeDietType(req.query.dietType);
+    if (category === "carb" && !allowsCarbCategory(dietType)) {
+      return res.json([]);
+    }
+
     const where = {
       ...(category ? { category } : {}),
       ...(dietType !== "traditional" ? { dietTags: { has: dietType } } : {}),
@@ -106,6 +116,9 @@ router.post("/generate", async (req, res) => {
     if (compatibleFoods.length !== foods.length) {
       return res.status(400).json({ error: "A seleção contém alimentos incompatíveis com o estilo alimentar escolhido." });
     }
+    if (!allowsCarbCategory(dietType) && compatibleFoods.some((food) => food.category === "carb")) {
+      return res.status(400).json({ error: "Dietas carnívoras não aceitam alimentos classificados como carboidrato." });
+    }
 
     const requestedRecipeIds = Array.isArray(selectedRecipeIds) ? selectedRecipeIds : [];
     const recipes = requestedRecipeIds.length > 0
@@ -116,8 +129,10 @@ router.post("/generate", async (req, res) => {
       return res.status(400).json({ error: "A seleção contém receitas incompatíveis com o estilo alimentar escolhido." });
     }
 
+    const effectiveCarbGrams = allowsCarbCategory(dietType) ? carbGrams : 0;
+
     const result = generateDiet({
-      targetKcal, protGrams, carbGrams, fatGrams,
+      targetKcal, protGrams, carbGrams: effectiveCarbGrams, fatGrams,
       numMeals,
       mealDistribution,
       foods: compatibleFoods,
@@ -131,7 +146,7 @@ router.post("/generate", async (req, res) => {
       targetKcal,
       targetMacros: {
         protGrams,
-        carbGrams,
+        carbGrams: effectiveCarbGrams,
         fatGrams,
       },
       dietType,
@@ -176,7 +191,7 @@ router.post("/generate", async (req, res) => {
         objectivePct: objectivePct || 0,
         targetKcal,
         protPerKg: protPerKg || 2.0,
-        carbPerKg: carbPerKg || 3.0,
+        carbPerKg: allowsCarbCategory(dietType) ? (carbPerKg || 3.0) : 0,
         fatPerKg: fatPerKg || 0.8,
         snapshotWeight: weight ?? null,
         snapshotHeight: height ?? null,

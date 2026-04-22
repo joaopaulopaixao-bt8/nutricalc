@@ -74,10 +74,17 @@ VITE_API_URL=https://seu-backend.onrender.com
 - Salvar relatório
 - Excluir dieta, relatório e registro corporal
 - Validar se o avatar carrega
+- Executar o checklist do gerador em [docs/VALIDATION_CHECKLIST.md](/c:/NutriCalc/docs/VALIDATION_CHECKLIST.md)
+- Executar o checklist de produção em [docs/PRODUCTION_CHECKLIST.md](/c:/NutriCalc/docs/PRODUCTION_CHECKLIST.md)
 
 ## 5. Pontos ainda pendentes para produção mais sólida
 
 - trocar autenticação de `localStorage` para cookie `HTTP-only`
 - configurar envio real de email para reset de senha
-- revisar armazenamento de avatar em disco local do Render
+- validar Supabase Storage de avatar no ambiente publicado
 - configurar domínio real no Google Login
+
+## 6. Roteiros completos
+
+- Validação funcional do gerador: [docs/VALIDATION_CHECKLIST.md](/c:/NutriCalc/docs/VALIDATION_CHECKLIST.md)
+- Produção e segurança: [docs/PRODUCTION_CHECKLIST.md](/c:/NutriCalc/docs/PRODUCTION_CHECKLIST.md)

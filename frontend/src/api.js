@@ -85,8 +85,10 @@ export async function getDiet(id) {
 export async function fetchMyDiets(filters = {}) {
   const params = new URLSearchParams();
   if (filters.objective && filters.objective !== "all") params.set("objective", filters.objective);
+  if (filters.dietType && filters.dietType !== "all") params.set("dietType", filters.dietType);
   if (filters.numMeals && filters.numMeals !== "all") params.set("numMeals", String(filters.numMeals));
   if (filters.targetKcalMax) params.set("targetKcalMax", String(filters.targetKcalMax));
+  if (filters.hasRecipes && filters.hasRecipes !== "all") params.set("hasRecipes", filters.hasRecipes);
   if (filters.days && filters.days !== "all") params.set("days", String(filters.days));
   const query = params.toString() ? `?${params.toString()}` : "";
   const res = await fetch(`${API_URL}/api/auth/me/diets${query}`, buildRequestOptions());
@@ -96,6 +98,8 @@ export async function fetchMyDiets(filters = {}) {
 export async function fetchMyReports(filters = {}) {
   const params = new URLSearchParams();
   if (filters.objective && filters.objective !== "all") params.set("objective", filters.objective);
+  if (filters.dietType && filters.dietType !== "all") params.set("dietType", filters.dietType);
+  if (filters.hasDiet && filters.hasDiet !== "all") params.set("hasDiet", filters.hasDiet);
   if (filters.days && filters.days !== "all") params.set("days", String(filters.days));
   const query = params.toString() ? `?${params.toString()}` : "";
   const res = await fetch(`${API_URL}/api/auth/me/reports${query}`, buildRequestOptions());
