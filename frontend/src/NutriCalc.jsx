@@ -3131,12 +3131,12 @@ function StepCard({ step, title, description }) {
 
 function TestimonialCard({ image, quote, name, result }) {
   return (
-    <div style={{...softGlassCardStyle,padding:"10px",display:"grid",gridTemplateColumns:"minmax(120px, 160px) 1fr",gap:14,alignItems:"stretch"}}>
-      <div style={{borderRadius:18,overflow:"hidden",minHeight:164,background:"#0b100f"}}>
+    <div style={{...softGlassCardStyle,padding:"12px",display:"grid",gridTemplateColumns:"minmax(132px, 168px) 1fr",gap:16,alignItems:"stretch",minHeight:220}}>
+      <div style={{borderRadius:18,overflow:"hidden",minHeight:180,background:"#0b100f"}}>
         <img src={image} alt={name} loading="lazy" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} />
       </div>
-      <div style={{display:"grid",alignContent:"space-between",gap:12,padding:"10px 6px 10px 0"}}>
-        <div style={{fontSize:15,lineHeight:1.72,color:"#d7ddd9"}}>{quote}</div>
+      <div style={{display:"grid",alignContent:"space-between",gap:14,padding:"10px 8px 10px 0"}}>
+        <div style={{fontSize:15,lineHeight:1.75,color:"#d7ddd9",display:"-webkit-box",WebkitLineClamp:5,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{quote}</div>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"end",gap:14,flexWrap:"wrap"}}>
           <div style={{fontSize:14,fontWeight:700,color:"#f5f7fa"}}>{name}</div>
           <div style={{fontSize:32,fontWeight:800,color:"#7ed957",letterSpacing:"-0.03em",lineHeight:1}}>{result}</div>
@@ -3269,18 +3269,19 @@ function PublicHeader({ currentPage, onCreateAccount, onEnter, onNavigatePage, v
 function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
   const heroImage = "/marketing/hero-reference-crop.png";
   const mealImage = "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1600";
-  const [simulator, setSimulator] = useState({ weight: "80", height: "178", age: "30", objective: "cutting" });
+  const [simulator, setSimulator] = useState({ weight: "80", height: "178", age: "30", objective: "cutting", activity: "1.55" });
 
   const simulatorResult = useMemo(() => {
     const weight = Number(simulator.weight) || 80;
     const height = Number(simulator.height) || 178;
     const age = Number(simulator.age) || 30;
-    const base = 10 * weight + 6.25 * height - 5 * age + 5;
+    const activityFactor = Number(simulator.activity) || 1.55;
+    const base = (10 * weight + 6.25 * height - 5 * age + 5) * activityFactor;
     const adjusted = simulator.objective === "cutting" ? base - 250 : simulator.objective === "bulk" ? base + 220 : base;
     const protein = Math.round(weight * (simulator.objective === "bulk" ? 2.0 : 2.2));
     const fat = Math.round(weight * 0.7);
     const carbs = Math.max(80, Math.round((adjusted - protein * 4 - fat * 9) / 4));
-    return { kcal: Math.round(adjusted), protein, carbs, fat };
+    return { kcal: Math.round(adjusted), protein, carbs, fat, activityFactor };
   }, [simulator]);
 
   const setField = (key, value) => setSimulator((prev) => ({ ...prev, [key]: value }));
@@ -3323,9 +3324,9 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
             <div style={{position:"relative",borderRadius:28,overflow:"hidden",minHeight:viewport.isMobile?360:620,background:"#050a08"}}>
               <img src={heroImage} alt="Mulher fitness preparando refeição com painel nutricional ao lado" loading="eager" style={{width:"100%",height:"100%",objectFit:"cover",objectPosition:"center top",display:"block"}} />
               <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg, rgba(5,10,8,0.02), rgba(5,10,8,0.32))"}} />
-              <div style={{position:"absolute",left:18,bottom:18,padding:"12px 14px",borderRadius:18,background:"rgba(7,11,15,0.72)",border:"1px solid rgba(255,255,255,0.08)",backdropFilter:"blur(12px)",maxWidth:220}}>
-                <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:800,color:"#7ed957"}}>Visual premium</div>
-                <div style={{fontSize:15,lineHeight:1.45,fontWeight:700,color:"#f5f7fa",marginTop:6}}>Hero mais humano, mais aspiracional e mais próximo da referência.</div>
+              <div style={{position:"absolute",left:18,bottom:18,padding:"12px 14px",borderRadius:18,background:"rgba(7,11,15,0.72)",border:"1px solid rgba(255,255,255,0.08)",backdropFilter:"blur(12px)",maxWidth:240}}>
+                <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:800,color:"#7ed957"}}>Rotina com foco</div>
+                <div style={{fontSize:15,lineHeight:1.45,fontWeight:700,color:"#f5f7fa",marginTop:6}}>Planeje suas refeições, acompanhe metas e mantenha constância no dia a dia.</div>
               </div>
             </div>
           </div>
@@ -3369,20 +3370,20 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
             <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg, rgba(5,10,8,0.1), rgba(5,10,8,0.72))"}} />
             <div style={{position:"absolute",left:18,right:18,bottom:18}}>
               <div style={{...softGlassCardStyle,padding:"18px",borderRadius:22}}>
-                <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:800,color:"#7ed957"}}>Visual de rotina real</div>
-                <div style={{fontSize:24,fontWeight:800,lineHeight:1.1,color:"#f5f7fa",marginTop:10}}>Comida com apelo, organização prática e cara de produto fitness de verdade.</div>
+                <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:800,color:"#7ed957"}}>Alimentação que cabe na rotina</div>
+                <div style={{fontSize:24,fontWeight:800,lineHeight:1.1,color:"#f5f7fa",marginTop:10}}>Refeições com apelo visual e praticidade para manter o plano com mais consistência.</div>
               </div>
             </div>
           </div>
           <div style={{display:"grid",gap:18}}>
             <div style={{...glassCardStyle,padding:viewport.isMobile?"22px 18px":"26px"}}>
-              <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:800,color:"#7ed957"}}>Primeira impressão forte</div>
-              <div style={{fontSize:viewport.isMobile?24:30,fontWeight:800,lineHeight:1.08,color:"#f5f7fa",marginTop:10}}>Dark, premium e feito para conversar com quem quer performance e disciplina.</div>
-              <div style={{fontSize:15,lineHeight:1.75,color:"#a7b0aa",marginTop:10}}>A entrada do NutriCalc agora se posiciona como produto final, não como página técnica para desenvolvimento.</div>
+              <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:800,color:"#7ed957"}}>Mais clareza desde o primeiro acesso</div>
+              <div style={{fontSize:viewport.isMobile?24:30,fontWeight:800,lineHeight:1.08,color:"#f5f7fa",marginTop:10}}>Tudo pensado para você visualizar o plano, entender o progresso e seguir com mais foco.</div>
+              <div style={{fontSize:15,lineHeight:1.75,color:"#a7b0aa",marginTop:10}}>O NutriCalc reúne planejamento, rotina alimentar e evolução em uma experiência simples de acompanhar todos os dias.</div>
             </div>
             <div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(0,1fr))",gap:14}}>
-              <MetricCard value="Plano" label="mais claro no primeiro olhar" />
-              <MetricCard value="Visual" label="mais memorável e comercial" />
+              <MetricCard value="Plano" label="mais simples de entender" />
+              <MetricCard value="Rotina" label="mais fácil de seguir" />
             </div>
           </div>
         </div>
@@ -3396,6 +3397,14 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
               <FG label="Peso" value={simulator.weight} onChange={(value) => setField("weight", value)} placeholder="Ex: 80" />
               <FG label="Altura" value={simulator.height} onChange={(value) => setField("height", value)} placeholder="Ex: 178" />
               <FG label="Idade" value={simulator.age} onChange={(value) => setField("age", value)} placeholder="Ex: 30" />
+              <div>
+                <label style={lS}>Nível de atividade</label>
+                <CustomSelect
+                  value={simulator.activity}
+                  onChange={(value) => setField("activity", value)}
+                  options={ACT.map((item) => ({ value: String(item.factor), label: `${item.label} - ${item.desc}` }))}
+                />
+              </div>
               <div>
                 <label style={lS}>Objetivo</label>
                 <CustomSelect
@@ -3418,6 +3427,7 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
             <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:800,color:"#7ed957"}}>Preview do resultado</div>
             <div style={{fontFamily:"'Inter Tight','Inter','Segoe UI',sans-serif",fontSize:56,fontWeight:800,letterSpacing:"-0.08em",marginTop:14,color:"#f5f7fa"}}>{simulatorResult.kcal}</div>
             <div style={{fontSize:15,color:"#a7b0aa",marginTop:-4}}>kcal estimadas por dia</div>
+            <div style={{fontSize:13,color:"#8f9a93",marginTop:10}}>Estimativa considerando seu objetivo e nível de atividade.</div>
             <div style={{display:"grid",gap:14,marginTop:22}}>
               <MacroBar label="Proteínas" value={`${simulatorResult.protein}g`} color="#7ed957" width={`${Math.min(86, simulatorResult.protein / 1.8)}%`} />
               <MacroBar label="Carboidratos" value={`${simulatorResult.carbs}g`} color="#f59e0b" width={`${Math.min(86, simulatorResult.carbs / 3)}%`} />
@@ -3445,7 +3455,7 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
       <section id="depoimentos" style={{padding:viewport.isMobile?"10px 0 34px":"10px 0 56px"}}>
         <div style={{...marketingSectionWrap,padding:viewport.isMobile?"0 14px":"0 24px"}}>
           <SectionHeader eyebrow="Resultados reais" title="Histórias de quem transformou a sua rotina" intro="Exemplos visuais de progresso construído com disciplina, clareza e constância." centered viewport={viewport} />
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:16,marginTop:24}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(320px,1fr))",gap:16,marginTop:24}}>
             <TestimonialCard image="/marketing/testimonial-1.png" quote="Perdi 7 kg em 10 semanas seguindo o plano. A organização das refeições fez toda a diferença." name="Carlos D." result="-7kg" />
             <TestimonialCard image="/marketing/testimonial-2.png" quote="Mais definição, mais energia e sem abrir mão do que eu gosto de comer. Simplesmente incrível." name="Juliana M." result="-4kg" />
             <TestimonialCard image="/marketing/testimonial-3.png" quote="O acompanhamento e os ajustes semanais me mantiveram sempre no caminho certo." name="Rafael T." result="-9kg" />
@@ -3456,11 +3466,12 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
       <section id="app" style={{padding:viewport.isMobile?"10px 0 34px":"10px 0 56px"}}>
         <div style={{...marketingSectionWrap,padding:viewport.isMobile?"0 14px":"0 24px",display:"grid",gridTemplateColumns:viewport.isTablet?"1fr":"minmax(0,0.9fr) minmax(340px,1.1fr)",gap:18,alignItems:"center"}}>
           <div>
-            <SectionHeader eyebrow="Painel e app" title="Leve seu plano para onde você for" intro="Acesse seu plano, registre refeições, acompanhe sua evolução e receba notificações para nunca sair do foco." viewport={viewport} />
+            <SectionHeader eyebrow="Seu plano sempre com você" title="Acesse de qualquer lugar pelo site" intro="Use o NutriCalc no navegador do celular, tablet ou computador e, se quiser, adicione à tela inicial para abrir como app." viewport={viewport} />
             <div style={{display:"flex",gap:12,marginTop:24,flexWrap:"wrap",flexDirection:viewport.isMobile?"column":"row"}}>
-              <MarketingButton onClick={onCreateAccount} secondary subtle style={{width:viewport.isMobile?"100%":"auto"}}>App Store</MarketingButton>
-              <MarketingButton onClick={onCreateAccount} secondary subtle style={{width:viewport.isMobile?"100%":"auto"}}>Google Play</MarketingButton>
+              <MarketingButton onClick={onCreateAccount} style={{width:viewport.isMobile?"100%":"auto"}}>Usar agora pelo site</MarketingButton>
+              <MarketingButton onClick={onEnter} secondary subtle style={{width:viewport.isMobile?"100%":"auto"}}>Entrar e continuar</MarketingButton>
             </div>
+            <div style={{fontSize:13,color:"#8f9a93",marginTop:12,lineHeight:1.7}}>Sem baixar em loja. A experiência funciona direto no navegador e pode ser instalada como PWA na tela inicial.</div>
           </div>
           <div style={{...glassCardStyle,padding:viewport.isMobile?"18px":"22px",display:"grid",gap:14}}>
             <div style={{display:"grid",gridTemplateColumns:"minmax(180px,240px) 1fr",gap:14,alignItems:"stretch"}}>
