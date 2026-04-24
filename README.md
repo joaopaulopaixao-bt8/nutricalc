@@ -68,6 +68,7 @@ Este bloco é o ponto de partida para as próximas atualizações.
 - Sprint 4 executada: separadas em módulos a navegação pública e a lógica de decisão entre experiência pública, perfil e app autenticado, reduzindo acoplamento do `NutriCalc.jsx`
 - Sprint 5 executada: home pública reescrita com foco mais comercial, menos texto institucional e comunicação mais orientada a benefício, meta, progresso e conversão
 - Sprint 6 executada: home pública recebeu imagens reais e blocos visuais para reforçar apelo comercial, produto e rotina alimentar logo na primeira dobra
+- Sprint 7 executada: branding do frontend ajustado com favicon `N` verde do NutriCalc e metadados básicos do `head` para a home publicada
 
 ## Como retomar o desenvolvimento
 
