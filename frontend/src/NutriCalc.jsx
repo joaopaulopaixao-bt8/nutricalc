@@ -4757,7 +4757,8 @@ function CustomSelect({ value, onChange, options, placeholder = "Selecione" }) {
                   color: selected ? "#f8fafc" : "#dbe4f0",
                   textAlign: "left",
                   fontSize: 15,
-                  fontFamily: "'JetBrains Mono',monospace",
+                  fontFamily: "'Outfit','Segoe UI',sans-serif",
+                  fontWeight: 400,
                   cursor: "pointer",
                 }}
               >
@@ -4778,7 +4779,7 @@ function BB({onClick}){return(<button onClick={onClick} style={{padding:"14px 24
 const h1S={fontSize:28,fontWeight:800,marginBottom:4,letterSpacing:"-0.03em"};
 const dS={color:"#94a3b8",marginBottom:32,fontSize:15};
 const lS={display:"block",fontSize:12,fontWeight:600,color:"#64748b",marginBottom:8,letterSpacing:"0.05em",textTransform:"uppercase"};
-const iS={width:"100%",padding:"12px 16px",borderRadius:10,fontSize:16,background:"var(--field-bg)",border:"1px solid var(--field-border)",color:"var(--field-fg)",outline:"none",fontFamily:"'JetBrains Mono',monospace",boxSizing:"border-box",appearance:"none",WebkitAppearance:"none",MozAppearance:"none"};
+const iS={width:"100%",padding:"12px 16px",borderRadius:10,fontSize:16,fontWeight:400,background:"var(--field-bg)",border:"1px solid var(--field-border)",color:"var(--field-fg)",outline:"none",fontFamily:"'Outfit','Segoe UI',sans-serif",boxSizing:"border-box",appearance:"none",WebkitAppearance:"none",MozAppearance:"none"};
 const pB={padding:"10px 16px",borderRadius:10,fontSize:14,border:"1px solid var(--btn-border)",cursor:"pointer",outline:"none",transition:"all 0.15s",background:"var(--btn-bg)",color:"var(--btn-fg)"};
 const nBS={flex:1,padding:"14px 24px",borderRadius:10,fontSize:15,fontWeight:700,background:"var(--btn-primary-bg)",border:"none",color:"var(--btn-primary-fg)",cursor:"pointer",outline:"none",letterSpacing:"-0.01em"};
 const tS={padding:"10px 8px",fontSize:11,fontWeight:600,letterSpacing:"0.05em",textTransform:"uppercase",textAlign:"center"};
