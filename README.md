@@ -69,6 +69,7 @@ Este bloco é o ponto de partida para as próximas atualizações.
 - Sprint 5 executada: home pública reescrita com foco mais comercial, menos texto institucional e comunicação mais orientada a benefício, meta, progresso e conversão
 - Sprint 6 executada: home pública recebeu imagens reais e blocos visuais para reforçar apelo comercial, produto e rotina alimentar logo na primeira dobra
 - Sprint 7 executada: branding do frontend ajustado com favicon `N` verde do NutriCalc e metadados básicos do `head` para a home publicada
+- Sprint 8 executada: checklist final de aceite da nova home pública documentado em [docs/HOME_RELEASE_CHECKLIST.md](/c:/NutriCalc/docs/HOME_RELEASE_CHECKLIST.md)
 
 ## Como retomar o desenvolvimento
 
