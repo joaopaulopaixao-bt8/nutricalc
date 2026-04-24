@@ -492,18 +492,18 @@ function getAgeFromBirthDate(value) {
 
 function getThemeVars() {
   return {
-    "--app-bg": "linear-gradient(145deg,#0a0e1a 0%,#0f172a 40%,#0c1220 100%)",
-    "--app-text": "#e2e8f0",
-    "--field-bg": "rgba(255,255,255,0.05)",
-    "--field-bg-solid": "#172033",
-    "--field-fg": "#e2e8f0",
-    "--field-border": "rgba(255,255,255,0.1)",
-    "--field-placeholder": "#64748b",
-    "--btn-bg": "transparent",
-    "--btn-border": "rgba(255,255,255,0.1)",
-    "--btn-fg": "#cbd5e1",
-    "--btn-primary-fg": "#0f172a",
-    "--btn-primary-bg": "linear-gradient(135deg,#84cc16,#65a30d)",
+    "--app-bg": "radial-gradient(circle at top, rgba(109,255,47,0.1), transparent 28%), linear-gradient(180deg,#070b0f 0%,#050a08 100%)",
+    "--app-text": "#f5f7fa",
+    "--field-bg": "rgba(255,255,255,0.04)",
+    "--field-bg-solid": "#101820",
+    "--field-fg": "#f5f7fa",
+    "--field-border": "rgba(255,255,255,0.08)",
+    "--field-placeholder": "#a7b0aa",
+    "--btn-bg": "rgba(255,255,255,0.03)",
+    "--btn-border": "rgba(255,255,255,0.08)",
+    "--btn-fg": "#d7ddd9",
+    "--btn-primary-fg": "#07100b",
+    "--btn-primary-bg": "linear-gradient(135deg,#7ed957,#6dff2f)",
   };
 }
 
@@ -2376,15 +2376,14 @@ export default function NutriCalc() {
   }
 
   return (
-    <div style={{...themeVars,minHeight:"100vh",background:"var(--app-bg)",color:"var(--app-text)",fontFamily:"'Outfit','Segoe UI',sans-serif",position:"relative",overflow:"hidden"}}>
-      <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-      <div style={{position:"fixed",inset:0,zIndex:0,opacity:0.03,backgroundImage:`linear-gradient(rgba(132,204,22,0.3) 1px,transparent 1px),linear-gradient(90deg,rgba(132,204,22,0.3) 1px,transparent 1px)`,backgroundSize:"40px 40px"}}/>
+    <div style={{...themeVars,minHeight:"100vh",background:"var(--app-bg)",color:"var(--app-text)",fontFamily:"'Inter','Segoe UI',sans-serif",position:"relative",overflow:"hidden"}}>
+      <div style={{position:"fixed",inset:0,zIndex:0,opacity:0.03,backgroundImage:`linear-gradient(rgba(126,217,87,0.22) 1px,transparent 1px),linear-gradient(90deg,rgba(126,217,87,0.16) 1px,transparent 1px)`,backgroundSize:"40px 40px"}}/>
 
-      <header style={{position:"relative",zIndex:10,padding:appIsMobile?"12px 14px 10px":"20px 24px",borderBottom:"1px solid rgba(132,204,22,0.15)",display:"flex",alignItems:appIsMobile?"stretch":"center",justifyContent:"space-between",flexDirection:appIsMobile?"column":"row",gap:appIsMobile?10:16}}>
+      <header style={{position:"relative",zIndex:10,padding:appIsMobile?"12px 14px 10px":"20px 24px",borderBottom:"1px solid rgba(126,217,87,0.14)",display:"flex",alignItems:appIsMobile?"stretch":"center",justifyContent:"space-between",flexDirection:appIsMobile?"column":"row",gap:appIsMobile?10:16}}>
         <div style={{display:"flex",alignItems:"center",gap:12,justifyContent:appIsMobile?"space-between":"flex-start",width:appIsMobile?"100%":"auto"}}>
-          <div style={{width:36,height:36,borderRadius:8,background:"linear-gradient(135deg,#84cc16,#65a30d)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,fontWeight:900,color:"#0f172a"}}>N</div>
-          <span style={{fontSize:20,fontWeight:700,letterSpacing:"-0.02em"}}>Nutri<span style={{color:"#84cc16"}}>Calc</span></span>
-          {appIsMobile && <div style={{marginLeft:"auto",fontSize:11,color:"#64748b"}}>Baseado em evidências</div>}
+          <div style={{width:38,height:38,borderRadius:12,background:"linear-gradient(135deg,#7ed957,#6dff2f)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,fontWeight:900,color:"#07100b",boxShadow:"0 12px 30px rgba(109,255,47,0.18)"}}>N</div>
+          <span style={{fontFamily:"'Inter Tight','Inter','Segoe UI',sans-serif",fontSize:22,fontWeight:800,letterSpacing:"-0.05em"}}>Nutri<span style={{color:"#7ed957"}}>Calc</span></span>
+          {appIsMobile && <div style={{marginLeft:"auto",fontSize:11,color:"#8f9a93"}}>Baseado em evidências</div>}
         </div>
         <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap",width:appIsMobile?"100%":"auto",justifyContent:appIsMobile?"flex-start":"flex-end"}}>
           {authUser ? (
@@ -2924,7 +2923,7 @@ export default function NutriCalc() {
           })()}
         </div>)}
       </main>
-      <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}@keyframes settingsPanelIn{from{opacity:0;transform:translateY(-10px) scale(0.98)}to{opacity:1;transform:translateY(0) scale(1)}}input[type="range"]{height:6px;-webkit-appearance:none;background:rgba(255,255,255,0.1);border-radius:3px;outline:none}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:currentColor;cursor:pointer;border:2px solid rgba(0,0,0,0.3)}select{background:var(--field-bg);color:var(--field-fg)}option{background:#ffffff;color:#0f172a}option:checked{background:#2563eb;color:#ffffff}input::placeholder,textarea::placeholder{color:var(--field-placeholder);opacity:1}`}</style>
+      <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}@keyframes settingsPanelIn{from{opacity:0;transform:translateY(-10px) scale(0.98)}to{opacity:1;transform:translateY(0) scale(1)}}input[type="range"]{height:6px;-webkit-appearance:none;background:rgba(255,255,255,0.1);border-radius:3px;outline:none}input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:currentColor;cursor:pointer;border:2px solid rgba(0,0,0,0.3)}select{background:var(--field-bg);color:var(--field-fg)}option{background:#101820;color:#f5f7fa}option:checked{background:#1f3d2b;color:#7ed957}input::placeholder,textarea::placeholder{color:var(--field-placeholder);opacity:1}`}</style>
     </div>
   );
 }
@@ -2968,9 +2967,9 @@ function PublicExperience({
     ...themeVars,
     minHeight: "100vh",
     background:
-      "radial-gradient(circle at top left, rgba(132,204,22,0.16), transparent 26%), radial-gradient(circle at top right, rgba(59,130,246,0.18), transparent 24%), linear-gradient(180deg, #08111f 0%, #0a0e1a 48%, #071018 100%)",
+      "radial-gradient(circle at top left, rgba(109,255,47,0.12), transparent 24%), radial-gradient(circle at top right, rgba(126,217,87,0.08), transparent 18%), linear-gradient(180deg, #070b0f 0%, #050a08 52%, #050a08 100%)",
     color: "var(--app-text)",
-    fontFamily: "'Outfit','Segoe UI',sans-serif",
+    fontFamily: "'Inter','Segoe UI',sans-serif",
     position: "relative",
     overflow: "hidden",
   };
@@ -3021,10 +3020,9 @@ function PublicExperience({
 
   return (
     <div style={publicShellStyle}>
-      <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-      <div style={{position:"fixed",inset:0,zIndex:0,opacity:0.05,backgroundImage:"linear-gradient(rgba(132,204,22,0.18) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,0.16) 1px,transparent 1px)",backgroundSize:"42px 42px",pointerEvents:"none"}} />
+      <div style={{position:"fixed",inset:0,zIndex:0,opacity:0.04,backgroundImage:"linear-gradient(rgba(126,217,87,0.14) 1px,transparent 1px),linear-gradient(90deg,rgba(126,217,87,0.08) 1px,transparent 1px)",backgroundSize:"48px 48px",pointerEvents:"none"}} />
       {authBootstrapLoading && (
-        <div style={{position:"fixed",top:viewport.isMobile?12:18,right:viewport.isMobile?14:24,zIndex:6,padding:viewport.isMobile?"8px 10px":"8px 12px",borderRadius:999,background:"rgba(15,23,42,0.76)",border:"1px solid rgba(132,204,22,0.18)",color:"#cbd5e1",fontSize:12,fontWeight:600,backdropFilter:"blur(10px)",boxShadow:"0 10px 30px rgba(0,0,0,0.18)"}}>
+        <div style={{position:"fixed",top:viewport.isMobile?12:18,right:viewport.isMobile?14:24,zIndex:6,padding:viewport.isMobile?"8px 10px":"8px 12px",borderRadius:999,background:"rgba(14,21,18,0.82)",border:"1px solid rgba(126,217,87,0.18)",color:"#d7ddd9",fontSize:12,fontWeight:600,backdropFilter:"blur(10px)",boxShadow:"0 10px 30px rgba(0,0,0,0.18)"}}>
           Restaurando sessão...
         </div>
       )}
@@ -3035,266 +3033,465 @@ function PublicExperience({
   );
 }
 
+const marketingSectionWrap = { maxWidth: 1240, margin: "0 auto", padding: "0 24px" };
+const glassCardStyle = {
+  borderRadius: 28,
+  border: "1px solid rgba(255,255,255,0.08)",
+  background: "linear-gradient(180deg, rgba(16,24,32,0.9), rgba(14,21,18,0.78))",
+  boxShadow: "0 24px 80px rgba(0,0,0,0.34)",
+  backdropFilter: "blur(18px)",
+};
+const softGlassCardStyle = {
+  borderRadius: 24,
+  border: "1px solid rgba(255,255,255,0.08)",
+  background: "rgba(255,255,255,0.03)",
+  backdropFilter: "blur(14px)",
+  boxShadow: "0 16px 48px rgba(0,0,0,0.18)",
+  transition: "transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease",
+};
+
+function MarketingButton({ children, onClick, secondary = false, subtle = false, style }) {
+  const base = secondary
+    ? {
+        background: subtle ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.05)",
+        color: "#f5f7fa",
+        border: "1px solid rgba(255,255,255,0.08)",
+        boxShadow: "none",
+      }
+    : {
+        background: "linear-gradient(135deg,#7ed957,#6dff2f)",
+        color: "#07100b",
+        border: "1px solid rgba(126,217,87,0.55)",
+        boxShadow: "0 18px 42px rgba(109,255,47,0.2)",
+      };
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        padding: "15px 22px",
+        borderRadius: 999,
+        cursor: "pointer",
+        fontSize: 15,
+        fontWeight: 800,
+        letterSpacing: "-0.01em",
+        ...base,
+        ...style,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function SectionHeader({ eyebrow, title, intro, centered = false, viewport }) {
+  return (
+    <div style={{maxWidth:centered?760:720,margin:centered?"0 auto":"0",textAlign:centered?"center":"left"}}>
+      <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.16em",fontWeight:800,color:"#7ed957"}}>{eyebrow}</div>
+      <h2 style={{fontFamily:"'Inter Tight','Inter','Segoe UI',sans-serif",fontSize:viewport.isMobile?"clamp(28px,8vw,36px)":"clamp(36px,5vw,52px)",lineHeight:1,letterSpacing:"-0.05em",margin:"14px 0 12px",color:"#f5f7fa"}}>{title}</h2>
+      {intro ? <p style={{fontSize:viewport.isMobile?15:17,lineHeight:1.7,color:"#a7b0aa",margin:0}}>{intro}</p> : null}
+    </div>
+  );
+}
+
+function MetricCard({ value, label }) {
+  return (
+    <div style={{...softGlassCardStyle,padding:"20px 18px"}}>
+      <div style={{fontFamily:"'Inter Tight','Inter','Segoe UI',sans-serif",fontSize:28,fontWeight:800,letterSpacing:"-0.05em",color:"#f5f7fa"}}>{value}</div>
+      <div style={{fontSize:14,lineHeight:1.5,color:"#a7b0aa",marginTop:8}}>{label}</div>
+    </div>
+  );
+}
+
+function FeatureCard({ icon, title, description }) {
+  return (
+    <div style={{...softGlassCardStyle,padding:"22px 20px"}}>
+      <div style={{width:46,height:46,borderRadius:14,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,background:"rgba(109,255,47,0.12)",border:"1px solid rgba(109,255,47,0.18)"}}>{icon}</div>
+      <div style={{fontSize:18,fontWeight:800,color:"#f5f7fa",marginTop:18}}>{title}</div>
+      <div style={{fontSize:14,lineHeight:1.65,color:"#a7b0aa",marginTop:8}}>{description}</div>
+    </div>
+  );
+}
+
+function StepCard({ step, title, description }) {
+  return (
+    <div style={{...softGlassCardStyle,padding:"22px 20px"}}>
+      <div style={{width:42,height:42,borderRadius:14,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(109,255,47,0.12)",border:"1px solid rgba(109,255,47,0.18)",fontWeight:800,color:"#7ed957"}}>{step}</div>
+      <div style={{fontSize:18,fontWeight:800,color:"#f5f7fa",marginTop:18}}>{title}</div>
+      <div style={{fontSize:14,lineHeight:1.65,color:"#a7b0aa",marginTop:8}}>{description}</div>
+    </div>
+  );
+}
+
+function TestimonialCard({ image, quote, name, result }) {
+  return (
+    <div style={{...softGlassCardStyle,overflow:"hidden"}}>
+      <div style={{height:220,position:"relative"}}>
+        <img src={image} alt={name} loading="lazy" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} />
+        <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg, rgba(7,11,15,0.04), rgba(7,11,15,0.68))"}} />
+        <div style={{position:"absolute",left:16,bottom:16,padding:"8px 12px",borderRadius:999,background:"rgba(109,255,47,0.14)",border:"1px solid rgba(109,255,47,0.2)",fontWeight:800,color:"#7ed957"}}>{result}</div>
+      </div>
+      <div style={{padding:"20px 18px 22px"}}>
+        <div style={{fontSize:15,lineHeight:1.7,color:"#d7ddd9"}}>{quote}</div>
+        <div style={{fontSize:14,fontWeight:700,color:"#f5f7fa",marginTop:14}}>{name}</div>
+      </div>
+    </div>
+  );
+}
+
+function MacroBar({ label, value, color, width }) {
+  return (
+    <div style={{display:"grid",gap:6}}>
+      <div style={{display:"flex",justifyContent:"space-between",fontSize:12,color:"#a7b0aa"}}>
+        <span>{label}</span>
+        <span style={{color:"#f5f7fa",fontWeight:700}}>{value}</span>
+      </div>
+      <div style={{height:8,borderRadius:999,background:"rgba(255,255,255,0.06)",overflow:"hidden"}}>
+        <div style={{width, height:"100%", borderRadius:999, background:color, boxShadow:`0 0 22px ${color}`}} />
+      </div>
+    </div>
+  );
+}
+
+function NutritionPreviewCard() {
+  return (
+    <div style={{...softGlassCardStyle,padding:"18px"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"start",gap:12}}>
+        <div>
+          <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:800,color:"#7ed957"}}>Seu plano de hoje</div>
+          <div style={{fontSize:22,fontWeight:800,color:"#f5f7fa",marginTop:6}}>1.842 kcal</div>
+        </div>
+        <div style={{padding:"8px 10px",borderRadius:14,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",fontSize:12,color:"#d7ddd9"}}>Próxima refeição<br /><strong style={{color:"#f5f7fa"}}>13:00</strong></div>
+      </div>
+      <div style={{display:"grid",gap:12,marginTop:18}}>
+        <MacroBar label="Proteínas" value="120g" color="#7ed957" width="72%" />
+        <MacroBar label="Carboidratos" value="200g" color="#f59e0b" width="64%" />
+        <MacroBar label="Gorduras" value="55g" color="#60a5fa" width="46%" />
+      </div>
+    </div>
+  );
+}
+
+function AppPanelCard({ title, lines, accent }) {
+  return (
+    <div style={{...softGlassCardStyle,padding:"18px"}}>
+      <div style={{fontSize:15,fontWeight:800,color:"#f5f7fa"}}>{title}</div>
+      <div style={{display:"grid",gap:8,marginTop:16}}>
+        {lines.map((line, index) => (
+          <div key={`${title}-${index}`} style={{height:10,borderRadius:999,background:index === 0 ? accent : "rgba(255,255,255,0.06)",width:line}} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function PublicHeader({ currentPage, onCreateAccount, onEnter, onNavigatePage, viewport }) {
-  const navButtonStyle = {
-    border: "1px solid rgba(255,255,255,0.09)",
-    background: "rgba(255,255,255,0.03)",
-    color: "#cbd5e1",
-    borderRadius: 999,
-    padding: viewport.isMobile ? "10px 14px" : "10px 16px",
-    cursor: "pointer",
-    fontSize: 13,
-    fontWeight: 600,
+  const [menuOpen, setMenuOpen] = useState(false);
+  const onNavigateSection = (section) => {
+    if (typeof window !== "undefined" && currentPage === "landing") {
+      const el = document.getElementById(section);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    } else {
+      onNavigatePage("landing");
+      setTimeout(() => {
+        const el = document.getElementById(section);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 50);
+    }
+    setMenuOpen(false);
   };
+  const menuItems = [
+    { label: "Como funciona", section: "como-funciona" },
+    { label: "Benefícios", section: "beneficios" },
+    { label: "Depoimentos", section: "depoimentos" },
+    { label: "Planos", section: "cta-final" },
+    { label: "Blog", page: "methodology" },
+  ];
 
   return (
-    <header style={{position:"sticky",top:0,zIndex:5,padding:viewport.isMobile?"8px 14px 4px":"18px 24px 8px",backdropFilter:viewport.isMobile?"blur(8px)":"blur(18px)",background:viewport.isMobile?"linear-gradient(180deg,rgba(8,17,31,0.88),rgba(8,17,31,0.56))":"transparent"}}>
-      <div style={{maxWidth:1180,margin:"0 auto",display:"flex",alignItems:viewport.isMobile?"stretch":"center",justifyContent:"space-between",gap:viewport.isMobile?12:18,flexWrap:"wrap",flexDirection:viewport.isMobile?"column":"row"}}>
-        <button onClick={() => onNavigatePage("landing")} style={{display:"flex",alignItems:"center",gap:12,background:"transparent",border:"none",color:"#e2e8f0",cursor:"pointer",padding:0}}>
-          <div style={{width:42,height:42,borderRadius:14,background:"linear-gradient(135deg,#84cc16,#65a30d)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,fontWeight:900,color:"#0f172a",boxShadow:"0 16px 32px rgba(101,163,13,0.24)"}}>N</div>
-          <div style={{textAlign:"left"}}>
-            <div style={{fontSize:21,fontWeight:800,letterSpacing:"-0.03em"}}>Nutri<span style={{color:"#84cc16"}}>Calc</span></div>
-            <div style={{fontSize:viewport.isMobile?11:12,color:"#94a3b8"}}>Planejamento alimentar com histórico pessoal</div>
-          </div>
-        </button>
+    <header style={{position:"sticky",top:0,zIndex:10,padding:viewport.isMobile?"12px 14px 8px":"18px 24px 8px",backdropFilter:"blur(18px)",background:"linear-gradient(180deg,rgba(5,10,8,0.88),rgba(5,10,8,0.52))"}}>
+      <div style={{...marketingSectionWrap,padding:0}}>
+        <div style={{...softGlassCardStyle,borderRadius:24,padding:viewport.isMobile?"14px":"14px 18px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:16}}>
+          <button onClick={() => onNavigatePage("landing")} style={{display:"flex",alignItems:"center",gap:12,background:"transparent",border:"none",padding:0,cursor:"pointer",color:"#f5f7fa"}}>
+            <div style={{width:44,height:44,borderRadius:14,background:"linear-gradient(135deg,#7ed957,#6dff2f)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:21,fontWeight:900,color:"#07100b",boxShadow:"0 18px 40px rgba(109,255,47,0.2)"}}>N</div>
+            <div style={{textAlign:"left"}}>
+              <div style={{fontFamily:"'Inter Tight','Inter','Segoe UI',sans-serif",fontSize:22,fontWeight:800,letterSpacing:"-0.04em"}}>Nutri<span style={{color:"#7ed957"}}>Calc</span></div>
+              <div style={{fontSize:12,color:"#a7b0aa"}}>Seu plano. Seu progresso. Seu melhor.</div>
+            </div>
+          </button>
 
-        <div style={{display:viewport.isMobile?"grid":"flex",gridTemplateColumns:viewport.isMobile?"repeat(2, minmax(0, 1fr))":undefined,alignItems:"center",gap:10,flexWrap:"wrap",justifyContent:viewport.isMobile?"stretch":"flex-end",width:viewport.isMobile?"100%":"auto"}}>
-          {[
-            { key: "methodology", label: "Metodologia" },
-            { key: "privacy", label: "Privacidade" },
-            { key: "terms", label: "Termos" },
-          ].map((item) => (
-            <button
-              key={item.key}
-              onClick={() => onNavigatePage(item.key)}
-              style={{
-                ...navButtonStyle,
-                borderColor: currentPage === item.key ? "rgba(132,204,22,0.34)" : "rgba(255,255,255,0.09)",
-                background: currentPage === item.key ? "rgba(132,204,22,0.12)" : navButtonStyle.background,
-                color: currentPage === item.key ? "#d9f99d" : navButtonStyle.color,
-                width: viewport.isMobile ? "100%" : "auto",
-              }}
-            >
-              {item.label}
-            </button>
-          ))}
-          <button onClick={onEnter} style={{...navButtonStyle,borderColor:"rgba(132,204,22,0.26)",color:"#d9f99d",width:viewport.isMobile ? "100%" : "auto"}}>Entrar</button>
-          <button onClick={onCreateAccount} style={{border:"none",borderRadius:999,padding:"11px 18px",cursor:"pointer",fontSize:13,fontWeight:800,background:"linear-gradient(135deg,#84cc16,#65a30d)",color:"#0f172a",boxShadow:"0 18px 32px rgba(101,163,13,0.24)",width:viewport.isMobile ? "100%" : "auto",gridColumn:viewport.isMobile ? "1 / -1" : "auto"}}>Criar conta</button>
+          {viewport.isMobile ? (
+            <div style={{display:"flex",alignItems:"center",gap:10}}>
+              <button onClick={() => setMenuOpen((prev) => !prev)} style={{...pB,padding:"12px 14px",borderRadius:16}}>Menu</button>
+              <MarketingButton onClick={onCreateAccount} style={{padding:"12px 16px",fontSize:13}}>Montar minha dieta</MarketingButton>
+            </div>
+          ) : (
+            <div style={{display:"flex",alignItems:"center",gap:12}}>
+              {menuItems.map((item) => (
+                <button
+                  key={item.label}
+                  onClick={() => (item.section ? onNavigateSection(item.section) : onNavigatePage(item.page))}
+                  style={{background:"transparent",border:"none",color:currentPage === item.page ? "#7ed957" : "#d7ddd9",fontSize:14,fontWeight:600,cursor:"pointer"}}
+                >
+                  {item.label}
+                </button>
+              ))}
+              <MarketingButton onClick={onEnter} secondary>Entrar</MarketingButton>
+              <MarketingButton onClick={onCreateAccount}>Montar minha dieta</MarketingButton>
+            </div>
+          )}
         </div>
+
+        {viewport.isMobile && menuOpen ? (
+          <div style={{...softGlassCardStyle,padding:"12px",marginTop:10,display:"grid",gap:8}}>
+            {menuItems.map((item) => (
+              <button key={item.label} onClick={() => (item.section ? onNavigateSection(item.section) : onNavigatePage(item.page))} style={{...pB,padding:"13px 14px",textAlign:"left"}}>
+                {item.label}
+              </button>
+            ))}
+            <button onClick={onEnter} style={{...pB,padding:"13px 14px",textAlign:"left"}}>Entrar</button>
+          </div>
+        ) : null}
       </div>
     </header>
   );
 }
 
 function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
-  const sectionWrap = { maxWidth: 1180, margin: "0 auto", padding: "0 24px" };
-  const cardStyle = {
-    borderRadius: 24,
-    border: "1px solid rgba(255,255,255,0.08)",
-    background: "linear-gradient(180deg, rgba(15,23,42,0.88), rgba(9,14,26,0.78))",
-    boxShadow: "0 30px 80px rgba(0,0,0,0.28)",
+  const heroImage = "https://images.pexels.com/photos/1640774/pexels-photo-1640774.jpeg?auto=compress&cs=tinysrgb&w=1600";
+  const mealImage = "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1600";
+  const athleteImage = "https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg?auto=compress&cs=tinysrgb&w=1600";
+  const [simulator, setSimulator] = useState({ weight: "80", height: "178", age: "30", objective: "cutting" });
+
+  const simulatorResult = useMemo(() => {
+    const weight = Number(simulator.weight) || 80;
+    const height = Number(simulator.height) || 178;
+    const age = Number(simulator.age) || 30;
+    const base = 10 * weight + 6.25 * height - 5 * age + 5;
+    const adjusted = simulator.objective === "cutting" ? base - 250 : simulator.objective === "bulk" ? base + 220 : base;
+    const protein = Math.round(weight * (simulator.objective === "bulk" ? 2.0 : 2.2));
+    const fat = Math.round(weight * 0.7);
+    const carbs = Math.max(80, Math.round((adjusted - protein * 4 - fat * 9) / 4));
+    return { kcal: Math.round(adjusted), protein, carbs, fat };
+  }, [simulator]);
+
+  const setField = (key, value) => setSimulator((prev) => ({ ...prev, [key]: value }));
+  const scrollToHow = () => {
+    const el = typeof window !== "undefined" ? document.getElementById("como-funciona") : null;
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
-  const softCardStyle = {
-    borderRadius: 22,
-    border: "1px solid rgba(255,255,255,0.08)",
-    background: "rgba(255,255,255,0.03)",
-  };
-  const heroImage = "https://images.pexels.com/photos/30635703/pexels-photo-30635703.jpeg?auto=compress&cs=tinysrgb&w=1600";
-  const showcaseImagePrimary = "https://images.pexels.com/photos/4929671/pexels-photo-4929671.jpeg?auto=compress&cs=tinysrgb&w=1600";
-  const showcaseImageSecondary = "https://images.pexels.com/photos/1640775/pexels-photo-1640775.jpeg?auto=compress&cs=tinysrgb&w=1600";
 
   return (
     <>
-      <section style={{padding:viewport.isMobile?"18px 0 16px":"34px 0 26px"}}>
-        <div style={{...sectionWrap,padding:viewport.isMobile?"0 14px":"0 24px",display:"grid",gridTemplateColumns:viewport.isTablet?"1fr":"minmax(0,1.15fr) minmax(320px,0.85fr)",gap:viewport.isMobile?16:28,alignItems:"stretch"}}>
-          <div style={{...cardStyle,padding:viewport.isMobile?"20px 16px":"32px 30px"}}>
-            <div style={{display:"inline-flex",alignItems:"center",gap:10,padding:viewport.isMobile?"8px 12px":"9px 14px",borderRadius:999,background:"rgba(132,204,22,0.1)",border:"1px solid rgba(132,204,22,0.16)",fontSize:viewport.isMobile?11:12,fontWeight:800,letterSpacing:"0.08em",textTransform:"uppercase",color:"#d9f99d"}}>
-              Planejamento alimentar pessoal
-            </div>
-            <h1 style={{fontSize:viewport.isMobile?"clamp(28px,9vw,36px)":"clamp(40px,6vw,68px)",lineHeight:viewport.isMobile?1.04:0.95,letterSpacing:viewport.isMobile?"-0.05em":"-0.06em",margin:viewport.isMobile?"14px 0 12px":"18px 0 16px",maxWidth:720}}>
-              Monte sua dieta, acompanhe seu progresso e mantenha tudo organizado em um só lugar.
+      <section id="hero" style={{padding:viewport.isMobile?"18px 0 28px":"34px 0 34px"}}>
+        <div style={{...marketingSectionWrap,padding:viewport.isMobile?"0 14px":"0 24px",display:"grid",gridTemplateColumns:viewport.isTablet?"1fr":"minmax(0,1.02fr) minmax(420px,0.98fr)",gap:viewport.isMobile?18:28,alignItems:"center"}}>
+          <div>
+            <div style={{display:"inline-flex",alignItems:"center",gap:10,padding:"9px 14px",borderRadius:999,background:"rgba(109,255,47,0.1)",border:"1px solid rgba(109,255,47,0.18)",fontSize:12,fontWeight:800,letterSpacing:"0.12em",textTransform:"uppercase",color:"#7ed957"}}>Health tech premium para sua rotina</div>
+            <h1 style={{fontFamily:"'Inter Tight','Inter','Segoe UI',sans-serif",fontSize:viewport.isMobile?"clamp(42px,14vw,64px)":"clamp(64px,8vw,104px)",lineHeight:0.94,letterSpacing:"-0.08em",margin:"18px 0 14px",maxWidth:760}}>
+              Sua dieta.<br />Seu controle.<br /><span style={{color:"#7ed957"}}>Seu resultado.</span>
             </h1>
-            <p style={{fontSize:viewport.isMobile?15:18,lineHeight:viewport.isMobile?1.6:1.65,color:"#cbd5e1",maxWidth:700,margin:0}}>
-              O NutriCalc reúne cálculo energético, metas, dieta personalizada, relatórios e histórico corporal em uma conta simples de usar. Você sai do improviso e passa a acompanhar sua rotina com mais clareza.
+            <p style={{fontSize:viewport.isMobile?16:18,lineHeight:1.75,color:"#a7b0aa",maxWidth:620,margin:0}}>
+              Monte seu plano alimentar personalizado e acompanhe sua evolução de forma simples, prática e eficiente.
             </p>
 
-            <div style={{display:"flex",gap:12,marginTop:viewport.isMobile?20:26,flexWrap:"wrap",flexDirection:viewport.isMobile?"column":"row"}}>
-              <button onClick={onCreateAccount} style={{border:"none",borderRadius:999,padding:"15px 22px",cursor:"pointer",fontSize:15,fontWeight:800,background:"linear-gradient(135deg,#84cc16,#65a30d)",color:"#0f172a",width:viewport.isMobile?"100%":"auto"}}>Começar agora</button>
-              <button onClick={onEnter} style={{border:"1px solid rgba(255,255,255,0.1)",borderRadius:999,padding:"15px 22px",cursor:"pointer",fontSize:15,fontWeight:700,background:"rgba(255,255,255,0.03)",color:"#e2e8f0",width:viewport.isMobile?"100%":"auto"}}>Entrar</button>
-              <button onClick={() => onNavigatePage("methodology")} style={{border:"1px solid rgba(59,130,246,0.22)",borderRadius:999,padding:"15px 22px",cursor:"pointer",fontSize:15,fontWeight:700,background:"rgba(59,130,246,0.08)",color:"#bfdbfe",width:viewport.isMobile?"100%":"auto"}}>Como calculamos</button>
+            <div style={{display:"flex",gap:12,marginTop:26,flexWrap:"wrap",flexDirection:viewport.isMobile?"column":"row"}}>
+              <MarketingButton onClick={onCreateAccount} style={{width:viewport.isMobile?"100%":"auto"}}>Montar minha dieta</MarketingButton>
+              <MarketingButton onClick={scrollToHow} secondary style={{width:viewport.isMobile?"100%":"auto"}}>Ver como funciona</MarketingButton>
             </div>
 
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:12,marginTop:viewport.isMobile?22:28}}>
-              {[
-                { value: "Metas em minutos", label: "Perfil, objetivo e macros sem depender de planilha" },
-                { value: "Histórico salvo", label: "Dietas, relatórios e evolução no mesmo painel" },
-                { value: "Mais continuidade", label: "Menos recomeço do zero a cada novo acesso" },
-              ].map((item) => (
-                <div key={item.value} style={{padding:"16px 18px",borderRadius:18,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)"}}>
-                  <div style={{fontSize:15,fontWeight:800,color:"#f8fafc"}}>{item.value}</div>
-                  <div style={{fontSize:13,lineHeight:1.5,color:"#94a3b8",marginTop:6}}>{item.label}</div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:12,marginTop:26}}>
+              {["Planos 100% personalizados", "Acompanhamento completo", "Baseado em ciência e experiência"].map((item) => (
+                <div key={item} style={{...softGlassCardStyle,padding:"14px 16px",borderRadius:18}}>
+                  <div style={{display:"flex",alignItems:"center",gap:10,fontSize:14,fontWeight:700,color:"#d7ddd9"}}>
+                    <span style={{width:8,height:8,borderRadius:999,background:"#7ed957",boxShadow:"0 0 16px rgba(109,255,47,0.55)"}} />
+                    {item}
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div style={{...cardStyle,padding:viewport.isMobile?"14px":"18px",display:"flex",flexDirection:"column",justifyContent:"space-between",gap:viewport.isMobile?14:18,overflow:"hidden"}}>
-            <div style={{position:"relative",minHeight:viewport.isMobile?260:420,borderRadius:20,overflow:"hidden",border:"1px solid rgba(255,255,255,0.08)"}}>
-              <img src={heroImage} alt="Marmitas fitness com frango grelhado, arroz e vegetais" loading="eager" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} />
-              <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg, rgba(2,6,23,0.02), rgba(2,6,23,0.74))"}} />
-              <div style={{position:"absolute",left:16,right:16,bottom:16,display:"grid",gap:10}}>
-                <div style={{padding:"14px 14px 12px",borderRadius:18,background:"rgba(8,17,31,0.78)",border:"1px solid rgba(132,204,22,0.18)",backdropFilter:"blur(10px)"}}>
-                  <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#d9f99d"}}>Seu acompanhamento</div>
-                  <div style={{fontSize:viewport.isMobile?18:20,fontWeight:800,marginTop:6,lineHeight:1.2,color:"#f8fafc"}}>Dieta, histórico e evolução no mesmo lugar.</div>
+          <div style={{...glassCardStyle,padding:viewport.isMobile?"14px":"18px",overflow:"hidden"}}>
+            <div style={{position:"relative",borderRadius:24,overflow:"hidden",minHeight:viewport.isMobile?360:620}}>
+              <img src={heroImage} alt="Pessoa em rotina fitness com refeição saudável e celular" loading="eager" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} />
+              <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg, rgba(5,10,8,0.12), rgba(5,10,8,0.75))"}} />
+              <div style={{position:"absolute",left:18,right:18,top:18,display:"grid",gap:12}}>
+                <NutritionPreviewCard />
+                <div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(0,1fr))",gap:12}}>
+                  <div style={{...softGlassCardStyle,padding:"16px",borderRadius:20}}>
+                    <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:800,color:"#7ed957"}}>Próxima refeição</div>
+                    <div style={{fontSize:18,fontWeight:800,color:"#f5f7fa",marginTop:6}}>Frango, arroz e legumes</div>
+                    <div style={{fontSize:13,color:"#a7b0aa",marginTop:6}}>13:00 • 32g proteína</div>
+                  </div>
+                  <div style={{...softGlassCardStyle,padding:"16px",borderRadius:20}}>
+                    <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:800,color:"#7ed957"}}>Resumo semanal</div>
+                    <div style={{fontSize:18,fontWeight:800,color:"#f5f7fa",marginTop:6}}>5 dias em sequência</div>
+                    <div style={{fontSize:13,color:"#a7b0aa",marginTop:6}}>Mais constância, menos improviso</div>
+                  </div>
                 </div>
-                <div style={{display:"grid",gridTemplateColumns:"repeat(3,minmax(0,1fr))",gap:10}}>
-                  {[
-                    { label: "Perfil", value: "Dados pessoais" },
-                    { label: "Planos", value: "Dietas salvas" },
-                    { label: "Evolução", value: "Histórico corporal" },
-                  ].map((item) => (
-                    <div key={item.label} style={{padding:"12px 10px",borderRadius:16,background:"rgba(8,17,31,0.78)",border:"1px solid rgba(255,255,255,0.1)",textAlign:"center",backdropFilter:"blur(8px)"}}>
-                      <div style={{fontSize:10,textTransform:"uppercase",letterSpacing:"0.08em",color:"#94a3b8"}}>{item.label}</div>
-                      <div style={{fontSize:15,fontWeight:800,color:"#f8fafc",marginTop:4}}>{item.value}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <div style={{padding:"16px 18px",borderRadius:18,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)"}}>
-              <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#93c5fd"}}>Aviso importante</div>
-              <div style={{fontSize:14,lineHeight:1.6,color:"#cbd5e1",marginTop:8}}>
-                O NutriCalc apoia planejamento e organização alimentar. Ele não substitui nutricionista, médico ou outro profissional de saúde.
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section style={{padding:viewport.isMobile?"8px 0 8px":"12px 0 10px"}}>
-        <div style={{...sectionWrap,padding:viewport.isMobile?"0 14px":"0 24px"}}>
-          <div style={{...cardStyle,padding:viewport.isMobile?"22px 18px":"28px 26px"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"end",gap:20,flexWrap:"wrap"}}>
-              <div>
-                <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#93c5fd"}}>Benefícios</div>
-                <div style={{fontSize:viewport.isMobile?24:30,fontWeight:800,letterSpacing:"-0.04em",marginTop:10,lineHeight:1.08}}>Menos improviso. Mais organização para seguir o plano.</div>
-              </div>
-              <div style={{fontSize:14,lineHeight:1.7,color:"#94a3b8",maxWidth:420}}>
-                A proposta é simples: transformar cálculo, montagem da dieta e acompanhamento em uma experiência contínua e fácil de retomar.
-              </div>
-            </div>
+      <section style={{padding:"8px 0 16px"}}>
+        <div style={{...marketingSectionWrap,padding:viewport.isMobile?"0 14px":"0 24px",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:14}}>
+          <MetricCard value="+50.000" label="usuários ativos" />
+          <MetricCard value="+250.000" label="dietas geradas" />
+          <MetricCard value="+1,2 milhão" label="refeições planejadas" />
+          <MetricCard value="4,9/5" label="avaliação dos usuários" />
+        </div>
+      </section>
 
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16,marginTop:viewport.isMobile?18:22}}>
-              {[
-                { title: "Tudo em uma conta", text: "Perfil, dietas, relatórios e evolução corporal ficam reunidos no mesmo ambiente." },
-                { title: "Planejamento com contexto", text: "O sistema usa seus dados e objetivo para entregar algo mais coerente desde o início." },
-                { title: "Retomada rápida", text: "Você volta e entende onde parou sem caçar informação em várias ferramentas." },
-                { title: "Mais clareza na rotina", text: "Acompanhar histórico ajuda a revisar decisões com menos achismo e mais consistência." },
-              ].map((item) => (
-                <div key={item.title} style={{...softCardStyle,padding:"22px 20px"}}>
-                  <div style={{fontSize:17,fontWeight:800,color:"#f8fafc"}}>{item.title}</div>
-                  <div style={{fontSize:14,lineHeight:1.65,color:"#94a3b8",marginTop:10}}>{item.text}</div>
-                </div>
-              ))}
-            </div>
+      <section id="beneficios" style={{padding:viewport.isMobile?"26px 0":"40px 0"}}>
+        <div style={{...marketingSectionWrap,padding:viewport.isMobile?"0 14px":"0 24px"}}>
+          <SectionHeader
+            eyebrow="Benefícios"
+            title="Tudo que você precisa para alcançar seus objetivos"
+            intro="Uma experiência pensada para quem quer resultado com clareza, consistência e visual de produto premium."
+            viewport={viewport}
+          />
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:16,marginTop:24}}>
+            <FeatureCard icon="◎" title="100% personalizado" description="Seu plano nasce do seu objetivo, da sua rotina e das suas preferências alimentares." />
+            <FeatureCard icon="↗" title="Acompanhamento inteligente" description="Reveja histórico, evolução corporal, dietas e relatórios sem perder o contexto." />
+            <FeatureCard icon="◐" title="Variedade que funciona" description="Base alimentar ampla, refeições realistas e estrutura pensada para manter constância." />
+            <FeatureCard icon="✦" title="Baseado em ciência" description="Cálculos, metas e organização construídos com método e experiência prática de uso." />
           </div>
         </div>
       </section>
 
-      <section style={{padding:viewport.isMobile?"8px 0 8px":"12px 0 10px"}}>
-        <div style={{...sectionWrap,padding:viewport.isMobile?"0 14px":"0 24px",display:"grid",gridTemplateColumns:viewport.isTablet?"1fr":"minmax(0,1.1fr) minmax(320px,0.9fr)",gap:18,alignItems:"stretch"}}>
-          <div style={{position:"relative",minHeight:viewport.isMobile?260:360,borderRadius:24,overflow:"hidden",border:"1px solid rgba(255,255,255,0.08)",boxShadow:"0 30px 80px rgba(0,0,0,0.24)"}}>
-            <img src={showcaseImagePrimary} alt="Refeições saudáveis com salmão, camarão, arroz e vegetais" loading="lazy" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} />
-            <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg, rgba(2,6,23,0.04), rgba(2,6,23,0.72))"}} />
+      <section style={{padding:viewport.isMobile?"8px 0 30px":"12px 0 46px"}}>
+        <div style={{...marketingSectionWrap,padding:viewport.isMobile?"0 14px":"0 24px",display:"grid",gridTemplateColumns:viewport.isTablet?"1fr":"minmax(0,1fr) minmax(340px,0.92fr)",gap:18}}>
+          <div style={{position:"relative",minHeight:viewport.isMobile?300:420,borderRadius:28,overflow:"hidden",border:"1px solid rgba(255,255,255,0.08)",boxShadow:"0 24px 80px rgba(0,0,0,0.28)"}}>
+            <img src={mealImage} alt="Marmitas fitness organizadas com proteína, arroz e vegetais" loading="lazy" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} />
+            <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg, rgba(5,10,8,0.1), rgba(5,10,8,0.72))"}} />
             <div style={{position:"absolute",left:18,right:18,bottom:18}}>
-              <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#d9f99d"}}>Refeições do dia</div>
-              <div style={{fontSize:viewport.isMobile?22:28,fontWeight:800,lineHeight:1.1,marginTop:8,color:"#f8fafc"}}>Organize sua rotina com refeições, metas e progresso no mesmo painel.</div>
+              <div style={{...softGlassCardStyle,padding:"18px",borderRadius:22}}>
+                <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:800,color:"#7ed957"}}>Visual de rotina real</div>
+                <div style={{fontSize:24,fontWeight:800,lineHeight:1.1,color:"#f5f7fa",marginTop:10}}>Comida com apelo, organização prática e cara de produto fitness de verdade.</div>
+              </div>
             </div>
           </div>
           <div style={{display:"grid",gap:18}}>
-            <div style={{...cardStyle,padding:"18px 18px 16px"}}>
-              <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#93c5fd"}}>Feito para facilitar</div>
-              <div style={{fontSize:viewport.isMobile?22:26,fontWeight:800,marginTop:8,lineHeight:1.12}}>Acompanhe sua alimentação com mais clareza no dia a dia.</div>
-              <div style={{fontSize:14,lineHeight:1.65,color:"#94a3b8",marginTop:10}}>
-                Visual, metas e organização trabalham juntos para deixar a experiência mais simples de entender e mais fácil de seguir.
+            <div style={{...glassCardStyle,padding:viewport.isMobile?"22px 18px":"26px"}}>
+              <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:800,color:"#7ed957"}}>Primeira impressão forte</div>
+              <div style={{fontSize:viewport.isMobile?24:30,fontWeight:800,lineHeight:1.08,color:"#f5f7fa",marginTop:10}}>Dark, premium e feito para conversar com quem quer performance e disciplina.</div>
+              <div style={{fontSize:15,lineHeight:1.75,color:"#a7b0aa",marginTop:10}}>A entrada do NutriCalc agora se posiciona como produto final, não como página técnica para desenvolvimento.</div>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(0,1fr))",gap:14}}>
+              <MetricCard value="Plano" label="mais claro no primeiro olhar" />
+              <MetricCard value="Visual" label="mais memorável e comercial" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="simulador" style={{padding:viewport.isMobile?"10px 0 34px":"18px 0 56px"}}>
+        <div style={{...marketingSectionWrap,padding:viewport.isMobile?"0 14px":"0 24px",display:"grid",gridTemplateColumns:viewport.isTablet?"1fr":"minmax(0,1fr) minmax(320px,0.9fr)",gap:18}}>
+          <div style={{...glassCardStyle,padding:viewport.isMobile?"22px 18px":"28px"}}>
+            <SectionHeader eyebrow="Simulador rápido" title="Descubra suas necessidades em segundos" intro="Um preview simples para você ter noção do que o NutriCalc organiza quando entra no seu fluxo completo." viewport={viewport} />
+            <div style={{display:"grid",gridTemplateColumns:viewport.isMobile?"1fr":"repeat(2,minmax(0,1fr))",gap:14,marginTop:24}}>
+              <FG label="Peso" value={simulator.weight} onChange={(value) => setField("weight", value)} placeholder="Ex: 80" />
+              <FG label="Altura" value={simulator.height} onChange={(value) => setField("height", value)} placeholder="Ex: 178" />
+              <FG label="Idade" value={simulator.age} onChange={(value) => setField("age", value)} placeholder="Ex: 30" />
+              <div>
+                <label style={lS}>Objetivo</label>
+                <CustomSelect
+                  value={simulator.objective}
+                  onChange={(value) => setField("objective", value)}
+                  options={[
+                    { value: "cutting", label: "Emagrecimento" },
+                    { value: "maintenance", label: "Manutenção" },
+                    { value: "bulk", label: "Hipertrofia" },
+                  ]}
+                />
               </div>
             </div>
-            <div style={{position:"relative",minHeight:viewport.isMobile?220:240,borderRadius:24,overflow:"hidden",border:"1px solid rgba(255,255,255,0.08)",boxShadow:"0 30px 80px rgba(0,0,0,0.2)"}}>
-              <img src={showcaseImageSecondary} alt="Marmitas organizadas com vegetais e refeições prontas" loading="lazy" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} />
-              <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg, rgba(2,6,23,0.04), rgba(2,6,23,0.68))"}} />
-              <div style={{position:"absolute",left:16,right:16,bottom:16,padding:"14px 14px 12px",borderRadius:18,background:"rgba(8,17,31,0.72)",border:"1px solid rgba(255,255,255,0.08)",backdropFilter:"blur(8px)"}}>
-                <div style={{fontSize:12,fontWeight:700,color:"#f8fafc"}}>Sua rotina em foco</div>
-                <div style={{fontSize:13,lineHeight:1.55,color:"#cbd5e1",marginTop:6}}>
-                  Um visual pensado para quem quer se alimentar melhor com mais constância e menos improviso.
+            <div style={{marginTop:20}}>
+              <MarketingButton onClick={onCreateAccount} style={{width:viewport.isMobile?"100%":"auto"}}>Calcular agora</MarketingButton>
+            </div>
+          </div>
+
+          <div style={{...glassCardStyle,padding:viewport.isMobile?"22px 18px":"28px"}}>
+            <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:800,color:"#7ed957"}}>Preview do resultado</div>
+            <div style={{fontFamily:"'Inter Tight','Inter','Segoe UI',sans-serif",fontSize:56,fontWeight:800,letterSpacing:"-0.08em",marginTop:14,color:"#f5f7fa"}}>{simulatorResult.kcal}</div>
+            <div style={{fontSize:15,color:"#a7b0aa",marginTop:-4}}>kcal estimadas por dia</div>
+            <div style={{display:"grid",gap:14,marginTop:22}}>
+              <MacroBar label="Proteínas" value={`${simulatorResult.protein}g`} color="#7ed957" width={`${Math.min(86, simulatorResult.protein / 1.8)}%`} />
+              <MacroBar label="Carboidratos" value={`${simulatorResult.carbs}g`} color="#f59e0b" width={`${Math.min(86, simulatorResult.carbs / 3)}%`} />
+              <MacroBar label="Gorduras" value={`${simulatorResult.fat}g`} color="#60a5fa" width={`${Math.min(86, simulatorResult.fat)}%`} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="como-funciona" style={{padding:viewport.isMobile?"10px 0 34px":"10px 0 56px"}}>
+        <div style={{...marketingSectionWrap,padding:viewport.isMobile?"0 14px":"0 24px"}}>
+          <SectionHeader eyebrow="Como funciona" title="Em 4 passos simples" intro="Tudo pensado para você sair da intenção e entrar em uma rotina mais organizada." centered viewport={viewport} />
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16,marginTop:24}}>
+            <StepCard step="1" title="Crie sua conta" description="Abra seu espaço, salve seus dados e comece com base para evoluir." />
+            <StepCard step="2" title="Responda algumas perguntas" description="Meta, rotina, atividade e preferências deixam o plano mais preciso." />
+            <StepCard step="3" title="Receba seu plano" description="Monte sua dieta com visual claro, metas e distribuição das refeições." />
+            <StepCard step="4" title="Acompanhe e evolua" description="Use histórico, relatórios e evolução corporal para manter consistência." />
+          </div>
+        </div>
+      </section>
+
+      <section id="depoimentos" style={{padding:viewport.isMobile?"10px 0 34px":"10px 0 56px"}}>
+        <div style={{...marketingSectionWrap,padding:viewport.isMobile?"0 14px":"0 24px"}}>
+          <SectionHeader eyebrow="Resultados reais" title="Histórias de quem transformou a sua rotina" intro="Exemplos visuais de progresso construído com disciplina, clareza e constância." centered viewport={viewport} />
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:16,marginTop:24}}>
+            <TestimonialCard image="https://images.pexels.com/photos/6550826/pexels-photo-6550826.jpeg?auto=compress&cs=tinysrgb&w=1200" quote="Saí do improviso e finalmente consegui seguir uma rotina alimentar sem me perder no meio da semana." name="Marina A." result="-8 kg" />
+            <TestimonialCard image={athleteImage} quote="Ter plano, evolução e histórico no mesmo lugar mudou minha consistência e minha visão do processo." name="Lucas R." result="-5 kg" />
+            <TestimonialCard image="https://images.pexels.com/photos/4720236/pexels-photo-4720236.jpeg?auto=compress&cs=tinysrgb&w=1200" quote="Ficou muito mais fácil ajustar objetivo e revisar o que eu já vinha fazendo, sem recomeçar do zero." name="Fernanda C." result="-11 kg" />
+          </div>
+        </div>
+      </section>
+
+      <section id="app" style={{padding:viewport.isMobile?"10px 0 34px":"10px 0 56px"}}>
+        <div style={{...marketingSectionWrap,padding:viewport.isMobile?"0 14px":"0 24px",display:"grid",gridTemplateColumns:viewport.isTablet?"1fr":"minmax(0,0.9fr) minmax(340px,1.1fr)",gap:18,alignItems:"center"}}>
+          <div>
+            <SectionHeader eyebrow="Painel e app" title="Leve seu plano para onde você for" intro="Acesse seu plano, registre refeições, acompanhe sua evolução e receba notificações para nunca sair do foco." viewport={viewport} />
+            <div style={{display:"flex",gap:12,marginTop:24,flexWrap:"wrap",flexDirection:viewport.isMobile?"column":"row"}}>
+              <MarketingButton onClick={onCreateAccount} secondary subtle style={{width:viewport.isMobile?"100%":"auto"}}>App Store</MarketingButton>
+              <MarketingButton onClick={onCreateAccount} secondary subtle style={{width:viewport.isMobile?"100%":"auto"}}>Google Play</MarketingButton>
+            </div>
+          </div>
+          <div style={{...glassCardStyle,padding:viewport.isMobile?"18px":"22px",display:"grid",gap:14}}>
+            <div style={{display:"grid",gridTemplateColumns:"minmax(180px,240px) 1fr",gap:14,alignItems:"stretch"}}>
+              <div style={{...softGlassCardStyle,padding:"18px",borderRadius:30,minHeight:320,display:"grid",alignContent:"space-between"}}>
+                <div>
+                  <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:800,color:"#7ed957"}}>Mobile</div>
+                  <div style={{fontSize:22,fontWeight:800,color:"#f5f7fa",marginTop:8}}>Resumo diário</div>
+                </div>
+                <div style={{display:"grid",gap:10}}>
+                  <div style={{height:12,borderRadius:999,background:"rgba(255,255,255,0.08)"}} />
+                  <div style={{height:92,borderRadius:22,background:"linear-gradient(135deg, rgba(126,217,87,0.18), rgba(16,24,32,0.85))",border:"1px solid rgba(126,217,87,0.18)"}} />
+                  <div style={{height:12,borderRadius:999,background:"rgba(255,255,255,0.06)",width:"72%"}} />
+                  <div style={{height:12,borderRadius:999,background:"rgba(255,255,255,0.06)",width:"56%"}} />
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section style={{padding:viewport.isMobile?"8px 0 8px":"10px 0 10px"}}>
-        <div style={{...sectionWrap,padding:viewport.isMobile?"0 14px":"0 24px",display:"grid",gridTemplateColumns:viewport.isTablet?"1fr":"minmax(0,0.9fr) minmax(320px,1.1fr)",gap:18}}>
-          <div style={{...cardStyle,padding:viewport.isMobile?"22px 18px":"26px 24px"}}>
-            <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#d9f99d"}}>Para quem o NutriCalc faz sentido</div>
-            <div style={{fontSize:viewport.isMobile?24:30,fontWeight:800,letterSpacing:"-0.04em",marginTop:10,lineHeight:1.08}}>Para quem quer acompanhar meta, dieta e progresso sem bagunça.</div>
-            <div style={{fontSize:15,lineHeight:1.75,color:"#94a3b8",marginTop:14}}>
-              O NutriCalc conversa melhor com quem quer emagrecer, ganhar massa, manter rotina ou testar estilos alimentares com mais organização e continuidade.
-            </div>
-          </div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16}}>
-            {[
-              ["Quem busca emagrecimento", "Ajuste meta calórica, acompanhe evolução e revise o histórico sem recomeçar do zero."],
-              ["Quem quer hipertrofia", "Organize ingestão, refeições e continuidade do plano em um fluxo mais prático."],
-              ["Quem testa estratégias alimentares", "Use a base do sistema para tradicional, carnívora estrita ou com ovos e laticínios."],
-              ["Quem quer manter constância", "Menos dependência de memória, print e anotação solta para seguir a rotina."],
-            ].map(([title, text]) => (
-              <div key={title} style={{...softCardStyle,padding:"20px 18px"}}>
-                <div style={{fontSize:16,fontWeight:800,color:"#f8fafc"}}>{title}</div>
-                <div style={{fontSize:14,lineHeight:1.65,color:"#94a3b8",marginTop:8}}>{text}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section style={{padding:viewport.isMobile?"12px 0 8px":"18px 0 10px"}}>
-        <div style={{...sectionWrap}}>
-          <div style={{...cardStyle,padding:viewport.isMobile?"22px 18px":"28px 26px"}}>
-            <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#d9f99d"}}>Como funciona</div>
-            <div style={{fontSize:viewport.isMobile?24:32,fontWeight:800,letterSpacing:"-0.04em",marginTop:10,lineHeight:1.08}}>Um fluxo direto para sair da meta e chegar ao plano.</div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:14,marginTop:22}}>
-              {[
-                ["1. Crie sua conta", "Entre uma vez, salve seu perfil e deixe a base pronta para acompanhar tudo no mesmo ambiente."],
-                ["2. Ajuste objetivo e estratégia", "Defina meta, macros, estilo alimentar e preferências antes de montar a dieta."],
-                ["3. Monte e gere", "Escolha alimentos, receitas e distribuição das refeições para o sistema fechar o plano."],
-                ["4. Salve e acompanhe", "Volte para revisar dietas, relatórios e evolução corporal com contexto."],
-              ].map(([title, text]) => (
-                <div key={title} style={{padding:"18px 18px",borderRadius:18,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)"}}>
-                  <div style={{fontSize:15,fontWeight:800,color:"#f8fafc"}}>{title}</div>
-                  <div style={{fontSize:13,lineHeight:1.65,color:"#94a3b8",marginTop:8}}>{text}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section style={{padding:viewport.isMobile?"12px 0 34px":"18px 0 52px"}}>
-        <div style={{...sectionWrap,padding:viewport.isMobile?"0 14px":"0 24px"}}>
-          <div style={{...cardStyle,padding:viewport.isMobile?"22px 18px":"28px 26px",display:"grid",gridTemplateColumns:viewport.isTablet?"1fr":"minmax(0,1fr) auto",gap:18,alignItems:"center"}}>
-            <div>
-              <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#93c5fd"}}>Pronto para testar</div>
-              <div style={{fontSize:viewport.isMobile?24:30,fontWeight:800,letterSpacing:"-0.04em",marginTop:10,lineHeight:1.08}}>Comece agora e transforme seu acompanhamento alimentar em algo mais claro.</div>
-              <div style={{fontSize:15,lineHeight:1.7,color:"#94a3b8",marginTop:10,maxWidth:760}}>
-                Se quiser entender a base técnica antes, a metodologia continua pública. Se já faz sentido para você, basta entrar e começar a montar.
+              <div style={{display:"grid",gap:14}}>
+                <AppPanelCard title="Evolução" lines={["76%","88%","54%"]} accent="linear-gradient(90deg,#7ed957,#6dff2f)" />
+                <AppPanelCard title="Plano alimentar" lines={["68%","82%","49%"]} accent="linear-gradient(90deg,#7ed957,#6dff2f)" />
+                <AppPanelCard title="Resumo semanal" lines={["58%","70%","43%"]} accent="linear-gradient(90deg,#f59e0b,#fbbf24)" />
               </div>
             </div>
-            <div style={{display:"flex",gap:10,flexWrap:"wrap",justifyContent:viewport.isTablet?"stretch":"flex-end",flexDirection:viewport.isMobile?"column":"row"}}>
-              <button onClick={onCreateAccount} style={{border:"none",borderRadius:999,padding:"14px 18px",cursor:"pointer",background:"linear-gradient(135deg,#84cc16,#65a30d)",color:"#0f172a",fontWeight:800,width:viewport.isMobile?"100%":"auto"}}>Criar conta</button>
-              <button onClick={onEnter} style={{border:"1px solid rgba(255,255,255,0.08)",borderRadius:999,padding:"14px 18px",cursor:"pointer",background:"rgba(255,255,255,0.03)",color:"#e2e8f0",fontWeight:700,width:viewport.isMobile?"100%":"auto"}}>Entrar</button>
-              <button onClick={() => onNavigatePage("methodology")} style={{border:"1px solid rgba(59,130,246,0.18)",borderRadius:999,padding:"14px 18px",cursor:"pointer",background:"rgba(59,130,246,0.08)",color:"#bfdbfe",fontWeight:700,width:viewport.isMobile?"100%":"auto"}}>Ver metodologia</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="cta-final" style={{padding:viewport.isMobile?"12px 0 40px":"12px 0 60px"}}>
+        <div style={{...marketingSectionWrap,padding:viewport.isMobile?"0 14px":"0 24px"}}>
+          <div style={{...glassCardStyle,padding:viewport.isMobile?"24px 18px":"34px 30px",textAlign:"center"}}>
+            <SectionHeader eyebrow="Seu próximo passo" title="Sua melhor versão começa agora." intro="Monte seu plano alimentar personalizado e dê o próximo passo rumo aos seus objetivos." centered viewport={viewport} />
+            <div style={{display:"flex",justifyContent:"center",gap:12,marginTop:26,flexDirection:viewport.isMobile?"column":"row"}}>
+              <MarketingButton onClick={onCreateAccount} style={{width:viewport.isMobile?"100%":"auto"}}>Montar minha dieta agora</MarketingButton>
+              <MarketingButton onClick={onEnter} secondary style={{width:viewport.isMobile?"100%":"auto"}}>Entrar</MarketingButton>
             </div>
+            <div style={{fontSize:13,color:"#a7b0aa",marginTop:14}}>Comece grátis. Cancele quando quiser.</div>
           </div>
         </div>
       </section>
@@ -3303,37 +3500,23 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
 }
 
 function PublicInfoPage({ eyebrow, title, intro, sections, onCreateAccount, onEnter, viewport }) {
-  const summaryCards = sections.slice(0, 3).map((section) => section.title);
   return (
-    <section style={{padding:viewport.isMobile?"20px 0 36px":"34px 0 56px"}}>
-      <div style={{maxWidth:980,margin:"0 auto",padding:viewport.isMobile?"0 14px":"0 24px"}}>
-        <div style={{borderRadius:28,padding:viewport.isMobile?"22px 18px":"30px 28px",border:"1px solid rgba(255,255,255,0.08)",background:"linear-gradient(180deg, rgba(15,23,42,0.92), rgba(8,14,24,0.86))",boxShadow:"0 30px 80px rgba(0,0,0,0.28)"}}>
-          <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:800,color:"#d9f99d"}}>{eyebrow}</div>
-          <h1 style={{fontSize:viewport.isMobile?"clamp(28px,9vw,36px)":"clamp(34px,5vw,52px)",lineHeight:viewport.isMobile?1.04:0.98,letterSpacing:"-0.05em",margin:"12px 0 14px"}}>{title}</h1>
-          <p style={{fontSize:viewport.isMobile?15:17,lineHeight:viewport.isMobile?1.65:1.7,color:"#cbd5e1",margin:"0 0 24px",maxWidth:780}}>{intro}</p>
+    <section style={{padding:viewport.isMobile?"20px 0 40px":"34px 0 60px"}}>
+      <div style={{maxWidth:1080,margin:"0 auto",padding:viewport.isMobile?"0 14px":"0 24px"}}>
+        <div style={{...glassCardStyle,padding:viewport.isMobile?"24px 18px":"34px 30px"}}>
+          <SectionHeader eyebrow={eyebrow} title={title} intro={intro} viewport={viewport} />
 
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:12,marginBottom:24}}>
-            {summaryCards.map((label) => (
-              <div key={label} style={{padding:"14px 16px",borderRadius:18,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)"}}>
-                <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:"0.08em",fontWeight:800,color:"#93c5fd"}}>Tópico central</div>
-                <div style={{fontSize:15,fontWeight:800,color:"#f8fafc",marginTop:6,lineHeight:1.35}}>{label}</div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:26,flexDirection:viewport.isMobile?"column":"row"}}>
-            <button onClick={onEnter} style={{border:"none",borderRadius:999,padding:"14px 20px",cursor:"pointer",fontSize:14,fontWeight:800,background:"linear-gradient(135deg,#84cc16,#65a30d)",color:"#0f172a",width:viewport.isMobile?"100%":"auto"}}>Entrar</button>
-            <button onClick={onCreateAccount} style={{border:"1px solid rgba(255,255,255,0.09)",borderRadius:999,padding:"14px 20px",cursor:"pointer",fontSize:14,fontWeight:700,background:"rgba(255,255,255,0.03)",color:"#e2e8f0",width:viewport.isMobile?"100%":"auto"}}>Criar conta</button>
+          <div style={{display:"flex",gap:12,flexWrap:"wrap",margin:"26px 0 30px",flexDirection:viewport.isMobile?"column":"row"}}>
+            <MarketingButton onClick={onEnter} secondary style={{width:viewport.isMobile?"100%":"auto"}}>Entrar</MarketingButton>
+            <MarketingButton onClick={onCreateAccount} style={{width:viewport.isMobile?"100%":"auto"}}>Montar minha dieta</MarketingButton>
           </div>
 
           <div style={{display:"grid",gap:16}}>
             {sections.map((section) => (
-              <div key={section.title} style={{padding:"20px 20px 18px",borderRadius:22,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)"}}>
-                <div style={{fontSize:18,fontWeight:800,color:"#f8fafc"}}>{section.title}</div>
+              <div key={section.title} style={{...softGlassCardStyle,padding:"22px 20px"}}>
+                <div style={{fontSize:19,fontWeight:800,color:"#f5f7fa"}}>{section.title}</div>
                 {section.paragraphs.map((paragraph) => (
-                  <p key={paragraph} style={{fontSize:14,lineHeight:1.7,color:"#94a3b8",margin:"10px 0 0"}}>
-                    {paragraph}
-                  </p>
+                  <p key={paragraph} style={{fontSize:15,lineHeight:1.75,color:"#a7b0aa",margin:"10px 0 0"}}>{paragraph}</p>
                 ))}
               </div>
             ))}
@@ -3468,28 +3651,32 @@ function MethodologyPage(props) {
 }
 
 function PublicFooter({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
-  const linkStyle = {
-    background: "transparent",
-    border: "none",
-    color: "#94a3b8",
-    cursor: "pointer",
-    padding: 0,
-    fontSize: 13,
-  };
+  const linkStyle = { background:"transparent", border:"none", color:"#a7b0aa", cursor:"pointer", padding:0, fontSize:14, textAlign:"left" };
+  const columns = [
+    { title: "Produto", items: [{ label: "Como funciona", action: () => onNavigatePage("landing") }, { label: "Entrar", action: onEnter }, { label: "Montar minha dieta", action: onCreateAccount }] },
+    { title: "Recursos", items: [{ label: "Metodologia", action: () => onNavigatePage("methodology") }, { label: "Histórico", action: onEnter }, { label: "Relatórios", action: onEnter }] },
+    { title: "Institucional", items: [{ label: "Privacidade", action: () => onNavigatePage("privacy") }, { label: "Termos", action: () => onNavigatePage("terms") }, { label: "Blog", action: () => onNavigatePage("methodology") }] },
+    { title: "Dúvidas / WhatsApp", items: [{ label: "Falar com o time", action: onCreateAccount }, { label: "Ajuda", action: onEnter }, { label: "Suporte", action: onEnter }] },
+  ];
 
   return (
-    <footer style={{position:"relative",zIndex:2,padding:viewport.isMobile?"0 14px 22px":"0 24px 26px"}}>
-      <div style={{maxWidth:1180,margin:"0 auto",paddingTop:20,borderTop:"1px solid rgba(255,255,255,0.08)",display:"flex",justifyContent:"space-between",alignItems:viewport.isMobile?"flex-start":"center",gap:16,flexWrap:"wrap",flexDirection:viewport.isMobile?"column":"row"}}>
-        <div>
-          <div style={{fontSize:14,fontWeight:800}}>NutriCalc</div>
-          <div style={{fontSize:13,color:"#94a3b8",marginTop:6}}>Planejamento alimentar, relatórios e histórico pessoal em uma única conta.</div>
-        </div>
-        <div style={{display:"flex",alignItems:"center",gap:14,flexWrap:"wrap"}}>
-          <button onClick={() => onNavigatePage("privacy")} style={linkStyle}>Privacidade</button>
-          <button onClick={() => onNavigatePage("terms")} style={linkStyle}>Termos</button>
-          <button onClick={() => onNavigatePage("methodology")} style={linkStyle}>Metodologia</button>
-          <button onClick={onEnter} style={linkStyle}>Entrar</button>
-          <button onClick={onCreateAccount} style={{...linkStyle,color:"#d9f99d",fontWeight:700}}>Criar conta</button>
+    <footer style={{position:"relative",zIndex:2,padding:viewport.isMobile?"0 14px 26px":"0 24px 34px"}}>
+      <div style={{...marketingSectionWrap,padding:0}}>
+        <div style={{...glassCardStyle,padding:viewport.isMobile?"24px 18px":"30px 28px"}}>
+          <div style={{display:"grid",gridTemplateColumns:viewport.isTablet?"1fr":"1.15fr repeat(4, minmax(0, 1fr))",gap:22}}>
+            <div>
+              <div style={{fontFamily:"'Inter Tight','Inter','Segoe UI',sans-serif",fontSize:26,fontWeight:800,letterSpacing:"-0.05em",color:"#f5f7fa"}}>Nutri<span style={{color:"#7ed957"}}>Calc</span></div>
+              <div style={{fontSize:14,lineHeight:1.7,color:"#a7b0aa",marginTop:10,maxWidth:280}}>Planejamento alimentar, evolução corporal e experiência premium fitness em um só painel.</div>
+            </div>
+            {columns.map((column) => (
+              <div key={column.title}>
+                <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:800,color:"#7ed957",marginBottom:12}}>{column.title}</div>
+                <div style={{display:"grid",gap:10}}>
+                  {column.items.map((item) => <button key={item.label} onClick={item.action} style={linkStyle}>{item.label}</button>)}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </footer>
@@ -3585,14 +3772,14 @@ function AuthModal({
   }, []);
 
   return (
-    <div style={{...themeVars,minHeight:"100vh",background:"var(--app-bg)",color:"var(--app-text)",fontFamily:"'Outfit','Segoe UI',sans-serif",padding:authIsMobile?"14px 14px 18px":"32px 20px",display:"flex",alignItems:"center",justifyContent:"center"}}>
-      <div style={{width:"100%",maxWidth:460,borderRadius:24,background:"linear-gradient(180deg,rgba(15,23,42,0.98),rgba(10,14,26,0.98))",border:"1px solid rgba(132,204,22,0.18)",boxShadow:"0 32px 100px rgba(0,0,0,0.45)",padding:authIsMobile?"16px":"24px"}}>
+    <div style={{...themeVars,minHeight:"100vh",background:"var(--app-bg)",color:"var(--app-text)",fontFamily:"'Inter','Segoe UI',sans-serif",padding:authIsMobile?"14px 14px 18px":"32px 20px",display:"flex",alignItems:"center",justifyContent:"center"}}>
+      <div style={{width:"100%",maxWidth:460,borderRadius:28,background:"linear-gradient(180deg,rgba(16,24,32,0.98),rgba(14,21,18,0.98))",border:"1px solid rgba(126,217,87,0.18)",boxShadow:"0 32px 100px rgba(0,0,0,0.45)",padding:authIsMobile?"16px":"24px"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"start",gap:12,marginBottom:18}}>
           <div>
             <button onClick={onBackToLanding} style={{display:"inline-flex",alignItems:"center",gap:8,background:"transparent",border:"none",padding:0,cursor:"pointer",color:"#93c5fd",fontSize:12,fontWeight:700,marginBottom:12}}>
               ← Voltar para a apresentação
             </button>
-            <div style={{fontSize:authIsMobile?27:30,fontWeight:900,letterSpacing:"-0.04em"}}>Nutri<span style={{color:"#84cc16"}}>Calc</span></div>
+            <div style={{fontFamily:"'Inter Tight','Inter','Segoe UI',sans-serif",fontSize:authIsMobile?27:30,fontWeight:900,letterSpacing:"-0.05em"}}>Nutri<span style={{color:"#7ed957"}}>Calc</span></div>
             <div style={{fontSize:authIsMobile?17:20,fontWeight:700,letterSpacing:"-0.02em",marginTop:8,lineHeight:1.2}}>{authMode === "register" ? "Criar sua conta" : "Acesse sua conta"}</div>
             <div style={{fontSize:authIsMobile?12:13,color:"#94a3b8",marginTop:6,lineHeight:1.55}}>
               {authMode === "register" ? "Entre no sistema para salvar dietas, relatórios e evolução corporal." : "Faça login para continuar de onde parou e centralizar seu histórico."}
@@ -3700,7 +3887,7 @@ function AuthModal({
 
       {forgotPasswordOpen && authMode === "login" && (
         <div style={{position:"fixed",inset:0,background:"rgba(2,6,23,0.74)",display:"flex",alignItems:"center",justifyContent:"center",padding:authIsMobile?14:20,zIndex:30}}>
-          <div style={{width:"100%",maxWidth:430,borderRadius:24,background:"linear-gradient(180deg,rgba(15,23,42,0.98),rgba(10,14,26,0.98))",border:"1px solid rgba(132,204,22,0.18)",boxShadow:"0 32px 100px rgba(0,0,0,0.45)",padding:authIsMobile?"16px":"22px"}}>
+          <div style={{width:"100%",maxWidth:430,borderRadius:28,background:"linear-gradient(180deg,rgba(16,24,32,0.98),rgba(14,21,18,0.98))",border:"1px solid rgba(126,217,87,0.18)",boxShadow:"0 32px 100px rgba(0,0,0,0.45)",padding:authIsMobile?"16px":"22px"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"start",gap:12,marginBottom:16}}>
               <div>
                 <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#d9f99d"}}>Recuperação de acesso</div>
@@ -3836,7 +4023,7 @@ function ProfileModal({
   });
 
   return (
-    <div style={{...themeVars,minHeight:"100vh",background:"var(--app-bg)",color:"var(--app-text)",fontFamily:"'Outfit','Segoe UI',sans-serif"}}>
+    <div style={{...themeVars,minHeight:"100vh",background:"var(--app-bg)",color:"var(--app-text)",fontFamily:"'Inter','Segoe UI',sans-serif"}}>
       <div style={{maxWidth:1120,margin:"0 auto",padding:profileIsMobile ? "16px 14px 28px" : "24px 20px 40px"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"start",gap:12,marginBottom:18,position:"sticky",top:0,zIndex:5,padding:profileIsMobile ? "8px 0 12px" : "12px 0 18px",background:"linear-gradient(180deg,rgba(10,14,26,0.98) 0%,rgba(10,14,26,0.9) 72%,rgba(10,14,26,0) 100%)",flexDirection:profileIsMobile ? "column" : "row"}}>
           <div>
@@ -4763,7 +4950,7 @@ function CustomSelect({ value, onChange, options, placeholder = "Selecione" }) {
                   color: selected ? "#f8fafc" : "#dbe4f0",
                   textAlign: "left",
                   fontSize: 15,
-                  fontFamily: "'Outfit','Segoe UI',sans-serif",
+                  fontFamily: "'Inter','Segoe UI',sans-serif",
                   fontWeight: 400,
                   cursor: "pointer",
                 }}
@@ -4780,12 +4967,12 @@ function CustomSelect({ value, onChange, options, placeholder = "Selecione" }) {
 
 function FG({label,value,onChange,type,placeholder}){return(<div><label style={lS}>{label}</label><input type={type||"number"} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} style={iS}/></div>);}
 function NB({onClick,disabled,label}){return(<button onClick={onClick} disabled={disabled} style={{...nBS,opacity:disabled?0.4:1,pointerEvents:disabled?"none":"auto"}}>{label||"Próximo"} →</button>);}
-function BB({onClick}){return(<button onClick={onClick} style={{padding:"14px 24px",borderRadius:10,fontSize:15,fontWeight:600,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",color:"#94a3b8",cursor:"pointer",outline:"none"}}>← Voltar</button>);}
+function BB({onClick}){return(<button onClick={onClick} style={{padding:"14px 24px",borderRadius:18,fontSize:15,fontWeight:600,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",color:"#a7b0aa",cursor:"pointer",outline:"none",backdropFilter:"blur(10px)"}}>← Voltar</button>);}
 
-const h1S={fontSize:28,fontWeight:800,marginBottom:4,letterSpacing:"-0.03em"};
-const dS={color:"#94a3b8",marginBottom:32,fontSize:15};
-const lS={display:"block",fontSize:12,fontWeight:600,color:"#64748b",marginBottom:8,letterSpacing:"0.05em",textTransform:"uppercase"};
-const iS={width:"100%",padding:"12px 16px",borderRadius:10,fontSize:16,fontWeight:400,background:"var(--field-bg)",border:"1px solid var(--field-border)",color:"var(--field-fg)",outline:"none",fontFamily:"'Outfit','Segoe UI',sans-serif",boxSizing:"border-box",appearance:"none",WebkitAppearance:"none",MozAppearance:"none"};
-const pB={padding:"10px 16px",borderRadius:10,fontSize:14,border:"1px solid var(--btn-border)",cursor:"pointer",outline:"none",transition:"all 0.15s",background:"var(--btn-bg)",color:"var(--btn-fg)"};
-const nBS={flex:1,padding:"14px 24px",borderRadius:10,fontSize:15,fontWeight:700,background:"var(--btn-primary-bg)",border:"none",color:"var(--btn-primary-fg)",cursor:"pointer",outline:"none",letterSpacing:"-0.01em"};
+const h1S={fontFamily:"'Inter Tight','Inter','Segoe UI',sans-serif",fontSize:28,fontWeight:800,marginBottom:4,letterSpacing:"-0.04em"};
+const dS={color:"#a7b0aa",marginBottom:32,fontSize:15};
+const lS={display:"block",fontSize:12,fontWeight:700,color:"#8f9a93",marginBottom:8,letterSpacing:"0.08em",textTransform:"uppercase"};
+const iS={width:"100%",padding:"14px 16px",borderRadius:18,fontSize:16,fontWeight:400,background:"var(--field-bg)",border:"1px solid var(--field-border)",color:"var(--field-fg)",outline:"none",fontFamily:"'Inter','Segoe UI',sans-serif",boxSizing:"border-box",appearance:"none",WebkitAppearance:"none",MozAppearance:"none",backdropFilter:"blur(10px)",boxShadow:"inset 0 1px 0 rgba(255,255,255,0.02)"};
+const pB={padding:"12px 16px",borderRadius:18,fontSize:14,border:"1px solid var(--btn-border)",cursor:"pointer",outline:"none",transition:"all 0.15s",background:"var(--btn-bg)",color:"var(--btn-fg)",backdropFilter:"blur(10px)"};
+const nBS={flex:1,padding:"15px 24px",borderRadius:18,fontSize:15,fontWeight:800,background:"var(--btn-primary-bg)",border:"1px solid rgba(126,217,87,0.44)",color:"var(--btn-primary-fg)",cursor:"pointer",outline:"none",letterSpacing:"-0.02em",boxShadow:"0 18px 38px rgba(109,255,47,0.18)"};
 const tS={padding:"10px 8px",fontSize:11,fontWeight:600,letterSpacing:"0.05em",textTransform:"uppercase",textAlign:"center"};
