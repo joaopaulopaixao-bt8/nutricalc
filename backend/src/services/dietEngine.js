@@ -14,9 +14,10 @@ const PRIMARY_PROTEIN_SHARE = {
 const FOOD_LIMITS_BY_NAME = {
   "Leite desnatado": { min: 100, max: 400, step: 50 },
   "Ovo inteiro cozido": { min: 50, max: 200, step: 50 },
+  "Ovos mexidos": { min: 50, max: 250, step: 25 },
   "Clara de ovo": { min: 33, max: 200, step: 33 },
   "Gema de ovo": { min: 17, max: 68, step: 17 },
-  "Whey protein (30g)": { min: 30, max: 60, step: 30 },
+  "Whey protein concentrado Growth (30g)": { min: 30, max: 60, step: 30 },
   "Caseina (30g)": { min: 30, max: 60, step: 30 },
   "Pao frances": { min: 50, max: 150, step: 50 },
 };
@@ -83,10 +84,11 @@ const MEAL_RULES = {
 
 const UNIT_PORTIONS = {
   "Ovo inteiro cozido": 50,
+  "Ovos mexidos": 50,
   "Clara de ovo": 33,
   "Gema de ovo": 17,
   "Pao frances": 50,
-  "Whey protein (30g)": 30,
+  "Whey protein concentrado Growth (30g)": 30,
   "Caseina (30g)": 30,
 };
 

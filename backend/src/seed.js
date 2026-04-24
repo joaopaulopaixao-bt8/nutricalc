@@ -26,7 +26,7 @@ const foods = [
   { id:"p21", name:"Queijo minas frescal", category:"protein", kcal:264, prot:17.4, carb:3.2, fat:20.2, mealTypes:["cafe","lanche"], subGroup:"queijo" },
   { id:"p22", name:"Iogurte natural desnatado", category:"protein", kcal:42, prot:4.1, carb:5.6, fat:0.3, mealTypes:["cafe","lanche"], subGroup:"laticinio" },
   { id:"p23", name:"Ricota fresca", category:"protein", kcal:140, prot:12.6, carb:3.5, fat:8.1, mealTypes:["cafe","lanche"], subGroup:"queijo_magro" },
-  { id:"p24", name:"Whey protein (30g)", category:"protein", kcal:120, prot:24, carb:3, fat:1.5, mealTypes:["lanche","cafe"], subGroup:"suplemento" },
+  { id:"p24", name:"Whey protein concentrado Growth (30g)", category:"protein", kcal:123, prot:23, carb:3.3, fat:2, mealTypes:["lanche","cafe"], subGroup:"suplemento" },
   { id:"p25", name:"Carne seca desfiada", category:"protein", kcal:230, prot:33.8, carb:0, fat:10.5, mealTypes:["principal"], subGroup:"bovina" },
   { id:"p26", name:"Frango desfiado", category:"protein", kcal:163, prot:31.5, carb:0, fat:3.8, mealTypes:["principal"], subGroup:"ave_magra" },
   { id:"p27", name:"Sobrecoxa s/ pele", category:"protein", kcal:183, prot:24.2, carb:0, fat:9.5, mealTypes:["principal"], subGroup:"ave" },
@@ -83,6 +83,7 @@ const foods = [
   { id:"p78", name:"Isca de frango grelhada", category:"protein", kcal:160, prot:31, carb:0, fat:3.7, mealTypes:["principal","lanche"], subGroup:"ave_magra" },
   { id:"p79", name:"Carne moída 80/20", category:"protein", kcal:254, prot:25.5, carb:0, fat:17, mealTypes:["principal"], subGroup:"bovina" },
   { id:"p80", name:"Hambúrguer bovino artesanal", category:"protein", kcal:260, prot:24, carb:0, fat:18, mealTypes:["principal","lanche"], subGroup:"bovina" },
+  { id:"p81", name:"Ovos mexidos", category:"protein", kcal:149, prot:10.4, carb:1.6, fat:10.8, mealTypes:["cafe","lanche","principal"], subGroup:"ovo" },
 
   // === CARBS ===
   { id:"c1", name:"Arroz branco cozido", category:"carb", kcal:128, prot:2.5, carb:28.1, fat:0.2, mealTypes:["principal"], subGroup:"arroz" },

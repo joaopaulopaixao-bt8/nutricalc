@@ -57,7 +57,7 @@ const TACO = {
     { id:"p21", name:"Queijo minas frescal", kcal:264, prot:17.4, carb:3.2, fat:20.2, mt:["cafe","lanche"], sg:"queijo" },
     { id:"p22", name:"Iogurte natural desnatado", kcal:42, prot:4.1, carb:5.6, fat:0.3, mt:["cafe","lanche"], sg:"laticinio" },
     { id:"p23", name:"Ricota fresca", kcal:140, prot:12.6, carb:3.5, fat:8.1, mt:["cafe","lanche"], sg:"queijo_magro" },
-    { id:"p24", name:"Whey protein (30g)", kcal:123, prot:23, carb:3.3, fat:2, mt:["lanche","cafe"], sg:"suplemento" },
+    { id:"p24", name:"Whey protein concentrado Growth (30g)", kcal:123, prot:23, carb:3.3, fat:2, mt:["lanche","cafe"], sg:"suplemento" },
     { id:"p25", name:"Carne seca desfiada", kcal:230, prot:33.8, carb:0, fat:10.5, mt:["principal"], sg:"bovina" },
     { id:"p26", name:"Frango desfiado", kcal:163, prot:31.5, carb:0, fat:3.8, mt:["principal"], sg:"ave_magra" },
     { id:"p27", name:"Sobrecoxa s/ pele", kcal:183, prot:24.2, carb:0, fat:9.5, mt:["principal"], sg:"ave" },
@@ -238,7 +238,7 @@ const DEFAULT_GENERATION_CONFIG = {
     "Ovos mexidos": { min: 50, max: 250, step: 25 },
     "Clara de ovo": { min: 33, max: 200, step: 33 },
     "Gema de ovo": { min: 17, max: 68, step: 17 },
-    "Whey protein (30g)": { min: 30, max: 60, step: 30 },
+    "Whey protein concentrado Growth (30g)": { min: 30, max: 60, step: 30 },
     "Caseína (30g)": { min: 30, max: 60, step: 30 },
     "Pão francês": { min: 50, max: 150, step: 50 },
   },
@@ -2576,7 +2576,7 @@ export default function NutriCalc() {
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
                   <ConfigField label="Leite máx. por refeição (ml)" value={generationConfig.foodLimitsByName?.["Leite desnatado"]?.max || 0} onChange={(value) => updateFoodLimit("Leite desnatado", "max", value)} />
                   <ConfigField label="Ovos máx. por refeição (g)" value={generationConfig.foodLimitsByName?.["Ovo inteiro cozido"]?.max || 0} onChange={(value) => updateFoodLimit("Ovo inteiro cozido", "max", value)} />
-                  <ConfigField label="Whey máx. por refeição (g)" value={generationConfig.foodLimitsByName?.["Whey protein (30g)"]?.max || 0} onChange={(value) => updateFoodLimit("Whey protein (30g)", "max", value)} />
+                  <ConfigField label="Whey máx. por refeição (g)" value={generationConfig.foodLimitsByName?.["Whey protein concentrado Growth (30g)"]?.max || 0} onChange={(value) => updateFoodLimit("Whey protein concentrado Growth (30g)", "max", value)} />
                   <ConfigField label="Caseína máx. por refeição (g)" value={generationConfig.foodLimitsByName?.["Caseína (30g)"]?.max || generationConfig.foodLimitsByName?.["Caseina (30g)"]?.max || 0} onChange={(value) => updateFoodLimit("Caseína (30g)", "max", value)} />
                   <ConfigField label="Carnes mín. refeição (g)" value={generationConfig.subgroupLimits?.ave_magra?.min || 0} onChange={(value) => updateSubgroupLimit("ave_magra", "min", value)} />
                   <ConfigField label="Carnes máx. refeição (g)" value={generationConfig.subgroupLimits?.ave_magra?.max || 0} onChange={(value) => updateSubgroupLimit("ave_magra", "max", value)} />
