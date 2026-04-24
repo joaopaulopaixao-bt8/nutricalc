@@ -67,6 +67,7 @@ Este bloco é o ponto de partida para as próximas atualizações.
 - Sprint 3 executada: alimentos, receitas e configuração do gerador passaram para carregamento sob demanda, disparando apenas ao abrir a etapa de montagem ou a engrenagem de configuração
 - Sprint 4 executada: separadas em módulos a navegação pública e a lógica de decisão entre experiência pública, perfil e app autenticado, reduzindo acoplamento do `NutriCalc.jsx`
 - Sprint 5 executada: home pública reescrita com foco mais comercial, menos texto institucional e comunicação mais orientada a benefício, meta, progresso e conversão
+- Sprint 6 executada: home pública recebeu imagens reais e blocos visuais para reforçar apelo comercial, produto e rotina alimentar logo na primeira dobra
 
 ## Como retomar o desenvolvimento
 
