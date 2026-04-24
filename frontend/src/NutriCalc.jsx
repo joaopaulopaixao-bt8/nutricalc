@@ -3074,6 +3074,10 @@ function MarketingButton({ children, onClick, secondary = false, subtle = false,
         fontSize: 15,
         fontWeight: 800,
         letterSpacing: "-0.01em",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 10,
         ...base,
         ...style,
       }}
@@ -3093,10 +3097,13 @@ function SectionHeader({ eyebrow, title, intro, centered = false, viewport }) {
   );
 }
 
-function MetricCard({ value, label }) {
+function MetricCard({ value, label, icon }) {
   return (
-    <div style={{...softGlassCardStyle,padding:"20px 18px"}}>
-      <div style={{fontFamily:"'Inter Tight','Inter','Segoe UI',sans-serif",fontSize:28,fontWeight:800,letterSpacing:"-0.03em",color:"#f5f7fa"}}>{value}</div>
+    <div style={{...softGlassCardStyle,padding:"20px 18px",minHeight:120}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"start",gap:12}}>
+        <div style={{fontFamily:"'Inter Tight','Inter','Segoe UI',sans-serif",fontSize:28,fontWeight:800,letterSpacing:"-0.03em",color:"#f5f7fa"}}>{value}</div>
+        {icon ? <div style={{width:38,height:38,borderRadius:14,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(109,255,47,0.1)",border:"1px solid rgba(109,255,47,0.16)",color:"#7ed957",fontSize:18}}>{icon}</div> : null}
+      </div>
       <div style={{fontSize:14,lineHeight:1.5,color:"#a7b0aa",marginTop:8}}>{label}</div>
     </div>
   );
@@ -3104,7 +3111,7 @@ function MetricCard({ value, label }) {
 
 function FeatureCard({ icon, title, description }) {
   return (
-    <div style={{...softGlassCardStyle,padding:"22px 20px"}}>
+    <div style={{...softGlassCardStyle,padding:"22px 20px",minHeight:220}}>
       <div style={{width:46,height:46,borderRadius:14,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,background:"rgba(109,255,47,0.12)",border:"1px solid rgba(109,255,47,0.18)"}}>{icon}</div>
       <div style={{fontSize:18,fontWeight:800,color:"#f5f7fa",marginTop:18}}>{title}</div>
       <div style={{fontSize:14,lineHeight:1.65,color:"#a7b0aa",marginTop:8}}>{description}</div>
@@ -3114,7 +3121,7 @@ function FeatureCard({ icon, title, description }) {
 
 function StepCard({ step, title, description }) {
   return (
-    <div style={{...softGlassCardStyle,padding:"22px 20px"}}>
+    <div style={{...softGlassCardStyle,padding:"22px 20px",minHeight:210,position:"relative"}}>
       <div style={{width:42,height:42,borderRadius:14,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(109,255,47,0.12)",border:"1px solid rgba(109,255,47,0.18)",fontWeight:800,color:"#7ed957"}}>{step}</div>
       <div style={{fontSize:18,fontWeight:800,color:"#f5f7fa",marginTop:18,lineHeight:1.25,letterSpacing:"-0.02em"}}>{title}</div>
       <div style={{fontSize:14,lineHeight:1.65,color:"#a7b0aa",marginTop:8}}>{description}</div>
@@ -3325,12 +3332,16 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
         </div>
       </section>
 
-      <section style={{padding:"8px 0 16px"}}>
-        <div style={{...marketingSectionWrap,padding:viewport.isMobile?"0 14px":"0 24px",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:14}}>
-          <MetricCard value="+50.000" label="usuários ativos" />
-          <MetricCard value="+250.000" label="dietas geradas" />
-          <MetricCard value="+1,2 milhão" label="refeições planejadas" />
-          <MetricCard value="4,9/5" label="avaliação dos usuários" />
+      <section style={{padding:"8px 0 18px"}}>
+        <div style={{...marketingSectionWrap,padding:viewport.isMobile?"0 14px":"0 24px"}}>
+          <div style={{...glassCardStyle,padding:viewport.isMobile?"14px":"14px",borderRadius:26}}>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:14}}>
+              <MetricCard value="+50.000" label="usuários ativos" icon="◎" />
+              <MetricCard value="+250.000" label="dietas geradas" icon="□" />
+              <MetricCard value="+1,2 milhão" label="refeições planejadas" icon="↗" />
+              <MetricCard value="4,9/5" label="avaliação dos usuários" icon="★" />
+            </div>
+          </div>
         </div>
       </section>
 
@@ -3419,11 +3430,14 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
       <section id="como-funciona" style={{padding:viewport.isMobile?"10px 0 34px":"10px 0 56px"}}>
         <div style={{...marketingSectionWrap,padding:viewport.isMobile?"0 14px":"0 24px"}}>
           <SectionHeader eyebrow="Como funciona" title="Em 4 passos simples" intro="Tudo pensado para você sair da intenção e entrar em uma rotina mais organizada." centered viewport={viewport} />
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16,marginTop:28}}>
-            <StepCard step="1" title="Crie sua conta" description="Abra seu espaço, salve seus dados e comece com base para evoluir." />
-            <StepCard step="2" title="Responda algumas perguntas" description="Meta, rotina, atividade e preferências deixam o plano mais preciso." />
-            <StepCard step="3" title="Receba seu plano" description="Monte sua dieta com visual claro, metas e distribuição das refeições." />
-            <StepCard step="4" title="Acompanhe e evolua" description="Use histórico, relatórios e evolução corporal para manter consistência." />
+          <div style={{position:"relative",marginTop:28}}>
+            {!viewport.isTablet ? <div style={{position:"absolute",left:"12%",right:"12%",top:22,height:1,background:"linear-gradient(90deg, rgba(109,255,47,0.08), rgba(109,255,47,0.35), rgba(109,255,47,0.08))"}} /> : null}
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16,position:"relative"}}>
+              <StepCard step="1" title="Crie sua conta" description="Abra seu espaço, salve seus dados e comece com base para evoluir." />
+              <StepCard step="2" title="Responda algumas perguntas" description="Meta, rotina, atividade e preferências deixam o plano mais preciso." />
+              <StepCard step="3" title="Receba seu plano" description="Monte sua dieta com visual claro, metas e distribuição das refeições." />
+              <StepCard step="4" title="Acompanhe e evolua" description="Use histórico, relatórios e evolução corporal para manter consistência." />
+            </div>
           </div>
         </div>
       </section>
@@ -3474,13 +3488,15 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
 
       <section id="cta-final" style={{padding:viewport.isMobile?"12px 0 40px":"12px 0 60px"}}>
         <div style={{...marketingSectionWrap,padding:viewport.isMobile?"0 14px":"0 24px"}}>
-          <div style={{...glassCardStyle,padding:viewport.isMobile?"24px 18px":"34px 30px",textAlign:"center"}}>
-            <SectionHeader eyebrow="Seu próximo passo" title="Sua melhor versão começa agora." intro="Monte seu plano alimentar personalizado e dê o próximo passo rumo aos seus objetivos." centered viewport={viewport} />
-            <div style={{display:"flex",justifyContent:"center",gap:12,marginTop:26,flexDirection:viewport.isMobile?"column":"row"}}>
+          <div style={{...glassCardStyle,padding:viewport.isMobile?"24px 18px":"34px 30px",display:"grid",gridTemplateColumns:viewport.isTablet?"1fr":"minmax(0,1fr) auto",gap:24,alignItems:"center"}}>
+            <div>
+              <SectionHeader eyebrow="Seu próximo passo" title="Sua melhor versão começa agora." intro="Monte seu plano alimentar personalizado e dê o próximo passo rumo aos seus objetivos." viewport={viewport} />
+            </div>
+            <div style={{display:"grid",gap:12,justifyItems:viewport.isTablet?"stretch":"end"}}>
               <MarketingButton onClick={onCreateAccount} style={{width:viewport.isMobile?"100%":"auto"}}>Montar minha dieta agora</MarketingButton>
               <MarketingButton onClick={onEnter} secondary style={{width:viewport.isMobile?"100%":"auto"}}>Entrar</MarketingButton>
+              <div style={{fontSize:13,color:"#a7b0aa",textAlign:viewport.isTablet?"left":"right"}}>Comece grátis. Cancele quando quiser.</div>
             </div>
-            <div style={{fontSize:13,color:"#a7b0aa",marginTop:14}}>Comece grátis. Cancele quando quiser.</div>
           </div>
         </div>
       </section>
