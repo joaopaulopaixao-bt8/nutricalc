@@ -3267,7 +3267,7 @@ function PublicHeader({ currentPage, onCreateAccount, onEnter, onNavigatePage, v
 }
 
 function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
-  const heroImage = "/marketing/hero-reference-crop.png";
+  const heroImage = "/marketing/hero-human-only.png";
   const mealImage = "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1600";
   const [simulator, setSimulator] = useState({ weight: "80", height: "178", age: "30", objective: "cutting", activity: "1.55" });
 
@@ -3322,12 +3322,8 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
 
           <div style={{...glassCardStyle,padding:viewport.isMobile?"14px":"18px",overflow:"hidden"}}>
             <div style={{position:"relative",borderRadius:28,overflow:"hidden",minHeight:viewport.isMobile?360:620,background:"#050a08"}}>
-              <img src={heroImage} alt="Mulher fitness preparando refeição com painel nutricional ao lado" loading="eager" style={{width:"100%",height:"100%",objectFit:"cover",objectPosition:"center top",display:"block"}} />
-              <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg, rgba(5,10,8,0.02), rgba(5,10,8,0.32))"}} />
-              <div style={{position:"absolute",left:18,bottom:18,padding:"12px 14px",borderRadius:18,background:"rgba(7,11,15,0.72)",border:"1px solid rgba(255,255,255,0.08)",backdropFilter:"blur(12px)",maxWidth:240}}>
-                <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:800,color:"#7ed957"}}>Rotina com foco</div>
-                <div style={{fontSize:15,lineHeight:1.45,fontWeight:700,color:"#f5f7fa",marginTop:6}}>Planeje suas refeições, acompanhe metas e mantenha constância no dia a dia.</div>
-              </div>
+              <img src={heroImage} alt="Mulher fitness preparando refeição saudável" loading="eager" style={{width:"100%",height:"100%",objectFit:"cover",objectPosition:"center top",display:"block"}} />
+              <div style={{position:"absolute",inset:0,background:"radial-gradient(circle at 80% 20%, rgba(109,255,47,0.08), transparent 24%), linear-gradient(180deg, rgba(5,10,8,0.04), rgba(5,10,8,0.22))"}} />
             </div>
           </div>
         </div>
