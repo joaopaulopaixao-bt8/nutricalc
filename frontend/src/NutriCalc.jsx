@@ -3087,7 +3087,7 @@ function SectionHeader({ eyebrow, title, intro, centered = false, viewport }) {
   return (
     <div style={{maxWidth:centered?760:720,margin:centered?"0 auto":"0",textAlign:centered?"center":"left"}}>
       <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.16em",fontWeight:800,color:"#7ed957"}}>{eyebrow}</div>
-      <h2 style={{fontFamily:"'Inter Tight','Inter','Segoe UI',sans-serif",fontSize:viewport.isMobile?"clamp(28px,8vw,36px)":"clamp(36px,5vw,52px)",lineHeight:1,letterSpacing:"-0.05em",margin:"14px 0 12px",color:"#f5f7fa"}}>{title}</h2>
+      <h2 style={{fontFamily:"'Inter Tight','Inter','Segoe UI',sans-serif",fontSize:viewport.isMobile?"clamp(28px,8vw,36px)":"clamp(36px,5vw,52px)",lineHeight:1.06,letterSpacing:"-0.03em",margin:"14px 0 12px",color:"#f5f7fa",textWrap:"balance"}}>{title}</h2>
       {intro ? <p style={{fontSize:viewport.isMobile?15:17,lineHeight:1.7,color:"#a7b0aa",margin:0}}>{intro}</p> : null}
     </div>
   );
@@ -3096,7 +3096,7 @@ function SectionHeader({ eyebrow, title, intro, centered = false, viewport }) {
 function MetricCard({ value, label }) {
   return (
     <div style={{...softGlassCardStyle,padding:"20px 18px"}}>
-      <div style={{fontFamily:"'Inter Tight','Inter','Segoe UI',sans-serif",fontSize:28,fontWeight:800,letterSpacing:"-0.05em",color:"#f5f7fa"}}>{value}</div>
+      <div style={{fontFamily:"'Inter Tight','Inter','Segoe UI',sans-serif",fontSize:28,fontWeight:800,letterSpacing:"-0.03em",color:"#f5f7fa"}}>{value}</div>
       <div style={{fontSize:14,lineHeight:1.5,color:"#a7b0aa",marginTop:8}}>{label}</div>
     </div>
   );
@@ -3116,7 +3116,7 @@ function StepCard({ step, title, description }) {
   return (
     <div style={{...softGlassCardStyle,padding:"22px 20px"}}>
       <div style={{width:42,height:42,borderRadius:14,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(109,255,47,0.12)",border:"1px solid rgba(109,255,47,0.18)",fontWeight:800,color:"#7ed957"}}>{step}</div>
-      <div style={{fontSize:18,fontWeight:800,color:"#f5f7fa",marginTop:18}}>{title}</div>
+      <div style={{fontSize:18,fontWeight:800,color:"#f5f7fa",marginTop:18,lineHeight:1.25,letterSpacing:"-0.02em"}}>{title}</div>
       <div style={{fontSize:14,lineHeight:1.65,color:"#a7b0aa",marginTop:8}}>{description}</div>
     </div>
   );
@@ -3124,15 +3124,16 @@ function StepCard({ step, title, description }) {
 
 function TestimonialCard({ image, quote, name, result }) {
   return (
-    <div style={{...softGlassCardStyle,overflow:"hidden"}}>
-      <div style={{height:220,position:"relative"}}>
+    <div style={{...softGlassCardStyle,padding:"10px",display:"grid",gridTemplateColumns:"minmax(120px, 160px) 1fr",gap:14,alignItems:"stretch"}}>
+      <div style={{borderRadius:18,overflow:"hidden",minHeight:164,background:"#0b100f"}}>
         <img src={image} alt={name} loading="lazy" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} />
-        <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg, rgba(7,11,15,0.04), rgba(7,11,15,0.68))"}} />
-        <div style={{position:"absolute",left:16,bottom:16,padding:"8px 12px",borderRadius:999,background:"rgba(109,255,47,0.14)",border:"1px solid rgba(109,255,47,0.2)",fontWeight:800,color:"#7ed957"}}>{result}</div>
       </div>
-      <div style={{padding:"20px 18px 22px"}}>
-        <div style={{fontSize:15,lineHeight:1.7,color:"#d7ddd9"}}>{quote}</div>
-        <div style={{fontSize:14,fontWeight:700,color:"#f5f7fa",marginTop:14}}>{name}</div>
+      <div style={{display:"grid",alignContent:"space-between",gap:12,padding:"10px 6px 10px 0"}}>
+        <div style={{fontSize:15,lineHeight:1.72,color:"#d7ddd9"}}>{quote}</div>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"end",gap:14,flexWrap:"wrap"}}>
+          <div style={{fontSize:14,fontWeight:700,color:"#f5f7fa"}}>{name}</div>
+          <div style={{fontSize:32,fontWeight:800,color:"#7ed957",letterSpacing:"-0.03em",lineHeight:1}}>{result}</div>
+        </div>
       </div>
     </div>
   );
@@ -3259,9 +3260,8 @@ function PublicHeader({ currentPage, onCreateAccount, onEnter, onNavigatePage, v
 }
 
 function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
-  const heroImage = "https://images.pexels.com/photos/1640774/pexels-photo-1640774.jpeg?auto=compress&cs=tinysrgb&w=1600";
+  const heroImage = "/marketing/hero-reference-crop.png";
   const mealImage = "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1600";
-  const athleteImage = "https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg?auto=compress&cs=tinysrgb&w=1600";
   const [simulator, setSimulator] = useState({ weight: "80", height: "178", age: "30", objective: "cutting" });
 
   const simulatorResult = useMemo(() => {
@@ -3288,7 +3288,7 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
         <div style={{...marketingSectionWrap,padding:viewport.isMobile?"0 14px":"0 24px",display:"grid",gridTemplateColumns:viewport.isTablet?"1fr":"minmax(0,1.02fr) minmax(420px,0.98fr)",gap:viewport.isMobile?18:28,alignItems:"center"}}>
           <div>
             <div style={{display:"inline-flex",alignItems:"center",gap:10,padding:"9px 14px",borderRadius:999,background:"rgba(109,255,47,0.1)",border:"1px solid rgba(109,255,47,0.18)",fontSize:12,fontWeight:800,letterSpacing:"0.12em",textTransform:"uppercase",color:"#7ed957"}}>Health tech premium para sua rotina</div>
-            <h1 style={{fontFamily:"'Inter Tight','Inter','Segoe UI',sans-serif",fontSize:viewport.isMobile?"clamp(42px,14vw,64px)":"clamp(64px,8vw,104px)",lineHeight:0.94,letterSpacing:"-0.08em",margin:"18px 0 14px",maxWidth:760}}>
+            <h1 style={{fontFamily:"'Inter Tight','Inter','Segoe UI',sans-serif",fontSize:viewport.isMobile?"clamp(42px,14vw,64px)":"clamp(64px,8vw,104px)",lineHeight:1.01,letterSpacing:"-0.04em",margin:"18px 0 16px",maxWidth:760,textWrap:"balance"}}>
               Sua dieta.<br />Seu controle.<br /><span style={{color:"#7ed957"}}>Seu resultado.</span>
             </h1>
             <p style={{fontSize:viewport.isMobile?16:18,lineHeight:1.75,color:"#a7b0aa",maxWidth:620,margin:0}}>
@@ -3313,23 +3313,12 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
           </div>
 
           <div style={{...glassCardStyle,padding:viewport.isMobile?"14px":"18px",overflow:"hidden"}}>
-            <div style={{position:"relative",borderRadius:24,overflow:"hidden",minHeight:viewport.isMobile?360:620}}>
-              <img src={heroImage} alt="Pessoa em rotina fitness com refeição saudável e celular" loading="eager" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} />
-              <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg, rgba(5,10,8,0.12), rgba(5,10,8,0.75))"}} />
-              <div style={{position:"absolute",left:18,right:18,top:18,display:"grid",gap:12}}>
-                <NutritionPreviewCard />
-                <div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(0,1fr))",gap:12}}>
-                  <div style={{...softGlassCardStyle,padding:"16px",borderRadius:20}}>
-                    <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:800,color:"#7ed957"}}>Próxima refeição</div>
-                    <div style={{fontSize:18,fontWeight:800,color:"#f5f7fa",marginTop:6}}>Frango, arroz e legumes</div>
-                    <div style={{fontSize:13,color:"#a7b0aa",marginTop:6}}>13:00 • 32g proteína</div>
-                  </div>
-                  <div style={{...softGlassCardStyle,padding:"16px",borderRadius:20}}>
-                    <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:800,color:"#7ed957"}}>Resumo semanal</div>
-                    <div style={{fontSize:18,fontWeight:800,color:"#f5f7fa",marginTop:6}}>5 dias em sequência</div>
-                    <div style={{fontSize:13,color:"#a7b0aa",marginTop:6}}>Mais constância, menos improviso</div>
-                  </div>
-                </div>
+            <div style={{position:"relative",borderRadius:28,overflow:"hidden",minHeight:viewport.isMobile?360:620,background:"#050a08"}}>
+              <img src={heroImage} alt="Mulher fitness preparando refeição com painel nutricional ao lado" loading="eager" style={{width:"100%",height:"100%",objectFit:"cover",objectPosition:"center top",display:"block"}} />
+              <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg, rgba(5,10,8,0.02), rgba(5,10,8,0.32))"}} />
+              <div style={{position:"absolute",left:18,bottom:18,padding:"12px 14px",borderRadius:18,background:"rgba(7,11,15,0.72)",border:"1px solid rgba(255,255,255,0.08)",backdropFilter:"blur(12px)",maxWidth:220}}>
+                <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:800,color:"#7ed957"}}>Visual premium</div>
+                <div style={{fontSize:15,lineHeight:1.45,fontWeight:700,color:"#f5f7fa",marginTop:6}}>Hero mais humano, mais aspiracional e mais próximo da referência.</div>
               </div>
             </div>
           </div>
@@ -3430,7 +3419,7 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
       <section id="como-funciona" style={{padding:viewport.isMobile?"10px 0 34px":"10px 0 56px"}}>
         <div style={{...marketingSectionWrap,padding:viewport.isMobile?"0 14px":"0 24px"}}>
           <SectionHeader eyebrow="Como funciona" title="Em 4 passos simples" intro="Tudo pensado para você sair da intenção e entrar em uma rotina mais organizada." centered viewport={viewport} />
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16,marginTop:24}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16,marginTop:28}}>
             <StepCard step="1" title="Crie sua conta" description="Abra seu espaço, salve seus dados e comece com base para evoluir." />
             <StepCard step="2" title="Responda algumas perguntas" description="Meta, rotina, atividade e preferências deixam o plano mais preciso." />
             <StepCard step="3" title="Receba seu plano" description="Monte sua dieta com visual claro, metas e distribuição das refeições." />
@@ -3443,9 +3432,9 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
         <div style={{...marketingSectionWrap,padding:viewport.isMobile?"0 14px":"0 24px"}}>
           <SectionHeader eyebrow="Resultados reais" title="Histórias de quem transformou a sua rotina" intro="Exemplos visuais de progresso construído com disciplina, clareza e constância." centered viewport={viewport} />
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:16,marginTop:24}}>
-            <TestimonialCard image="https://images.pexels.com/photos/6550826/pexels-photo-6550826.jpeg?auto=compress&cs=tinysrgb&w=1200" quote="Saí do improviso e finalmente consegui seguir uma rotina alimentar sem me perder no meio da semana." name="Marina A." result="-8 kg" />
-            <TestimonialCard image={athleteImage} quote="Ter plano, evolução e histórico no mesmo lugar mudou minha consistência e minha visão do processo." name="Lucas R." result="-5 kg" />
-            <TestimonialCard image="https://images.pexels.com/photos/4720236/pexels-photo-4720236.jpeg?auto=compress&cs=tinysrgb&w=1200" quote="Ficou muito mais fácil ajustar objetivo e revisar o que eu já vinha fazendo, sem recomeçar do zero." name="Fernanda C." result="-11 kg" />
+            <TestimonialCard image="/marketing/testimonial-1.png" quote="Perdi 7 kg em 10 semanas seguindo o plano. A organização das refeições fez toda a diferença." name="Carlos D." result="-7kg" />
+            <TestimonialCard image="/marketing/testimonial-2.png" quote="Mais definição, mais energia e sem abrir mão do que eu gosto de comer. Simplesmente incrível." name="Juliana M." result="-4kg" />
+            <TestimonialCard image="/marketing/testimonial-3.png" quote="O acompanhamento e os ajustes semanais me mantiveram sempre no caminho certo." name="Rafael T." result="-9kg" />
           </div>
         </div>
       </section>
