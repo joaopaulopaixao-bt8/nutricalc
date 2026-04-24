@@ -3820,14 +3820,14 @@ function ProfileModal({
   const toggleProfileSection = (section) => {
     setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
   };
-  const sectionToggleStyle = {
+  const getSectionToggleStyle = (expanded) => ({
     ...pB,
     padding: "8px 12px",
     fontSize: 12,
-    borderColor: "rgba(255,255,255,0.12)",
-    color: "#cbd5e1",
-    background: "rgba(255,255,255,0.03)",
-  };
+    borderColor: expanded ? "rgba(248,113,113,0.32)" : "rgba(255,255,255,0.12)",
+    color: expanded ? "#fca5a5" : "#cbd5e1",
+    background: expanded ? "rgba(248,113,113,0.1)" : "rgba(255,255,255,0.03)",
+  });
 
   return (
     <div style={{...themeVars,minHeight:"100vh",background:"var(--app-bg)",color:"var(--app-text)",fontFamily:"'Outfit','Segoe UI',sans-serif"}}>
@@ -3980,7 +3980,7 @@ function ProfileModal({
               <div style={{fontSize:12,letterSpacing:"0.12em",textTransform:"uppercase",color:"#84cc16",fontWeight:800}}>Saúde</div>
               <div style={{fontSize:18,fontWeight:800}}>Histórico corporal</div>
             </div>
-            <button onClick={() => toggleProfileSection("saude")} style={sectionToggleStyle}>
+            <button onClick={() => toggleProfileSection("saude")} style={getSectionToggleStyle(expandedSections.saude)}>
               {expandedSections.saude ? "Recolher" : "Expandir"}
             </button>
           </div>
@@ -4066,7 +4066,7 @@ function ProfileModal({
               <div style={{fontSize:18,fontWeight:800}}>Minha evolução</div>
             </div>
             <div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
-              <button onClick={() => toggleProfileSection("evolucao")} style={sectionToggleStyle}>
+              <button onClick={() => toggleProfileSection("evolucao")} style={getSectionToggleStyle(expandedSections.evolucao)}>
                 {expandedSections.evolucao ? "Recolher" : "Expandir"}
               </button>
               {expandedSections.evolucao && (
@@ -4134,7 +4134,7 @@ function ProfileModal({
               <div style={{fontSize:12,letterSpacing:"0.12em",textTransform:"uppercase",color:"#a78bfa",fontWeight:800}}>Dietas</div>
               <div style={{fontSize:18,fontWeight:800}}>Minhas dietas</div>
             </div>
-            <button onClick={() => toggleProfileSection("dietas")} style={sectionToggleStyle}>
+            <button onClick={() => toggleProfileSection("dietas")} style={getSectionToggleStyle(expandedSections.dietas)}>
               {expandedSections.dietas ? "Recolher" : "Expandir"}
             </button>
           </div>
@@ -4280,7 +4280,7 @@ function ProfileModal({
               <div style={{fontSize:12,letterSpacing:"0.12em",textTransform:"uppercase",color:"#f97316",fontWeight:800}}>Relatórios</div>
               <div style={{fontSize:18,fontWeight:800}}>Meus relatórios</div>
             </div>
-            <button onClick={() => toggleProfileSection("relatorios")} style={sectionToggleStyle}>
+            <button onClick={() => toggleProfileSection("relatorios")} style={getSectionToggleStyle(expandedSections.relatorios)}>
               {expandedSections.relatorios ? "Recolher" : "Expandir"}
             </button>
           </div>
