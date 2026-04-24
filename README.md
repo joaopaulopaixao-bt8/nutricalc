@@ -63,6 +63,10 @@ Este bloco é o ponto de partida para as próximas atualizações.
 - Sprint 7 executada: checklist de validação do gerador documentado em [docs/VALIDATION_CHECKLIST.md](/c:/NutriCalc/docs/VALIDATION_CHECKLIST.md)
 - Sprint 8 executada: checklist de produção e segurança documentado em [docs/PRODUCTION_CHECKLIST.md](/c:/NutriCalc/docs/PRODUCTION_CHECKLIST.md)
 - nova frente de performance/UX iniciada em 24/04/2026: Sprint 1 de diagnóstico da entrada pública e do boot inicial documentada em [docs/FRONTEND_PERFORMANCE_SPRINT1.md](/c:/NutriCalc/docs/FRONTEND_PERFORMANCE_SPRINT1.md)
+- Sprint 2 executada: removido o bloqueio global da entrada pública; a landing agora renderiza imediatamente enquanto a sessão é restaurada em paralelo
+- Sprint 3 executada: alimentos, receitas e configuração do gerador passaram para carregamento sob demanda, disparando apenas ao abrir a etapa de montagem ou a engrenagem de configuração
+- Sprint 4 executada: separadas em módulos a navegação pública e a lógica de decisão entre experiência pública, perfil e app autenticado, reduzindo acoplamento do `NutriCalc.jsx`
+- Sprint 5 executada: home pública reescrita com foco mais comercial, menos texto institucional e comunicação mais orientada a benefício, meta, progresso e conversão
 
 ## Como retomar o desenvolvimento
 

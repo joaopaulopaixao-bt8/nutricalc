@@ -26,6 +26,8 @@ import {
   updateBodyMetric,
   updateCurrentUser,
 } from "./api.js";
+import { resolveRootView, shouldLoadGeneratorData as shouldLoadGeneratorDataForExperience } from "./app/experienceRouting.js";
+import { PUBLIC_PAGES, getHashForPublicPage, getPublicPageFromHash, normalizePublicPage } from "./public/pageRouting.js";
 
 // ============================================================
 // TACO DB — Each food tagged with: mealTypes (cafe/lanche/principal), subGroup for coherent swaps
@@ -55,7 +57,7 @@ const TACO = {
     { id:"p21", name:"Queijo minas frescal", kcal:264, prot:17.4, carb:3.2, fat:20.2, mt:["cafe","lanche"], sg:"queijo" },
     { id:"p22", name:"Iogurte natural desnatado", kcal:42, prot:4.1, carb:5.6, fat:0.3, mt:["cafe","lanche"], sg:"laticinio" },
     { id:"p23", name:"Ricota fresca", kcal:140, prot:12.6, carb:3.5, fat:8.1, mt:["cafe","lanche"], sg:"queijo_magro" },
-    { id:"p24", name:"Whey protein (30g)", kcal:120, prot:24, carb:3, fat:1.5, mt:["lanche","cafe"], sg:"suplemento" },
+    { id:"p24", name:"Whey protein (30g)", kcal:123, prot:23, carb:3.3, fat:2, mt:["lanche","cafe"], sg:"suplemento" },
     { id:"p25", name:"Carne seca desfiada", kcal:230, prot:33.8, carb:0, fat:10.5, mt:["principal"], sg:"bovina" },
     { id:"p26", name:"Frango desfiado", kcal:163, prot:31.5, carb:0, fat:3.8, mt:["principal"], sg:"ave_magra" },
     { id:"p27", name:"Sobrecoxa s/ pele", kcal:183, prot:24.2, carb:0, fat:9.5, mt:["principal"], sg:"ave" },
@@ -74,6 +76,7 @@ const TACO = {
     { id:"p40", name:"Feijão preto cozido", kcal:77, prot:4.5, carb:14, fat:0.5, mt:["principal"], sg:"leguminosa" },
     { id:"p41", name:"Caseína (30g)", kcal:115, prot:23, carb:3.5, fat:1, mt:["lanche","cafe"], sg:"suplemento" },
     { id:"p42", name:"Acém cozido", kcal:198, prot:26, carb:0, fat:10.2, mt:["principal"], sg:"bovina" },
+    { id:"p81", name:"Ovos mexidos", kcal:149, prot:10.4, carb:1.6, fat:10.8, mt:["cafe","lanche","principal"], sg:"ovo" },
   ],
   carb: [
     { id:"c1", name:"Arroz branco cozido", kcal:128, prot:2.5, carb:28.1, fat:0.2, mt:["principal"], sg:"arroz" },
@@ -232,6 +235,7 @@ const DEFAULT_GENERATION_CONFIG = {
   foodLimitsByName: {
     "Leite desnatado": { min: 100, max: 400, step: 50 },
     "Ovo inteiro cozido": { min: 50, max: 200, step: 50 },
+    "Ovos mexidos": { min: 50, max: 250, step: 25 },
     "Clara de ovo": { min: 33, max: 200, step: 33 },
     "Gema de ovo": { min: 17, max: 68, step: 17 },
     "Whey protein (30g)": { min: 30, max: 60, step: 30 },
@@ -257,35 +261,6 @@ const MEAL_FILTERS = [
   { key: "lanche", label: "Lanches" },
   { key: "principal", label: "Almoço/Jantar" },
 ];
-
-const PUBLIC_PAGES = new Set(["landing", "auth", "privacy", "terms", "methodology"]);
-
-function getPublicPageFromHash() {
-  if (typeof window === "undefined") return "landing";
-
-  const normalized = window.location.hash.replace(/^#\/?/, "").trim().toLowerCase();
-  if (!normalized) return "landing";
-  if (normalized === "entrar" || normalized === "login" || normalized === "cadastro") return "auth";
-  if (normalized === "privacidade") return "privacy";
-  if (normalized === "termos") return "terms";
-  if (normalized === "metodologia" || normalized === "fontes") return "methodology";
-  return "landing";
-}
-
-function getHashForPublicPage(page) {
-  switch (page) {
-    case "auth":
-      return "#/entrar";
-    case "privacy":
-      return "#/privacidade";
-    case "terms":
-      return "#/termos";
-    case "methodology":
-      return "#/metodologia";
-    default:
-      return "#/";
-  }
-}
 
 function buildUniformMealDistribution(shares) {
   return shares.map(share => ({ prot: share, carb: share, fat: share }));
@@ -417,6 +392,7 @@ function normalizeStoredDietResult(savedDiet, subLists) {
 
 const UNIT_LABELS = {
   "Ovo inteiro cozido": { unit: "un", gramsPerUnit: 50 },
+  "Ovos mexidos": { unit: "un", gramsPerUnit: 50 },
   "Clara de ovo": { unit: "un", gramsPerUnit: 33 },
   "Pão francês": { unit: "un", gramsPerUnit: 50 },
 };
@@ -908,7 +884,7 @@ export default function NutriCalc() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsTab, setSettingsTab] = useState("prioridades");
   const [generationConfig, setGenerationConfig] = useState(DEFAULT_GENERATION_CONFIG);
-  const [configLoading, setConfigLoading] = useState(true);
+  const [configLoading, setConfigLoading] = useState(false);
   const [configError, setConfigError] = useState("");
   const [selIds, setSelIds] = useState(new Set());
   const [favIds, setFavIds] = useState(new Set());
@@ -927,12 +903,13 @@ export default function NutriCalc() {
   const [pdfLoading, setPdfLoading] = useState(false);
   const [foodsByCategory, setFoodsByCategory] = useState({ protein: [], carb: [], fat: [] });
   const [recipes, setRecipes] = useState([]);
+  const [recipesLoading, setRecipesLoading] = useState(false);
   const [selectedRecipeIds, setSelectedRecipeIds] = useState(new Set());
   const [fixedMeals, setFixedMeals] = useState({});
   const [recipeMealFilter, setRecipeMealFilter] = useState("all");
   const [recipeSelectionFilter, setRecipeSelectionFilter] = useState("all");
   const [baseChoiceTab, setBaseChoiceTab] = useState("foods");
-  const [foodsLoading, setFoodsLoading] = useState(true);
+  const [foodsLoading, setFoodsLoading] = useState(false);
   const [foodsError, setFoodsError] = useState("");
   const [foodsReloadKey, setFoodsReloadKey] = useState(0);
   const [tdeeData, setTdeeData] = useState(null);
@@ -951,6 +928,7 @@ export default function NutriCalc() {
   const themeVars = getThemeVars();
   const appIsMobile = appViewportWidth < 768;
   const appIsTablet = appViewportWidth < 1024;
+  const shouldLoadGeneratorData = shouldLoadGeneratorDataForExperience(authUser, step, settingsOpen);
   const derivedProfileAge = getAgeFromBirthDate(profileForm.birthDate || authUser?.birthDate || "");
   const isProfileSetupRequired = Boolean(authUser) && (
     !authUser?.name ||
@@ -966,6 +944,7 @@ export default function NutriCalc() {
     authUser?.bodyFatPercentage === undefined ||
     authUser?.bodyFatPercentage === ""
   );
+  const rootView = resolveRootView(authUser, profileOpen, isProfileSetupRequired);
   const numericWeight = Number(ud.weight) || 0;
   const numericHeight = Number(ud.height) || 0;
   const numericAge = Number(ud.age) || 0;
@@ -1042,7 +1021,7 @@ export default function NutriCalc() {
   }, []);
 
   const navigatePublicPage = useCallback((page) => {
-    const nextPage = PUBLIC_PAGES.has(page) ? page : "landing";
+    const nextPage = normalizePublicPage(page);
     if (typeof window !== "undefined") {
       const nextHash = getHashForPublicPage(nextPage);
       if (window.location.hash !== nextHash) {
@@ -1075,6 +1054,7 @@ export default function NutriCalc() {
     let cancelled = false;
 
     async function loadFoods() {
+      if (!shouldLoadGeneratorData || !authUser) return;
       setFoodsLoading(true);
       setFoodsError("");
       try {
@@ -1102,12 +1082,14 @@ export default function NutriCalc() {
     return () => {
       cancelled = true;
     };
-  }, [dietType, foodsReloadKey]);
+  }, [authUser, dietType, foodsReloadKey, shouldLoadGeneratorData]);
 
   useEffect(() => {
     let cancelled = false;
 
     async function loadRecipes() {
+      if (!shouldLoadGeneratorData || !authUser) return;
+      setRecipesLoading(true);
       try {
         const payload = await fetchRecipes(dietType);
         if (!cancelled) {
@@ -1115,6 +1097,8 @@ export default function NutriCalc() {
         }
       } catch (error) {
         if (!cancelled) setRecipes([]);
+      } finally {
+        if (!cancelled) setRecipesLoading(false);
       }
     }
 
@@ -1122,7 +1106,7 @@ export default function NutriCalc() {
     return () => {
       cancelled = true;
     };
-  }, [dietType]);
+  }, [authUser, dietType, shouldLoadGeneratorData]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1240,6 +1224,7 @@ export default function NutriCalc() {
     let cancelled = false;
 
     async function loadGenerationConfig() {
+      if (!shouldLoadGeneratorData || !authUser) return;
       setConfigLoading(true);
       setConfigError("");
       try {
@@ -1275,7 +1260,7 @@ export default function NutriCalc() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [authUser, shouldLoadGeneratorData]);
 
   useEffect(() => {
     let cancelled = false;
@@ -2294,20 +2279,10 @@ export default function NutriCalc() {
     }
   };
 
-  if (authBootstrapLoading) {
-    return (
-      <div style={{...themeVars,minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:"var(--app-bg)",color:"var(--app-text)",fontFamily:"'Outfit','Segoe UI',sans-serif",padding:24}}>
-        <div style={{width:"100%",maxWidth:420,padding:"28px 24px",borderRadius:24,background:"rgba(15,23,42,0.92)",border:"1px solid rgba(132,204,22,0.16)",textAlign:"center",boxShadow:"0 24px 80px rgba(0,0,0,0.28)"}}>
-          <div style={{fontSize:28,fontWeight:800,letterSpacing:"-0.03em"}}>Nutri<span style={{color:"#84cc16"}}>Calc</span></div>
-          <div style={{fontSize:14,color:"#94a3b8",marginTop:10}}>Carregando seu acesso...</div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!authUser) {
+  if (rootView === "public") {
     return (
       <PublicExperience
+        authBootstrapLoading={authBootstrapLoading}
         authError={authError}
         authForm={authForm}
         authLoading={authLoading}
@@ -2332,7 +2307,7 @@ export default function NutriCalc() {
     );
   }
 
-  if ((profileOpen || isProfileSetupRequired) && authUser) {
+  if (rootView === "profile") {
     return (
       <ProfileModal
         authUser={authUser}
@@ -2661,9 +2636,7 @@ export default function NutriCalc() {
           <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:32}}>
             {ACT.map((a,i)=>(<button key={i} onClick={()=>setUd(p=>({...p,al:i}))} style={{...pB,textAlign:"left",padding:"12px 16px",background:ud.al===i?"rgba(132,204,22,0.1)":"rgba(255,255,255,0.03)",borderColor:ud.al===i?"#84cc16":"rgba(255,255,255,0.08)"}}><span style={{color:ud.al===i?"#84cc16":"#e2e8f0",fontWeight:600}}>{a.label}</span><span style={{color:"#64748b",fontSize:13,marginLeft:8}}>{a.desc}</span></button>))}
           </div>
-          {foodsLoading&&<div style={{marginBottom:16,padding:"10px 16px",borderRadius:8,background:"rgba(132,204,22,0.08)",border:"1px solid rgba(132,204,22,0.25)",color:"#84cc16",fontSize:13}}>Carregando alimentos da API...</div>}
-          {foodsError&&<div style={{marginBottom:16,padding:"10px 16px",borderRadius:8,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.25)",color:"#ef4444",fontSize:13,display:"flex",justifyContent:"space-between",alignItems:"center",gap:12}}><span>{foodsError}</span><button onClick={()=>setFoodsReloadKey(k=>k+1)} style={{padding:"6px 12px",borderRadius:8,border:"1px solid rgba(239,68,68,0.35)",background:"rgba(239,68,68,0.12)",color:"#fecaca",cursor:"pointer"}}>Tentar novamente</button></div>}
-          <NB onClick={()=>setStep(2)} disabled={foodsLoading||!!foodsError||!ud.weight||!ud.height||!ud.age||!ud.sex}/>
+          <NB onClick={()=>setStep(2)} disabled={!ud.weight||!ud.height||!ud.age||!ud.sex}/>
         </div>)}
 
         {/* STEP 2 */}
@@ -2764,6 +2737,7 @@ export default function NutriCalc() {
         {/* STEP 4 */}
         {step===4&&(<div style={{animation:"fadeIn 0.4s"}}>
           <h1 style={h1S}>Monte sua base alimentar</h1><p style={dS}>{currentDietTypeConfig.label}: escolha alimentos avulsos e, se quiser, receitas prontas compatíveis.</p>
+          {(foodsLoading || recipesLoading) && <div style={{marginBottom:16,padding:"10px 16px",borderRadius:8,background:"rgba(132,204,22,0.08)",border:"1px solid rgba(132,204,22,0.25)",color:"#84cc16",fontSize:13}}>Carregando base alimentar e receitas...</div>}
           {foodsError&&<div style={{marginBottom:16,padding:"10px 16px",borderRadius:8,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.25)",color:"#ef4444",fontSize:13,display:"flex",justifyContent:"space-between",alignItems:"center",gap:12}}><span>{foodsError}</span><button onClick={()=>setFoodsReloadKey(k=>k+1)} style={{padding:"6px 12px",borderRadius:8,border:"1px solid rgba(239,68,68,0.35)",background:"rgba(239,68,68,0.12)",color:"#fecaca",cursor:"pointer"}}>Recarregar</button></div>}
           <div style={{display:"flex",gap:8,marginBottom:14}}>
             {[{k:"foods",l:"Alimentos avulsos"},{k:"recipes",l:`Receitas prontas (${selectedRecipes.length})`}].map((tab) => (
@@ -2811,10 +2785,11 @@ export default function NutriCalc() {
                 {MEAL_FILTERS.map(f=>(<button key={f.key} onClick={()=>setRecipeMealFilter(f.key)} style={{...pB,padding:"6px 12px",fontSize:11,background:recipeMealFilter===f.key?"rgba(132,204,22,0.12)":"transparent",borderColor:recipeMealFilter===f.key?"#84cc16":"rgba(255,255,255,0.08)",color:recipeMealFilter===f.key?"#a3e635":"#64748b"}}>{f.label}</button>))}
                 {[{k:"all",l:"Todas"},{k:"selected",l:"Selecionadas"}].map(f=>(<button key={f.k} onClick={()=>setRecipeSelectionFilter(f.k)} style={{...pB,padding:"6px 12px",fontSize:11,background:recipeSelectionFilter===f.k?"rgba(250,204,21,0.12)":"transparent",borderColor:recipeSelectionFilter===f.k?"#facc15":"rgba(255,255,255,0.08)",color:recipeSelectionFilter===f.k?"#facc15":"#64748b"}}>{f.l}</button>))}
               </div>
+              {recipesLoading && <div style={{marginBottom:12,padding:"10px 14px",borderRadius:10,background:"rgba(132,204,22,0.08)",border:"1px solid rgba(132,204,22,0.18)",color:"#d9f99d",fontSize:12}}>Carregando receitas compatíveis...</div>}
               <RecipeSelector recipes={recipes} selectedIds={selectedRecipeIds} onToggle={togRecipe} mealFilter={recipeMealFilter} selectionFilter={recipeSelectionFilter} allowCarbs={currentDietAllowsCarbs} />
             </>
           )}
-          <div style={{display:"flex",gap:12,marginTop:24}}><BB onClick={()=>setStep(3)}/><NB onClick={()=>setStep(5)} disabled={foodsLoading||!canAdv4} label={foodsLoading?"Carregando...":canAdv4?"Próximo":"Selecione os mínimos"}/></div>
+          <div style={{display:"flex",gap:12,marginTop:24}}><BB onClick={()=>setStep(3)}/><NB onClick={()=>setStep(5)} disabled={foodsLoading||recipesLoading||!canAdv4} label={foodsLoading||recipesLoading?"Carregando...":canAdv4?"Próximo":"Selecione os mínimos"}/></div>
         </div>)}
 
         {/* STEP 5 */}
@@ -2949,6 +2924,7 @@ export default function NutriCalc() {
 }
 
 function PublicExperience({
+  authBootstrapLoading,
   authError,
   authForm,
   authLoading,
@@ -3041,6 +3017,11 @@ function PublicExperience({
     <div style={publicShellStyle}>
       <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
       <div style={{position:"fixed",inset:0,zIndex:0,opacity:0.05,backgroundImage:"linear-gradient(rgba(132,204,22,0.18) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,0.16) 1px,transparent 1px)",backgroundSize:"42px 42px",pointerEvents:"none"}} />
+      {authBootstrapLoading && (
+        <div style={{position:"fixed",top:viewport.isMobile?12:18,right:viewport.isMobile?14:24,zIndex:6,padding:viewport.isMobile?"8px 10px":"8px 12px",borderRadius:999,background:"rgba(15,23,42,0.76)",border:"1px solid rgba(132,204,22,0.18)",color:"#cbd5e1",fontSize:12,fontWeight:600,backdropFilter:"blur(10px)",boxShadow:"0 10px 30px rgba(0,0,0,0.18)"}}>
+          Restaurando sessão...
+        </div>
+      )}
       <PublicHeader {...sharedLayoutProps} currentPage={publicPage} viewport={viewport} />
       <div style={{position:"relative",zIndex:1}}>{content}</div>
       <PublicFooter {...sharedLayoutProps} viewport={viewport} />
@@ -3119,26 +3100,26 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
         <div style={{...sectionWrap,padding:viewport.isMobile?"0 14px":"0 24px",display:"grid",gridTemplateColumns:viewport.isTablet?"1fr":"minmax(0,1.15fr) minmax(320px,0.85fr)",gap:viewport.isMobile?16:28,alignItems:"stretch"}}>
           <div style={{...cardStyle,padding:viewport.isMobile?"20px 16px":"32px 30px"}}>
             <div style={{display:"inline-flex",alignItems:"center",gap:10,padding:viewport.isMobile?"8px 12px":"9px 14px",borderRadius:999,background:"rgba(132,204,22,0.1)",border:"1px solid rgba(132,204,22,0.16)",fontSize:viewport.isMobile?11:12,fontWeight:800,letterSpacing:"0.08em",textTransform:"uppercase",color:"#d9f99d"}}>
-              Nutrição com histórico e acompanhamento
+              Planejamento alimentar pessoal
             </div>
             <h1 style={{fontSize:viewport.isMobile?"clamp(28px,9vw,36px)":"clamp(40px,6vw,68px)",lineHeight:viewport.isMobile?1.04:0.95,letterSpacing:viewport.isMobile?"-0.05em":"-0.06em",margin:viewport.isMobile?"14px 0 12px":"18px 0 16px",maxWidth:720}}>
-              Seu planejamento alimentar em um painel claro, privado e pronto para evoluir com você.
+              Monte sua dieta, acompanhe seu progresso e mantenha tudo organizado em um só lugar.
             </h1>
             <p style={{fontSize:viewport.isMobile?15:18,lineHeight:viewport.isMobile?1.6:1.65,color:"#cbd5e1",maxWidth:700,margin:0}}>
-              O NutriCalc reúne cálculo energético, geração de dieta, relatórios e histórico corporal em uma única conta. Você entra, organiza seu perfil e acompanha a evolução sem perder contexto entre uma sessão e outra.
+              O NutriCalc reúne cálculo energético, metas, dieta personalizada, relatórios e histórico corporal em uma conta simples de usar. Você sai do improviso e passa a acompanhar sua rotina com mais clareza.
             </p>
 
             <div style={{display:"flex",gap:12,marginTop:viewport.isMobile?20:26,flexWrap:"wrap",flexDirection:viewport.isMobile?"column":"row"}}>
-              <button onClick={onEnter} style={{border:"none",borderRadius:999,padding:"15px 22px",cursor:"pointer",fontSize:15,fontWeight:800,background:"linear-gradient(135deg,#84cc16,#65a30d)",color:"#0f172a",width:viewport.isMobile?"100%":"auto"}}>Entrar</button>
-              <button onClick={onCreateAccount} style={{border:"1px solid rgba(255,255,255,0.1)",borderRadius:999,padding:"15px 22px",cursor:"pointer",fontSize:15,fontWeight:700,background:"rgba(255,255,255,0.03)",color:"#e2e8f0",width:viewport.isMobile?"100%":"auto"}}>Criar conta</button>
-              <button onClick={() => onNavigatePage("methodology")} style={{border:"1px solid rgba(59,130,246,0.22)",borderRadius:999,padding:"15px 22px",cursor:"pointer",fontSize:15,fontWeight:700,background:"rgba(59,130,246,0.08)",color:"#bfdbfe",width:viewport.isMobile?"100%":"auto"}}>Ver metodologia</button>
+              <button onClick={onCreateAccount} style={{border:"none",borderRadius:999,padding:"15px 22px",cursor:"pointer",fontSize:15,fontWeight:800,background:"linear-gradient(135deg,#84cc16,#65a30d)",color:"#0f172a",width:viewport.isMobile?"100%":"auto"}}>Começar agora</button>
+              <button onClick={onEnter} style={{border:"1px solid rgba(255,255,255,0.1)",borderRadius:999,padding:"15px 22px",cursor:"pointer",fontSize:15,fontWeight:700,background:"rgba(255,255,255,0.03)",color:"#e2e8f0",width:viewport.isMobile?"100%":"auto"}}>Entrar</button>
+              <button onClick={() => onNavigatePage("methodology")} style={{border:"1px solid rgba(59,130,246,0.22)",borderRadius:999,padding:"15px 22px",cursor:"pointer",fontSize:15,fontWeight:700,background:"rgba(59,130,246,0.08)",color:"#bfdbfe",width:viewport.isMobile?"100%":"auto"}}>Como calculamos</button>
             </div>
 
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:12,marginTop:viewport.isMobile?22:28}}>
               {[
-                { value: "Conta individual", label: "Acesso pessoal com histórico privado" },
-                { value: "Fluxo contínuo", label: "Dietas, relatórios e evolução no mesmo lugar" },
-                { value: "Base técnica", label: "Metodologia, regras e contexto explicados publicamente" },
+                { value: "Metas em minutos", label: "Perfil, objetivo e macros sem depender de planilha" },
+                { value: "Histórico salvo", label: "Dietas, relatórios e evolução no mesmo painel" },
+                { value: "Mais continuidade", label: "Menos recomeço do zero a cada novo acesso" },
               ].map((item) => (
                 <div key={item.value} style={{padding:"16px 18px",borderRadius:18,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)"}}>
                   <div style={{fontSize:15,fontWeight:800,color:"#f8fafc"}}>{item.value}</div>
@@ -3151,13 +3132,13 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
           <div style={{...cardStyle,padding:viewport.isMobile?"16px":"24px",display:"flex",flexDirection:"column",justifyContent:"space-between",gap:viewport.isMobile?14:18}}>
             <div style={{display:"grid",gap:14}}>
               <div style={{padding:"18px 18px 16px",borderRadius:22,background:"linear-gradient(135deg, rgba(132,204,22,0.12), rgba(59,130,246,0.08))",border:"1px solid rgba(132,204,22,0.18)"}}>
-                <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#d9f99d"}}>Dentro do sistema</div>
-                <div style={{fontSize:viewport.isMobile?21:24,fontWeight:800,marginTop:8,lineHeight:1.15}}>A conta vira o centro do acompanhamento, não só um acesso técnico.</div>
+                <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#d9f99d"}}>O que você destrava</div>
+                <div style={{fontSize:viewport.isMobile?21:24,fontWeight:800,marginTop:8,lineHeight:1.15}}>Uma rotina alimentar com mais direção, registro e visão de progresso.</div>
               </div>
               {[
-                ["Perfil pessoal", "Nome, dados corporais, avatar e auditoria básica ajudam a manter um histórico consistente."],
-                ["Dietas e relatórios", "O sistema salva o que foi gerado para evitar repetição e permitir revisão com contexto."],
-                ["Evolução corporal", "Peso, altura, idade e percentual de gordura ficam organizados para comparação ao longo do tempo."],
+                ["Dieta ajustada ao seu objetivo", "Monte cutting, manutenção, bulking ou estilos específicos sem começar da estaca zero."],
+                ["Relatórios prontos para revisão", "Salve o que foi gerado e retome decisões com contexto, não só na memória."],
+                ["Evolução corporal no mesmo painel", "Compare peso e percentual de gordura sem espalhar dados em várias ferramentas."],
               ].map(([title, description]) => (
                 <div key={title} style={{padding:"16px 18px",borderRadius:18,background:"rgba(15,23,42,0.62)",border:"1px solid rgba(255,255,255,0.08)"}}>
                   <div style={{fontSize:15,fontWeight:800,color:"#f8fafc"}}>{title}</div>
@@ -3168,7 +3149,7 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
             <div style={{padding:"16px 18px",borderRadius:18,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)"}}>
               <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#93c5fd"}}>Aviso importante</div>
               <div style={{fontSize:14,lineHeight:1.6,color:"#cbd5e1",marginTop:8}}>
-                O NutriCalc apoia organização e planejamento alimentar. Ele não substitui avaliação de nutricionista, médico ou outro profissional de saúde.
+                O NutriCalc apoia planejamento e organização alimentar. Ele não substitui nutricionista, médico ou outro profissional de saúde.
               </div>
             </div>
           </div>
@@ -3180,20 +3161,20 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
           <div style={{...cardStyle,padding:viewport.isMobile?"22px 18px":"28px 26px"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"end",gap:20,flexWrap:"wrap"}}>
               <div>
-                <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#93c5fd"}}>O que a pessoa encontra aqui</div>
-                <div style={{fontSize:viewport.isMobile?24:30,fontWeight:800,letterSpacing:"-0.04em",marginTop:10,lineHeight:1.08}}>Uma entrada pública que explica o sistema antes de pedir login.</div>
+                <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#93c5fd"}}>Benefícios</div>
+                <div style={{fontSize:viewport.isMobile?24:30,fontWeight:800,letterSpacing:"-0.04em",marginTop:10,lineHeight:1.08}}>Menos improviso. Mais organização para seguir o plano.</div>
               </div>
               <div style={{fontSize:14,lineHeight:1.7,color:"#94a3b8",maxWidth:420}}>
-                Em vez de jogar a pessoa direto na autenticação, a home passa propósito, benefícios, segurança e contexto metodológico antes da decisão de entrar.
+                A proposta é simples: transformar cálculo, montagem da dieta e acompanhamento em uma experiência contínua e fácil de retomar.
               </div>
             </div>
 
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16,marginTop:viewport.isMobile?18:22}}>
               {[
-                { title: "Monte seu perfil", text: "Crie uma conta, complete os dados essenciais e deixe a base pronta para o sistema trabalhar com contexto." },
-                { title: "Gere e salve dietas", text: "Centralize planos, relatórios e revisões sem depender de planilhas ou anotações soltas." },
-                { title: "Acompanhe sua evolução", text: "Use o histórico corporal e de relatórios para enxergar continuidade e tomar decisões melhores." },
-                { title: "Proteja o histórico", text: "Os dados ficam vinculados à sua conta, com acesso individual e rastros básicos de atividade." },
+                { title: "Tudo em uma conta", text: "Perfil, dietas, relatórios e evolução corporal ficam reunidos no mesmo ambiente." },
+                { title: "Planejamento com contexto", text: "O sistema usa seus dados e objetivo para entregar algo mais coerente desde o início." },
+                { title: "Retomada rápida", text: "Você volta e entende onde parou sem caçar informação em várias ferramentas." },
+                { title: "Mais clareza na rotina", text: "Acompanhar histórico ajuda a revisar decisões com menos achismo e mais consistência." },
               ].map((item) => (
                 <div key={item.title} style={{...softCardStyle,padding:"22px 20px"}}>
                   <div style={{fontSize:17,fontWeight:800,color:"#f8fafc"}}>{item.title}</div>
@@ -3209,17 +3190,17 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
         <div style={{...sectionWrap,padding:viewport.isMobile?"0 14px":"0 24px",display:"grid",gridTemplateColumns:viewport.isTablet?"1fr":"minmax(0,0.9fr) minmax(320px,1.1fr)",gap:18}}>
           <div style={{...cardStyle,padding:viewport.isMobile?"22px 18px":"26px 24px"}}>
             <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#d9f99d"}}>Para quem o NutriCalc faz sentido</div>
-            <div style={{fontSize:viewport.isMobile?24:30,fontWeight:800,letterSpacing:"-0.04em",marginTop:10,lineHeight:1.08}}>Pessoas que querem organizar alimentação com continuidade e clareza.</div>
+            <div style={{fontSize:viewport.isMobile?24:30,fontWeight:800,letterSpacing:"-0.04em",marginTop:10,lineHeight:1.08}}>Para quem quer acompanhar meta, dieta e progresso sem bagunça.</div>
             <div style={{fontSize:15,lineHeight:1.75,color:"#94a3b8",marginTop:14}}>
-              A proposta conversa melhor com quem quer sair do improviso e centralizar histórico, relatórios e métricas em um painel só, sem perder o fio entre um acesso e outro.
+              O NutriCalc conversa melhor com quem quer emagrecer, ganhar massa, manter rotina ou testar estilos alimentares com mais organização e continuidade.
             </div>
           </div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16}}>
             {[
-              ["Quem quer autonomia organizada", "Útil para quem precisa estruturar rotina alimentar e revisar decisões com calma."],
-              ["Quem acompanha evolução corporal", "Ajuda a olhar tendência e histórico, não só um valor isolado do dia."],
-              ["Quem valoriza transparência", "A entrada pública explica metodologia, privacidade e limites do sistema antes do login."],
-              ["Quem quer contexto em uma conta só", "Dietas, relatórios e dados do perfil continuam acessíveis dentro do mesmo ambiente."],
+              ["Quem busca emagrecimento", "Ajuste meta calórica, acompanhe evolução e revise o histórico sem recomeçar do zero."],
+              ["Quem quer hipertrofia", "Organize ingestão, refeições e continuidade do plano em um fluxo mais prático."],
+              ["Quem testa estratégias alimentares", "Use a base do sistema para tradicional, carnívora estrita ou com ovos e laticínios."],
+              ["Quem quer manter constância", "Menos dependência de memória, print e anotação solta para seguir a rotina."],
             ].map(([title, text]) => (
               <div key={title} style={{...softCardStyle,padding:"20px 18px"}}>
                 <div style={{fontSize:16,fontWeight:800,color:"#f8fafc"}}>{title}</div>
@@ -3230,33 +3211,17 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
         </div>
       </section>
 
-      <section style={{padding:viewport.isMobile?"10px 0 8px":"16px 0 12px"}}>
-        <div style={{...sectionWrap,padding:viewport.isMobile?"0 14px":"0 24px",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16}}>
-          {[
-            { title: "Privacidade por conta", text: "A home já prepara a leitura do produto como espaço pessoal, com dados vinculados ao usuário autenticado." },
-            { title: "Base técnica visível", text: "Metodologia e fontes ganham espaço próprio para reduzir sensação de caixa-preta." },
-            { title: "Fluxo de acesso mais humano", text: "Primeiro o sistema se apresenta. Só depois a pessoa decide entrar ou criar conta." },
-            { title: "Posicionamento mais profissional", text: "A entrada deixa claro o valor do produto e também os limites da ferramenta." },
-          ].map((item) => (
-            <div key={item.title} style={{...cardStyle,padding:"22px 20px"}}>
-              <div style={{fontSize:17,fontWeight:800,color:"#f8fafc"}}>{item.title}</div>
-              <div style={{fontSize:14,lineHeight:1.65,color:"#94a3b8",marginTop:10}}>{item.text}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       <section style={{padding:viewport.isMobile?"12px 0 8px":"18px 0 10px"}}>
         <div style={{...sectionWrap}}>
           <div style={{...cardStyle,padding:viewport.isMobile?"22px 18px":"28px 26px"}}>
             <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#d9f99d"}}>Como funciona</div>
-            <div style={{fontSize:viewport.isMobile?24:32,fontWeight:800,letterSpacing:"-0.04em",marginTop:10,lineHeight:1.08}}>Um fluxo simples para sair do acesso e chegar ao acompanhamento.</div>
+            <div style={{fontSize:viewport.isMobile?24:32,fontWeight:800,letterSpacing:"-0.04em",marginTop:10,lineHeight:1.08}}>Um fluxo direto para sair da meta e chegar ao plano.</div>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:14,marginTop:22}}>
               {[
-                ["1. Entrar ou criar conta", "A landing apresenta o produto e leva a pessoa para autenticação só quando ela decide continuar."],
-                ["2. Completar o perfil", "Nome, sexo, data de nascimento, peso e altura deixam o cálculo mais consistente."],
-                ["3. Gerar e revisar", "O sistema monta a dieta, permite salvar relatório e manter a análise acessível."],
-                ["4. Acompanhar o histórico", "Você volta para revisar métricas, dietas anteriores e relatórios criados."],
+                ["1. Crie sua conta", "Entre uma vez, salve seu perfil e deixe a base pronta para acompanhar tudo no mesmo ambiente."],
+                ["2. Ajuste objetivo e estratégia", "Defina meta, macros, estilo alimentar e preferências antes de montar a dieta."],
+                ["3. Monte e gere", "Escolha alimentos, receitas e distribuição das refeições para o sistema fechar o plano."],
+                ["4. Salve e acompanhe", "Volte para revisar dietas, relatórios e evolução corporal com contexto."],
               ].map(([title, text]) => (
                 <div key={title} style={{padding:"18px 18px",borderRadius:18,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)"}}>
                   <div style={{fontSize:15,fontWeight:800,color:"#f8fafc"}}>{title}</div>
@@ -3272,15 +3237,15 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
         <div style={{...sectionWrap,padding:viewport.isMobile?"0 14px":"0 24px"}}>
           <div style={{...cardStyle,padding:viewport.isMobile?"22px 18px":"28px 26px",display:"grid",gridTemplateColumns:viewport.isTablet?"1fr":"minmax(0,1fr) auto",gap:18,alignItems:"center"}}>
             <div>
-              <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#93c5fd"}}>Antes de entrar</div>
-              <div style={{fontSize:viewport.isMobile?24:30,fontWeight:800,letterSpacing:"-0.04em",marginTop:10,lineHeight:1.08}}>Entenda como o NutriCalc funciona e entre só quando fizer sentido para você.</div>
+              <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#93c5fd"}}>Pronto para testar</div>
+              <div style={{fontSize:viewport.isMobile?24:30,fontWeight:800,letterSpacing:"-0.04em",marginTop:10,lineHeight:1.08}}>Comece agora e transforme seu acompanhamento alimentar em algo mais claro.</div>
               <div style={{fontSize:15,lineHeight:1.7,color:"#94a3b8",marginTop:10,maxWidth:760}}>
-                A área pública existe para apresentar o produto com clareza. Você pode revisar privacidade, termos e metodologia agora, ou seguir direto para entrar e começar seu acompanhamento.
+                Se quiser entender a base técnica antes, a metodologia continua pública. Se já faz sentido para você, basta entrar e começar a montar.
               </div>
             </div>
             <div style={{display:"flex",gap:10,flexWrap:"wrap",justifyContent:viewport.isTablet?"stretch":"flex-end",flexDirection:viewport.isMobile?"column":"row"}}>
-              <button onClick={onEnter} style={{border:"none",borderRadius:999,padding:"14px 18px",cursor:"pointer",background:"linear-gradient(135deg,#84cc16,#65a30d)",color:"#0f172a",fontWeight:800,width:viewport.isMobile?"100%":"auto"}}>Entrar</button>
-              <button onClick={onCreateAccount} style={{border:"1px solid rgba(255,255,255,0.08)",borderRadius:999,padding:"14px 18px",cursor:"pointer",background:"rgba(255,255,255,0.03)",color:"#e2e8f0",fontWeight:700,width:viewport.isMobile?"100%":"auto"}}>Criar conta</button>
+              <button onClick={onCreateAccount} style={{border:"none",borderRadius:999,padding:"14px 18px",cursor:"pointer",background:"linear-gradient(135deg,#84cc16,#65a30d)",color:"#0f172a",fontWeight:800,width:viewport.isMobile?"100%":"auto"}}>Criar conta</button>
+              <button onClick={onEnter} style={{border:"1px solid rgba(255,255,255,0.08)",borderRadius:999,padding:"14px 18px",cursor:"pointer",background:"rgba(255,255,255,0.03)",color:"#e2e8f0",fontWeight:700,width:viewport.isMobile?"100%":"auto"}}>Entrar</button>
               <button onClick={() => onNavigatePage("methodology")} style={{border:"1px solid rgba(59,130,246,0.18)",borderRadius:999,padding:"14px 18px",cursor:"pointer",background:"rgba(59,130,246,0.08)",color:"#bfdbfe",fontWeight:700,width:viewport.isMobile?"100%":"auto"}}>Ver metodologia</button>
             </div>
           </div>
