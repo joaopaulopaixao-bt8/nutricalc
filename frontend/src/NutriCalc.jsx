@@ -243,9 +243,15 @@ const DEFAULT_GENERATION_CONFIG = {
     "Pão francês": { min: 50, max: 150, step: 50 },
   },
   subgroupLimits: {
-    ave_magra: { min: 100, max: 250, step: 5 },
-    bovina_magra: { min: 100, max: 250, step: 5 },
-    peixe_magro: { min: 100, max: 250, step: 5 },
+    ave_magra: { min: 50, max: 250, step: 5 },
+    ave: { min: 50, max: 250, step: 5 },
+    bovina_magra: { min: 50, max: 250, step: 5 },
+    bovina: { min: 50, max: 250, step: 5 },
+    peixe_magro: { min: 50, max: 250, step: 5 },
+    peixe_gordo: { min: 50, max: 250, step: 5 },
+    peixe: { min: 50, max: 250, step: 5 },
+    frutos_mar: { min: 50, max: 250, step: 5 },
+    suina: { min: 50, max: 250, step: 5 },
   },
 };
 
