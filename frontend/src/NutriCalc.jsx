@@ -3138,14 +3138,14 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
               <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg, rgba(2,6,23,0.02), rgba(2,6,23,0.74))"}} />
               <div style={{position:"absolute",left:16,right:16,bottom:16,display:"grid",gap:10}}>
                 <div style={{padding:"14px 14px 12px",borderRadius:18,background:"rgba(8,17,31,0.78)",border:"1px solid rgba(132,204,22,0.18)",backdropFilter:"blur(10px)"}}>
-                  <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#d9f99d"}}>Resultado prático</div>
-                  <div style={{fontSize:viewport.isMobile?18:20,fontWeight:800,marginTop:6,lineHeight:1.2,color:"#f8fafc"}}>Planejamento com cara de rotina real, não de tela técnica.</div>
+                  <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#d9f99d"}}>Seu acompanhamento</div>
+                  <div style={{fontSize:viewport.isMobile?18:20,fontWeight:800,marginTop:6,lineHeight:1.2,color:"#f8fafc"}}>Dieta, histórico e evolução no mesmo lugar.</div>
                 </div>
                 <div style={{display:"grid",gridTemplateColumns:"repeat(3,minmax(0,1fr))",gap:10}}>
                   {[
-                    { label: "Perfil", value: "1 conta" },
-                    { label: "Dietas", value: "Salvas" },
-                    { label: "Progresso", value: "Contínuo" },
+                    { label: "Perfil", value: "Dados pessoais" },
+                    { label: "Planos", value: "Dietas salvas" },
+                    { label: "Evolução", value: "Histórico corporal" },
                   ].map((item) => (
                     <div key={item.label} style={{padding:"12px 10px",borderRadius:16,background:"rgba(8,17,31,0.78)",border:"1px solid rgba(255,255,255,0.1)",textAlign:"center",backdropFilter:"blur(8px)"}}>
                       <div style={{fontSize:10,textTransform:"uppercase",letterSpacing:"0.08em",color:"#94a3b8"}}>{item.label}</div>
@@ -3201,25 +3201,25 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
             <img src={showcaseImagePrimary} alt="Refeições saudáveis com salmão, camarão, arroz e vegetais" loading="lazy" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} />
             <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg, rgba(2,6,23,0.04), rgba(2,6,23,0.72))"}} />
             <div style={{position:"absolute",left:18,right:18,bottom:18}}>
-              <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#d9f99d"}}>Visual da rotina</div>
-              <div style={{fontSize:viewport.isMobile?22:28,fontWeight:800,lineHeight:1.1,marginTop:8,color:"#f8fafc"}}>A experiência pública começa mostrando resultado, não só explicação.</div>
+              <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#d9f99d"}}>Refeições do dia</div>
+              <div style={{fontSize:viewport.isMobile?22:28,fontWeight:800,lineHeight:1.1,marginTop:8,color:"#f8fafc"}}>Organize sua rotina com refeições, metas e progresso no mesmo painel.</div>
             </div>
           </div>
           <div style={{display:"grid",gap:18}}>
             <div style={{...cardStyle,padding:"18px 18px 16px"}}>
-              <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#93c5fd"}}>Apelo visual</div>
-              <div style={{fontSize:viewport.isMobile?22:26,fontWeight:800,marginTop:8,lineHeight:1.12}}>Mais atrativa para quem quer dieta, performance e constância.</div>
+              <div style={{fontSize:12,textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:800,color:"#93c5fd"}}>Feito para facilitar</div>
+              <div style={{fontSize:viewport.isMobile?22:26,fontWeight:800,marginTop:8,lineHeight:1.12}}>Acompanhe sua alimentação com mais clareza no dia a dia.</div>
               <div style={{fontSize:14,lineHeight:1.65,color:"#94a3b8",marginTop:10}}>
-                A home passa a conversar com o público final por imagem e contexto visual, sem depender só de leitura para convencer.
+                Visual, metas e organização trabalham juntos para deixar a experiência mais simples de entender e mais fácil de seguir.
               </div>
             </div>
             <div style={{position:"relative",minHeight:viewport.isMobile?220:240,borderRadius:24,overflow:"hidden",border:"1px solid rgba(255,255,255,0.08)",boxShadow:"0 30px 80px rgba(0,0,0,0.2)"}}>
               <img src={showcaseImageSecondary} alt="Marmitas organizadas com vegetais e refeições prontas" loading="lazy" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} />
               <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg, rgba(2,6,23,0.04), rgba(2,6,23,0.68))"}} />
               <div style={{position:"absolute",left:16,right:16,bottom:16,padding:"14px 14px 12px",borderRadius:18,background:"rgba(8,17,31,0.72)",border:"1px solid rgba(255,255,255,0.08)",backdropFilter:"blur(8px)"}}>
-                <div style={{fontSize:12,fontWeight:700,color:"#f8fafc"}}>Mais identidade de produto</div>
+                <div style={{fontSize:12,fontWeight:700,color:"#f8fafc"}}>Sua rotina em foco</div>
                 <div style={{fontSize:13,lineHeight:1.55,color:"#cbd5e1",marginTop:6}}>
-                  A entrada fica mais memorável e mais coerente com o que a pessoa espera de um app de nutrição.
+                  Um visual pensado para quem quer se alimentar melhor com mais constância e menos improviso.
                 </div>
               </div>
             </div>
