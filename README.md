@@ -62,6 +62,7 @@ Este bloco é o ponto de partida para as próximas atualizações.
 - Sprint 6 executada: relatórios salvos com filtros por estilo, objetivo, período e vínculo com dieta, exibindo contexto da dieta vinculada
 - Sprint 7 executada: checklist de validação do gerador documentado em [docs/VALIDATION_CHECKLIST.md](/c:/NutriCalc/docs/VALIDATION_CHECKLIST.md)
 - Sprint 8 executada: checklist de produção e segurança documentado em [docs/PRODUCTION_CHECKLIST.md](/c:/NutriCalc/docs/PRODUCTION_CHECKLIST.md)
+- nova frente de performance/UX iniciada em 24/04/2026: Sprint 1 de diagnóstico da entrada pública e do boot inicial documentada em [docs/FRONTEND_PERFORMANCE_SPRINT1.md](/c:/NutriCalc/docs/FRONTEND_PERFORMANCE_SPRINT1.md)
 
 ## Como retomar o desenvolvimento
 
@@ -312,7 +313,7 @@ node src/index.js
 ```
 
 ### Frontend
-- Vercel
+- Vercel com domínio público `https://nutricalc.spatium.top`
 
 Build:
 
@@ -327,7 +328,7 @@ Para a primeira publicação com a stack atual:
 - banco no `Supabase`
 - storage de avatar no `Supabase Storage`
 - backend no `Render`
-- frontend na `Vercel`
+- frontend na `Vercel` com domínio `https://nutricalc.spatium.top`
 
 Arquivos de apoio já preparados no projeto:
 
