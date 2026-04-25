@@ -3131,12 +3131,12 @@ function StepCard({ step, title, description }) {
 
 function TestimonialCard({ image, quote, name, result }) {
   return (
-    <div style={{...softGlassCardStyle,padding:"12px",display:"grid",gridTemplateColumns:"minmax(132px, 168px) 1fr",gap:16,alignItems:"stretch",minHeight:220}}>
-      <div style={{borderRadius:18,overflow:"hidden",minHeight:180,background:"#0b100f"}}>
+    <div style={{...softGlassCardStyle,padding:"12px",display:"grid",gap:14,minHeight:100}}>
+      <div style={{borderRadius:18,overflow:"hidden",background:"#0b100f",aspectRatio:"16 / 12"}}>
         <img src={image} alt={name} loading="lazy" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} />
       </div>
-      <div style={{display:"grid",alignContent:"space-between",gap:14,padding:"10px 8px 10px 0"}}>
-        <div style={{fontSize:15,lineHeight:1.75,color:"#d7ddd9",display:"-webkit-box",WebkitLineClamp:5,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{quote}</div>
+      <div style={{display:"grid",gap:14,padding:"2px 4px 4px"}}>
+        <div style={{fontSize:15,lineHeight:1.75,color:"#d7ddd9"}}>{quote}</div>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"end",gap:14,flexWrap:"wrap"}}>
           <div style={{fontSize:14,fontWeight:700,color:"#f5f7fa"}}>{name}</div>
           <div style={{fontSize:32,fontWeight:800,color:"#7ed957",letterSpacing:"-0.03em",lineHeight:1}}>{result}</div>
@@ -3452,9 +3452,9 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
         <div style={{...marketingSectionWrap,padding:viewport.isMobile?"0 14px":"0 24px"}}>
           <SectionHeader eyebrow="Resultados reais" title="Histórias de quem transformou a sua rotina" intro="Exemplos visuais de progresso construído com disciplina, clareza e constância." centered viewport={viewport} />
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(320px,1fr))",gap:16,marginTop:24}}>
-            <TestimonialCard image="/marketing/testimonial-1.png" quote="Perdi 7 kg em 10 semanas seguindo o plano. A organização das refeições fez toda a diferença." name="Carlos D." result="-7kg" />
-            <TestimonialCard image="/marketing/testimonial-2.png" quote="Mais definição, mais energia e sem abrir mão do que eu gosto de comer. Simplesmente incrível." name="Juliana M." result="-4kg" />
-            <TestimonialCard image="/marketing/testimonial-3.png" quote="O acompanhamento e os ajustes semanais me mantiveram sempre no caminho certo." name="Rafael T." result="-9kg" />
+            <TestimonialCard image="/marketing/testimonial-ai-1.png" quote="Perdi 7 kg em 10 semanas e finalmente consegui manter uma rotina alimentar que eu consigo seguir de verdade." name="Carlos D." result="-7kg" />
+            <TestimonialCard image="/marketing/testimonial-ai-2.png" quote="Ganhei mais definição, mais energia e uma relação muito melhor com o meu planejamento alimentar." name="Juliana M." result="-4kg" />
+            <TestimonialCard image="/marketing/testimonial-ai-3.png" quote="Os ajustes semanais me ajudaram a manter constância e continuar evoluindo sem sair do foco." name="Rafael T." result="-9kg" />
           </div>
         </div>
       </section>
