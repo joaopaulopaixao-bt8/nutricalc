@@ -3132,8 +3132,8 @@ function StepCard({ step, title, description }) {
 function TestimonialCard({ image, quote, name, result }) {
   return (
     <div style={{...softGlassCardStyle,padding:"12px",display:"grid",gap:14,minHeight:100}}>
-      <div style={{borderRadius:18,overflow:"hidden",background:"#0b100f",aspectRatio:"16 / 12"}}>
-        <img src={image} alt={name} loading="lazy" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} />
+      <div style={{borderRadius:18,overflow:"hidden",background:"#0b100f",aspectRatio:"16 / 12",display:"flex",alignItems:"center",justifyContent:"center",padding:"10px"}}>
+        <img src={image} alt={name} loading="lazy" style={{width:"100%",height:"100%",objectFit:"contain",display:"block"}} />
       </div>
       <div style={{display:"grid",gap:14,padding:"2px 4px 4px"}}>
         <div style={{fontSize:15,lineHeight:1.75,color:"#d7ddd9"}}>{quote}</div>
