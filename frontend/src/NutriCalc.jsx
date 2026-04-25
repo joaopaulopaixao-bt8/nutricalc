@@ -3267,7 +3267,7 @@ function PublicHeader({ currentPage, onCreateAccount, onEnter, onNavigatePage, v
 }
 
 function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
-  const heroImage = "/marketing/hero-human-only.png";
+  const heroImage = "/marketing/hero-model-vertical.png";
   const mealImage = "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1600";
   const [simulator, setSimulator] = useState({ weight: "80", height: "178", age: "30", objective: "cutting", activity: "1.55" });
 
@@ -3295,7 +3295,7 @@ function MarketingHome({ onCreateAccount, onEnter, onNavigatePage, viewport }) {
       <section id="hero" style={{padding:viewport.isMobile?"18px 0 28px":"34px 0 34px"}}>
         <div style={{...marketingSectionWrap,padding:viewport.isMobile?"0 14px":"0 24px",display:"grid",gridTemplateColumns:viewport.isTablet?"1fr":"minmax(0,1.02fr) minmax(420px,0.98fr)",gap:viewport.isMobile?18:28,alignItems:"center"}}>
           <div>
-            <div style={{display:"inline-flex",alignItems:"center",gap:10,padding:"9px 14px",borderRadius:999,background:"rgba(109,255,47,0.1)",border:"1px solid rgba(109,255,47,0.18)",fontSize:12,fontWeight:800,letterSpacing:"0.12em",textTransform:"uppercase",color:"#7ed957"}}>Health tech premium para sua rotina</div>
+            <div style={{display:"inline-flex",alignItems:"center",gap:10,padding:"9px 14px",borderRadius:999,background:"rgba(109,255,47,0.1)",border:"1px solid rgba(109,255,47,0.18)",fontSize:12,fontWeight:800,letterSpacing:"0.12em",textTransform:"uppercase",color:"#7ed957"}}>Planejamento alimentar com mais clareza</div>
             <h1 style={{fontFamily:"'Inter Tight','Inter','Segoe UI',sans-serif",fontSize:viewport.isMobile?"clamp(42px,14vw,64px)":"clamp(64px,8vw,104px)",lineHeight:1.01,letterSpacing:"-0.04em",margin:"18px 0 16px",maxWidth:760,textWrap:"balance"}}>
               Sua dieta.<br />Seu controle.<br /><span style={{color:"#7ed957"}}>Seu resultado.</span>
             </h1>
